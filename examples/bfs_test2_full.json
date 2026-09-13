@@ -1,0 +1,255 @@
+{
+  "algorithm": "bfs",
+  "start": "A",
+  "graph": {
+    "directed": false,
+    "weighted": false,
+    "nodes": [
+      {
+        "id": "A"
+      },
+      {
+        "id": "B"
+      },
+      {
+        "id": "C"
+      },
+      {
+        "id": "D"
+      },
+      {
+        "id": "E"
+      }
+    ],
+    "edges": [
+      {
+        "source": "A",
+        "target": "B"
+      },
+      {
+        "source": "A",
+        "target": "C"
+      },
+      {
+        "source": "B",
+        "target": "D"
+      },
+      {
+        "source": "C",
+        "target": "E"
+      }
+    ]
+  },
+  "states": [
+    {
+      "step": 0,
+      "event": "init",
+      "current": null,
+      "visited": [],
+      "frontier": [
+        "A"
+      ],
+      "parent": {},
+      "selected_edges": [],
+      "final_path": [],
+      "message": "Start BFS at A. Queue = [A]"
+    },
+    {
+      "step": 1,
+      "event": "visit",
+      "current": "A",
+      "visited": [
+        "A"
+      ],
+      "frontier": [
+        "B",
+        "C"
+      ],
+      "parent": {
+        "B": "A",
+        "C": "A"
+      },
+      "selected_edges": [],
+      "final_path": [],
+      "message": "Visit A. Queue = ['B', 'C']"
+    },
+    {
+      "step": 2,
+      "event": "visit",
+      "current": "B",
+      "visited": [
+        "A",
+        "B"
+      ],
+      "frontier": [
+        "C",
+        "D"
+      ],
+      "parent": {
+        "B": "A",
+        "C": "A",
+        "D": "B"
+      },
+      "selected_edges": [
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "final_path": [],
+      "message": "Visit B. Queue = ['C', 'D']"
+    },
+    {
+      "step": 3,
+      "event": "visit",
+      "current": "C",
+      "visited": [
+        "A",
+        "B",
+        "C"
+      ],
+      "frontier": [
+        "D",
+        "E"
+      ],
+      "parent": {
+        "B": "A",
+        "C": "A",
+        "D": "B",
+        "E": "C"
+      },
+      "selected_edges": [
+        [
+          "A",
+          "B"
+        ],
+        [
+          "A",
+          "C"
+        ]
+      ],
+      "final_path": [],
+      "message": "Visit C. Queue = ['D', 'E']"
+    },
+    {
+      "step": 4,
+      "event": "visit",
+      "current": "D",
+      "visited": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ],
+      "frontier": [
+        "E"
+      ],
+      "parent": {
+        "B": "A",
+        "C": "A",
+        "D": "B",
+        "E": "C"
+      },
+      "selected_edges": [
+        [
+          "A",
+          "B"
+        ],
+        [
+          "A",
+          "C"
+        ],
+        [
+          "B",
+          "D"
+        ]
+      ],
+      "final_path": [],
+      "message": "Visit D. Queue = ['E']"
+    },
+    {
+      "step": 5,
+      "event": "visit",
+      "current": "E",
+      "visited": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "frontier": [],
+      "parent": {
+        "B": "A",
+        "C": "A",
+        "D": "B",
+        "E": "C"
+      },
+      "selected_edges": [
+        [
+          "A",
+          "B"
+        ],
+        [
+          "A",
+          "C"
+        ],
+        [
+          "B",
+          "D"
+        ],
+        [
+          "C",
+          "E"
+        ]
+      ],
+      "final_path": [],
+      "message": "Visit E. Queue empty."
+    },
+    {
+      "step": 6,
+      "event": "done",
+      "current": null,
+      "visited": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "frontier": [],
+      "parent": {
+        "B": "A",
+        "C": "A",
+        "D": "B",
+        "E": "C"
+      },
+      "selected_edges": [
+        [
+          "A",
+          "B"
+        ],
+        [
+          "A",
+          "C"
+        ],
+        [
+          "B",
+          "D"
+        ],
+        [
+          "C",
+          "E"
+        ]
+      ],
+      "final_path": [
+        "A",
+        "B",
+        "C",
+        "D",
+        "E"
+      ],
+      "message": "BFS complete. Order: A -> B -> C -> D -> E"
+    }
+  ]
+}

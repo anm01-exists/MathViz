@@ -1,0 +1,145 @@
+{
+  "algorithm": "bfs",
+  "start": "B",
+  "graph": {
+    "directed": false,
+    "weighted": false,
+    "nodes": [
+      {
+        "id": "A"
+      },
+      {
+        "id": "B"
+      },
+      {
+        "id": "C"
+      }
+    ],
+    "edges": [
+      {
+        "source": "A",
+        "target": "B"
+      },
+      {
+        "source": "B",
+        "target": "C"
+      }
+    ]
+  },
+  "states": [
+    {
+      "step": 0,
+      "event": "init",
+      "current": null,
+      "visited": [],
+      "frontier": [
+        "B"
+      ],
+      "parent": {},
+      "selected_edges": [],
+      "final_path": [],
+      "message": "Start BFS at B. Queue = [B]"
+    },
+    {
+      "step": 1,
+      "event": "visit",
+      "current": "B",
+      "visited": [
+        "B"
+      ],
+      "frontier": [
+        "A",
+        "C"
+      ],
+      "parent": {
+        "A": "B",
+        "C": "B"
+      },
+      "selected_edges": [],
+      "final_path": [],
+      "message": "Visit B. Queue = ['A', 'C']"
+    },
+    {
+      "step": 2,
+      "event": "visit",
+      "current": "A",
+      "visited": [
+        "B",
+        "A"
+      ],
+      "frontier": [
+        "C"
+      ],
+      "parent": {
+        "A": "B",
+        "C": "B"
+      },
+      "selected_edges": [
+        [
+          "B",
+          "A"
+        ]
+      ],
+      "final_path": [],
+      "message": "Visit A. Queue = ['C']"
+    },
+    {
+      "step": 3,
+      "event": "visit",
+      "current": "C",
+      "visited": [
+        "B",
+        "A",
+        "C"
+      ],
+      "frontier": [],
+      "parent": {
+        "A": "B",
+        "C": "B"
+      },
+      "selected_edges": [
+        [
+          "B",
+          "A"
+        ],
+        [
+          "B",
+          "C"
+        ]
+      ],
+      "final_path": [],
+      "message": "Visit C. Queue empty."
+    },
+    {
+      "step": 4,
+      "event": "done",
+      "current": null,
+      "visited": [
+        "B",
+        "A",
+        "C"
+      ],
+      "frontier": [],
+      "parent": {
+        "A": "B",
+        "C": "B"
+      },
+      "selected_edges": [
+        [
+          "B",
+          "A"
+        ],
+        [
+          "B",
+          "C"
+        ]
+      ],
+      "final_path": [
+        "B",
+        "A",
+        "C"
+      ],
+      "message": "BFS complete. Order: B -> A -> C"
+    }
+  ]
+}

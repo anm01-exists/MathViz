@@ -1,0 +1,41 @@
+{
+  "algorithm": "dijkstra",
+  "start": "S",
+  "target": "T",
+  "graph": {
+    "directed": true,
+    "weighted": true,
+    "nodes": [
+      { "id": "S", "x": -3.0, "y": 0.0, "label": "S" },
+      { "id": "A", "x": -1.5, "y": 1.5, "label": "A" },
+      { "id": "B", "x": -1.5, "y": -1.5, "label": "B" },
+      { "id": "C", "x": 0.0, "y": 1.5, "label": "C" },
+      { "id": "D", "x": 0.0, "y": -1.5, "label": "D" },
+      { "id": "E", "x": 1.5, "y": 0.0, "label": "E" },
+      { "id": "T", "x": 3.0, "y": 0.0, "label": "T" }
+    ],
+    "edges": [
+      { "source": "S", "target": "A", "weight": 4 },
+      { "source": "S", "target": "B", "weight": 2 },
+      { "source": "A", "target": "C", "weight": 3 },
+      { "source": "A", "target": "D", "weight": 5 },
+      { "source": "B", "target": "D", "weight": 1 },
+      { "source": "B", "target": "E", "weight": 7 },
+      { "source": "C", "target": "E", "weight": 2 },
+      { "source": "D", "target": "C", "weight": 1 },
+      { "source": "D", "target": "T", "weight": 3 },
+      { "source": "E", "target": "T", "weight": 4 }
+    ]
+  },
+  "states": [
+    { "step": 0, "event": "init", "current": null, "visited": [], "finalized": [], "frontier": ["S", "A", "B", "C", "D", "E", "T"], "distances": { "S": 0, "A": null, "B": null, "C": null, "D": null, "E": null, "T": null }, "parent": {}, "message": "Init: dist(S)=0, rest=∞" },
+    { "step": 1, "event": "finalize", "current": "S", "visited": ["S"], "finalized": ["S"], "frontier": ["A", "B", "C", "D", "E", "T"], "distances": { "S": 0, "A": 4, "B": 2, "C": null, "D": null, "E": null, "T": null }, "parent": { "A": "S", "B": "S" }, "selected_edges": [["S", "A"], ["S", "B"]], "message": "Settle S (dist=0). Relax S→A=4, S→B=2" },
+    { "step": 2, "event": "finalize", "current": "B", "visited": ["S", "B"], "finalized": ["S", "B"], "frontier": ["A", "C", "D", "E", "T"], "distances": { "S": 0, "A": 4, "B": 2, "C": null, "D": 3, "E": 9, "T": null }, "parent": { "A": "S", "B": "S", "D": "B", "E": "B" }, "current_edge": { "source": "B", "target": "D" }, "selected_edges": [["S", "A"], ["S", "B"], ["B", "D"], ["B", "E"]], "message": "Settle B (dist=2). Relax B→D=3, B→E=9" },
+    { "step": 3, "event": "finalize", "current": "A", "visited": ["S", "B", "A"], "finalized": ["S", "B", "A"], "frontier": ["C", "D", "E", "T"], "distances": { "S": 0, "A": 4, "B": 2, "C": 7, "D": 3, "E": 9, "T": null }, "parent": { "A": "S", "B": "S", "D": "B", "E": "B", "C": "A" }, "current_edge": { "source": "A", "target": "C" }, "selected_edges": [["S", "A"], ["S", "B"], ["B", "D"], ["B", "E"], ["A", "C"]], "message": "Settle A (dist=4). Relax A→C=7, A→D=9 (no improvement)" },
+    { "step": 4, "event": "finalize", "current": "D", "visited": ["S", "B", "A", "D"], "finalized": ["S", "B", "A", "D"], "frontier": ["C", "E", "T"], "distances": { "S": 0, "A": 4, "B": 2, "C": 4, "D": 3, "E": 9, "T": 6 }, "parent": { "A": "S", "B": "S", "D": "B", "E": "B", "C": "D", "T": "D" }, "current_edge": { "source": "D", "target": "C" }, "selected_edges": [["S", "A"], ["S", "B"], ["B", "D"], ["B", "E"], ["A", "C"], ["D", "C"], ["D", "T"]], "message": "Settle D (dist=3). Relax D→C=4 (better!), D→T=6" },
+    { "step": 5, "event": "finalize", "current": "C", "visited": ["S", "B", "A", "D", "C"], "finalized": ["S", "B", "A", "D", "C"], "frontier": ["E", "T"], "distances": { "S": 0, "A": 4, "B": 2, "C": 4, "D": 3, "E": 6, "T": 6 }, "parent": { "A": "S", "B": "S", "D": "B", "E": "C", "C": "D", "T": "D" }, "current_edge": { "source": "C", "target": "E" }, "selected_edges": [["S", "A"], ["S", "B"], ["B", "D"], ["B", "E"], ["A", "C"], ["D", "C"], ["D", "T"], ["C", "E"]], "message": "Settle C (dist=4). Relax C→E=6 (better than 9!)" },
+    { "step": 6, "event": "finalize", "current": "E", "visited": ["S", "B", "A", "D", "C", "E"], "finalized": ["S", "B", "A", "D", "C", "E"], "frontier": ["T"], "distances": { "S": 0, "A": 4, "B": 2, "C": 4, "D": 3, "E": 6, "T": 6 }, "parent": { "A": "S", "B": "S", "D": "B", "E": "C", "C": "D", "T": "D" }, "current_edge": { "source": "C", "target": "E" }, "selected_edges": [["S", "A"], ["S", "B"], ["B", "D"], ["A", "C"], ["D", "C"], ["D", "T"], ["C", "E"]], "message": "Settle E (dist=6). Relax E→T=10 (no improvement)" },
+    { "step": 7, "event": "finalize", "current": "T", "visited": ["S", "B", "A", "D", "C", "E", "T"], "finalized": ["S", "B", "A", "D", "C", "E", "T"], "frontier": [], "distances": { "S": 0, "A": 4, "B": 2, "C": 4, "D": 3, "E": 6, "T": 6 }, "parent": { "A": "S", "B": "S", "D": "B", "E": "C", "C": "D", "T": "D" }, "current_edge": { "source": "D", "target": "T" }, "selected_edges": [["S", "B"], ["B", "D"], ["D", "T"]], "message": "Settle T (dist=6) = target. Done" },
+    { "step": 8, "event": "path_found", "current": null, "visited": ["S", "B", "A", "D", "C", "E", "T"], "finalized": ["S", "B", "A", "D", "C", "E", "T"], "frontier": [], "distances": { "S": 0, "A": 4, "B": 2, "C": 4, "D": 3, "E": 6, "T": 6 }, "parent": { "A": "S", "B": "S", "D": "B", "E": "C", "C": "D", "T": "D" }, "selected_edges": [["S", "B"], ["B", "D"], ["D", "T"]], "final_path": ["S", "B", "D", "T"], "message": "Shortest path S→B→D→T, cost 6" }
+  ]
+}

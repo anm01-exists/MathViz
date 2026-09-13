@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-primary-fixed": "#001f26", "surface-container-low": "#f2f3ff", "primary-fixed": "#acedff", "on-error": "#ffffff", "surface-container-lowest": "#ffffff", "secondary-fixed": "#71f8e4", "primary-container": "#06b6d4", "on-primary-container": "#00424f", "error-container": "#ffdad6", "secondary-container": "#6df5e1", "surface-tint": "#00687a", "tertiary-fixed": "#ffddb8", "primary-fixed-dim": "#4cd7f6", "on-tertiary": "#ffffff", "on-tertiary-fixed": "#2a1700", "on-tertiary-fixed-variant": "#653e00", "outline": "#6d797d", "on-secondary": "#ffffff", "on-primary-fixed-variant": "#004e5c", "surface-container": "#ebedfc", "on-surface": "#171b26", "tertiary": "#855300", "surface-dim": "#d7d9e8", "surface-bright": "#faf8ff", "background": "#faf8ff", "tertiary-fixed-dim": "#ffb95f", "inverse-surface": "#2c303b", "primary": "#00687a", "tertiary-container": "#e79400", "surface-container-highest": "#dfe2f1", "secondary-fixed-dim": "#4fdbc8", "on-secondary-container": "#006f64", "outline-variant": "#bcc9cd", "surface-container-high": "#e5e7f6", "inverse-on-surface": "#eef0ff", "secondary": "#006b5f", "on-surface-variant": "#3d494c", "on-secondary-fixed-variant": "#005048", "on-background": "#171b26", "inverse-primary": "#4cd7f6", "on-error-container": "#93000a", "error": "#ba1a1a", "surface": "#faf8ff", "surface-variant": "#dfe2f1", "on-tertiary-container": "#563400", "on-secondary-fixed": "#00201c", "on-primary": "#ffffff" }, borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" }, spacing: { "space-md": "0.75rem", "margin": "1.5rem", "space-lg": "1.25rem", "space-sm": "0.5rem", "gutter-mobile": "0.75rem", "gutter": "1rem", "margin-mobile": "0.75rem", "space-xs": "0.25rem", "space-xl": "2rem" }, fontFamily: { "headline-lg": ["Inter"], "body-sm": ["Inter"], "headline-lg-mobile": ["Inter"], "label-sm": ["JetBrains Mono"], "code-lg": ["JetBrains Mono"], "body-md": ["Inter"], "headline-md": ["Inter"], "body-lg": ["Inter"], "code-sm": ["JetBrains Mono"], "label-md": ["JetBrains Mono"], "headline-sm": ["Inter"], "code-md": ["JetBrains Mono"] }, fontSize: { "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "600" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "headline-lg-mobile": ["24px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "label-sm": ["10px", { "lineHeight": "12px", "letterSpacing": "0.06em", "fontWeight": "600" }], "code-lg": ["14px", { "lineHeight": "20px", "fontWeight": "500" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "headline-md": ["20px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "code-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.02em", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "letterSpacing": "0.04em", "fontWeight": "500" }], "headline-sm": ["16px", { "lineHeight": "24px", "fontWeight": "600" }], "code-md": ["12px", { "lineHeight": "18px", "fontWeight": "400" }] } } } };</script><style>@layer base{html,body{width:100vw;margin:0;padding:0;background-color:#faf8ff;color:#171b26;}body{overscroll-behavior-y:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head><body class="bg-surface font-body-md text-body-md text-on-surface flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-white/95 backdrop-blur-xl border-b border-slate-200/80 shadow-[0_1px_4px_rgba(0,0,0,0.05)]"><div class="h-16 px-gutter-mobile flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm min-w-0"><div class="w-9 h-9 rounded-lg bg-cyan-50 border border-cyan-200 flex items-center justify-center text-cyan-700 shadow-sm flex-shrink-0"><span class="material-symbols-outlined text-[20px]">hub</span></div><div class="flex flex-col min-w-0"><div class="flex items-center gap-space-xs"><span class="font-headline-sm text-headline-sm tracking-tight text-slate-900 font-bold truncate">MathViz</span><span class="px-1.5 py-0.5 rounded bg-cyan-100 text-cyan-800 font-label-sm text-label-sm border border-cyan-200 font-bold uppercase tracking-wider">BIS586</span></div><div class="flex items-center gap-space-xs"><span class="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-slate-700 font-code-sm text-code-sm font-medium truncate">V: 6 | E: 8 | Dir: ON</span></div></div></div><div class="flex items-center gap-space-xs flex-shrink-0"><button class="w-9 h-9 flex items-center justify-center rounded border border-slate-200 text-slate-600 hover:text-red-600 hover:bg-red-50 hover:border-red-200 transition-colors" title="Clear Graph"><span class="material-symbols-outlined text-[18px]">delete_sweep</span></button><button class="w-9 h-9 flex items-center justify-center rounded border border-slate-200 text-slate-600 hover:text-cyan-700 hover:bg-cyan-50 hover:border-cyan-200 transition-colors" title="Export Graph"><span class="material-symbols-outlined text-[18px]">ios_share</span></button><div class="w-8 h-8 rounded-full bg-cyan-700 flex items-center justify-center flex-shrink-0 ml-space-xs text-white shadow-sm ring-2 ring-cyan-100"><span class="material-symbols-outlined text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-20 bg-slate-50/50 min-h-screen"><div class="flex flex-col w-full">
+<!-- Mode Sub-bar & Graph Primitive Manipulation -->
+<div class="flex flex-col gap-space-xs px-gutter-mobile py-space-xs bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-sm">
+<!-- Top Row: Topology Configuration Chips -->
+<div class="flex items-center justify-between gap-space-xs overflow-x-auto no-scrollbar py-0.5">
+<div class="flex items-center gap-space-xs flex-shrink-0">
+<!-- Directed / Undirected Toggle -->
+<button class="flex items-center gap-1 px-2.5 py-1 rounded bg-cyan-700 text-white font-label-sm text-label-sm shadow-sm transition-transform active:scale-95 font-semibold" id="toggle-directed">
+<span class="material-symbols-outlined text-[14px]">arrow_right_alt</span>
+<span>DIRECTED</span>
+</button>
+<!-- Weighted / Unweighted Toggle -->
+<button class="flex items-center gap-1 px-2.5 py-1 rounded bg-teal-50 border border-teal-300 text-teal-800 font-label-sm text-label-sm shadow-sm transition-transform active:scale-95 font-semibold" id="toggle-weighted">
+<span class="material-symbols-outlined text-[14px]">scale</span>
+<span>WEIGHTED</span>
+</button>
+<!-- Backend Telemetry Chip -->
+<div class="flex items-center gap-1.5 px-2 py-1 rounded bg-slate-100 border border-slate-200 text-teal-700 font-label-sm text-label-sm flex-shrink-0 font-medium">
+<span class="w-2 h-2 rounded-full bg-teal-500 animate-pulse"></span>
+<span>FASTAPI BIS586</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 flex-shrink-0 font-code-sm text-code-sm font-semibold">
+<span class="px-1.5 py-0.5 rounded bg-amber-50 text-amber-800 border border-amber-200">|V|:6</span>
+<span class="px-1.5 py-0.5 rounded bg-cyan-50 text-cyan-800 border border-cyan-200">|E|:8</span>
+</div>
+</div>
+<!-- Bottom Row: Canvas Primitive Manipulation Controls -->
+<div class="flex items-center justify-between gap-space-xs overflow-x-auto no-scrollbar pt-0.5">
+<div class="flex items-center gap-space-xs flex-shrink-0">
+<button class="flex items-center gap-1 px-2.5 py-1.5 rounded bg-white border border-slate-200 text-cyan-700 hover:bg-cyan-50 active:scale-95 transition-all font-label-sm text-label-sm font-semibold shadow-xs" id="btn-add-node">
+<span class="material-symbols-outlined text-[16px]">add_circle</span>
+<span>+ NODE</span>
+</button>
+<button class="flex items-center gap-1 px-2.5 py-1.5 rounded bg-white border border-slate-200 text-teal-700 hover:bg-teal-50 active:scale-95 transition-all font-label-sm text-label-sm font-semibold shadow-xs" id="btn-add-edge">
+<span class="material-symbols-outlined text-[16px]">polyline</span>
+<span>+ EDGE</span>
+</button>
+<button class="flex items-center gap-1 px-2.5 py-1.5 rounded bg-white border border-slate-200 text-slate-700 hover:text-red-600 hover:bg-red-50 hover:border-red-200 active:scale-95 transition-all font-label-sm text-label-sm font-semibold shadow-xs" id="btn-del-elem">
+<span class="material-symbols-outlined text-[16px]">delete</span>
+<span>DELETE</span>
+</button>
+</div>
+<button class="flex items-center gap-1 px-2.5 py-1.5 rounded bg-white border border-red-200 text-red-700 hover:bg-red-50 active:scale-95 transition-all font-label-sm text-label-sm font-semibold shadow-xs flex-shrink-0" id="btn-clear-canvas">
+<span class="material-symbols-outlined text-[16px]">refresh</span>
+<span>RESET</span>
+</button>
+</div>
+</div>
+<!-- Interactive SVG Graph Canvas Viewport -->
+<div class="relative w-full h-[330px] bg-slate-50 border-b border-slate-200 overflow-hidden select-none touch-none shadow-inner">
+<!-- Mathematical Coordinate Grid Background -->
+<svg class="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<!-- Cartesian Grid Pattern -->
+<pattern height="32" id="grid-pattern" patternunits="userSpaceOnUse" width="32">
+<circle cx="2" cy="2" fill="#94a3b8" fill-opacity="0.35" r="1.2"></circle>
+<path d="M 32 0 L 0 0 0 32" fill="none" stroke="#cbd5e1" stroke-opacity="0.5" stroke-width="0.5"></path>
+</pattern>
+<!-- Radial glow gradients for active nodes (light mode soft glow) -->
+<radialgradient cx="50%" cy="50%" id="glow-start" r="50%">
+<stop offset="0%" stop-color="#0891b2" stop-opacity="0.25"></stop>
+<stop offset="100%" stop-color="#0891b2" stop-opacity="0"></stop>
+</radialgradient>
+<radialgradient cx="50%" cy="50%" id="glow-eval" r="50%">
+<stop offset="0%" stop-color="#f59e0b" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#f59e0b" stop-opacity="0"></stop>
+</radialgradient>
+<radialgradient cx="50%" cy="50%" id="glow-visited" r="50%">
+<stop offset="0%" stop-color="#0d9488" stop-opacity="0.25"></stop>
+<stop offset="100%" stop-color="#0d9488" stop-opacity="0"></stop>
+</radialgradient>
+<!-- Arrowhead Markers -->
+<marker id="arrow-default" markerheight="8" markerwidth="8" orient="auto" refx="17" refy="4">
+<path d="M 0 0 L 8 4 L 0 8 z" fill="#64748b"></path>
+</marker>
+<marker id="arrow-visited" markerheight="8" markerwidth="8" orient="auto" refx="17" refy="4">
+<path d="M 0 0 L 8 4 L 0 8 z" fill="#0d9488"></path>
+</marker>
+<marker id="arrow-active" markerheight="8" markerwidth="8" orient="auto" refx="17" refy="4">
+<path d="M 0 0 L 8 4 L 0 8 z" fill="#d97706"></path>
+</marker>
+</defs>
+<rect fill="url(#grid-pattern)" height="100%" width="100%"></rect>
+<!-- Coordinate Origin Watermark -->
+<text fill="#64748b" font-family="JetBrains Mono" font-size="10" font-weight="600" x="14" y="24">ℝ² [0,0] → [390,330]</text>
+<!-- Graph Edges -->
+<!-- Edge A -> B -->
+<line marker-end="url(#arrow-visited)" stroke="#0d9488" stroke-width="2.5" x1="56" x2="150" y1="130" y2="70"></line>
+<!-- Edge A -> C -->
+<line marker-end="url(#arrow-visited)" stroke="#0d9488" stroke-width="2.5" x1="56" x2="150" y1="130" y2="200"></line>
+<!-- Edge B -> D -->
+<line marker-end="url(#arrow-active)" stroke="#d97706" stroke-dasharray="4 2" stroke-width="2.5" x1="150" x2="250" y1="70" y2="105"></line>
+<!-- Edge C -> E -->
+<line marker-end="url(#arrow-default)" stroke="#64748b" stroke-width="1.8" x1="150" x2="250" y1="200" y2="250"></line>
+<!-- Edge C -> D -->
+<line marker-end="url(#arrow-active)" stroke="#d97706" stroke-width="2.5" x1="150" x2="250" y1="200" y2="105"></line>
+<!-- Edge D -> F -->
+<line marker-end="url(#arrow-default)" stroke="#64748b" stroke-width="1.8" x1="250" x2="335" y1="105" y2="160"></line>
+<!-- Edge B -> C (Cross link) -->
+<line marker-end="url(#arrow-default)" stroke="#64748b" stroke-width="1.8" x1="150" x2="150" y1="70" y2="200"></line>
+<!-- Edge E -> F -->
+<line marker-end="url(#arrow-default)" stroke="#64748b" stroke-width="1.8" x1="250" x2="335" y1="250" y2="160"></line>
+<!-- Glowing backdrop disks for active and frontier nodes -->
+<circle cx="56" cy="130" fill="url(#glow-start)" r="32"></circle>
+<circle cx="150" cy="70" fill="url(#glow-visited)" r="28"></circle>
+<circle cx="150" cy="200" fill="url(#glow-visited)" r="28"></circle>
+<circle cx="250" cy="105" fill="url(#glow-eval)" r="34">
+<animate attributename="r" dur="2s" repeatcount="indefinite" values="30;36;30"></animate>
+</circle>
+</svg>
+<!-- Edge Weight Micro-Capsules (JetBrains Mono) with light pill styling -->
+<div class="absolute left-[96px] top-[92px] -translate-x-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded bg-white text-teal-800 border border-teal-200 font-code-sm text-code-sm font-semibold shadow-sm pointer-events-none">w:4</div>
+<div class="absolute left-[95px] top-[170px] -translate-x-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded bg-white text-teal-800 border border-teal-200 font-code-sm text-code-sm font-semibold shadow-sm pointer-events-none">w:2</div>
+<div class="absolute left-[196px] top-[80px] -translate-x-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded bg-white text-amber-800 border border-amber-300 font-code-sm text-code-sm font-semibold shadow-sm pointer-events-none">w:5</div>
+<div class="absolute left-[195px] top-[145px] -translate-x-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded bg-white text-amber-800 border border-amber-300 font-code-sm text-code-sm font-semibold shadow-sm pointer-events-none">w:8</div>
+<div class="absolute left-[195px] top-[230px] -translate-x-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded bg-white text-slate-700 border border-slate-200 font-code-sm text-code-sm font-medium shadow-sm pointer-events-none">w:1</div>
+<div class="absolute left-[295px] top-[125px] -translate-x-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded bg-white text-slate-700 border border-slate-200 font-code-sm text-code-sm font-medium shadow-sm pointer-events-none">w:3</div>
+<div class="absolute left-[150px] top-[135px] -translate-x-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded bg-white text-slate-700 border border-slate-200 font-code-sm text-code-sm font-medium shadow-sm pointer-events-none">w:6</div>
+<div class="absolute left-[295px] top-[210px] -translate-x-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded bg-white text-slate-700 border border-slate-200 font-code-sm text-code-sm font-medium shadow-sm pointer-events-none">w:7</div>
+<!-- Node Elements with Custom States and Clickable Interactions -->
+<!-- Node A: Start Node (Cyan Ring) -->
+<div class="absolute left-[56px] top-[130px] -translate-x-1/2 -translate-y-1/2 group cursor-pointer flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-cyan-800 font-headline-sm text-headline-sm font-bold shadow-md ring-2 ring-cyan-600 border border-cyan-100">
+        A
+      </div>
+<span class="absolute -top-5 px-1.5 py-0.2 rounded bg-cyan-700 text-white font-label-sm text-label-sm font-bold shadow-sm whitespace-nowrap">START (v0)</span>
+<span class="text-[9px] font-code-sm text-slate-500 font-medium mt-0.5">(30,120)</span>
+</div>
+<!-- Node B: Visited (Secondary / Teal) -->
+<div class="absolute left-[150px] top-[70px] -translate-x-1/2 -translate-y-1/2 group cursor-pointer flex flex-col items-center">
+<div class="w-9 h-9 rounded-full bg-white flex items-center justify-center text-teal-800 font-headline-sm text-headline-sm font-bold shadow-sm ring-2 ring-teal-600 border border-teal-100">
+        B
+      </div>
+<span class="absolute -top-4 px-1 rounded bg-teal-50 border border-teal-200 text-teal-800 font-label-sm text-[9px] font-bold">VISITED</span>
+<span class="text-[9px] font-code-sm text-slate-500 font-medium mt-0.5">(140,50)</span>
+</div>
+<!-- Node C: Visited / Frontier (Secondary / Teal) -->
+<div class="absolute left-[150px] top-[200px] -translate-x-1/2 -translate-y-1/2 group cursor-pointer flex flex-col items-center">
+<div class="w-9 h-9 rounded-full bg-white flex items-center justify-center text-teal-800 font-headline-sm text-headline-sm font-bold shadow-sm ring-2 ring-teal-600 border border-teal-100">
+        C
+      </div>
+<span class="absolute -top-4 px-1 rounded bg-teal-50 border border-teal-200 text-teal-800 font-label-sm text-[9px] font-bold">EXPLORING</span>
+<span class="text-[9px] font-code-sm text-slate-500 font-medium mt-0.5">(140,190)</span>
+</div>
+<!-- Node D: Current BFS Evaluation (Tertiary / Amber) -->
+<div class="absolute left-[250px] top-[105px] -translate-x-1/2 -translate-y-1/2 group cursor-pointer flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-amber-800 font-headline-sm text-headline-sm font-bold shadow-md ring-2 ring-amber-500 border border-amber-200 animate-pulse">
+        D
+      </div>
+<span class="absolute -top-5 px-1.5 py-0.2 rounded bg-amber-500 text-white font-label-sm text-label-sm font-bold whitespace-nowrap shadow-sm">EVAL CURR</span>
+<span class="text-[9px] font-code-sm text-amber-700 font-semibold mt-0.5">(260,95)</span>
+</div>
+<!-- Node E: Unvisited (Slate / Muted) -->
+<div class="absolute left-[250px] top-[250px] -translate-x-1/2 -translate-y-1/2 group cursor-pointer flex flex-col items-center">
+<div class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-700 font-headline-sm text-headline-sm font-semibold ring-1 ring-slate-300 border border-white">
+        E
+      </div>
+<span class="text-[9px] font-code-sm text-slate-500 font-medium mt-0.5">(260,240)</span>
+</div>
+<!-- Node F: Target / Unvisited -->
+<div class="absolute left-[335px] top-[160px] -translate-x-1/2 -translate-y-1/2 group cursor-pointer flex flex-col items-center">
+<div class="w-9 h-9 rounded-full bg-slate-100 flex items-center justify-center text-slate-800 font-headline-sm text-headline-sm font-bold ring-2 ring-cyan-600/60 border border-white shadow-sm">
+        F
+      </div>
+<span class="absolute -top-4 px-1 rounded bg-cyan-50 border border-cyan-200 text-cyan-800 font-label-sm text-[9px] font-bold">TARGET</span>
+<span class="text-[9px] font-code-sm text-slate-500 font-medium mt-0.5">(340,150)</span>
+</div>
+<!-- Floating Canvas Utilities (Edge Aligned) -->
+<div class="absolute bottom-2.5 right-2.5 flex items-center gap-1 bg-white/95 backdrop-blur-md border border-slate-200 px-1.5 py-1 rounded shadow-md">
+<button class="w-7 h-7 flex items-center justify-center rounded text-slate-600 hover:text-cyan-700 hover:bg-slate-100 active:scale-95 transition-all" title="Pan Canvas">
+<span class="material-symbols-outlined text-[16px]">pan_tool</span>
+</button>
+<button class="w-7 h-7 flex items-center justify-center rounded text-cyan-700 bg-cyan-50 active:scale-95 transition-all" title="Snap Grid">
+<span class="material-symbols-outlined text-[16px]">grid_4x4</span>
+</button>
+<button class="w-7 h-7 flex items-center justify-center rounded text-slate-600 hover:text-cyan-700 hover:bg-slate-100 active:scale-95 transition-all" title="Center View">
+<span class="material-symbols-outlined text-[16px]">filter_center_focus</span>
+</button>
+<button class="w-7 h-7 flex items-center justify-center rounded text-slate-600 hover:text-cyan-700 hover:bg-slate-100 active:scale-95 transition-all" title="Reset Physics">
+<span class="material-symbols-outlined text-[16px]">restart_alt</span>
+</button>
+</div>
+<!-- Mini-Legend overlay (Top Left) -->
+<div class="absolute top-2.5 left-2.5 flex flex-col gap-1 bg-white/95 backdrop-blur-sm border border-slate-200 px-2 py-1.5 rounded shadow-sm text-[10px] font-code-sm text-slate-700 pointer-events-none">
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-cyan-600 ring-2 ring-cyan-200"></span>
+<span class="font-medium">Source (A)</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-teal-600 ring-2 ring-teal-200"></span>
+<span class="font-medium">Visited / Queue</span>
+</div>
+<div class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded-full bg-amber-500 ring-2 ring-amber-200"></span>
+<span class="font-medium">Current Neighbor (D)</span>
+</div>
+</div>
+</div>
+<!-- Algorithm Runner & Parameter Suite -->
+<div class="flex flex-col gap-space-sm px-gutter-mobile py-space-sm bg-white border-b border-slate-200">
+<!-- Algorithm Selection Segmented Control -->
+<div class="flex items-center p-1 rounded bg-slate-100 border border-slate-200">
+<button class="flex-1 py-1.5 rounded bg-cyan-700 text-white font-label-md text-label-md text-center shadow font-bold transition-all">
+        BFS (Breadth-First)
+      </button>
+<button class="flex-1 py-1.5 rounded text-slate-600 hover:text-slate-900 font-label-md text-label-md text-center transition-all font-medium">
+        DFS (Depth-First)
+      </button>
+<button class="flex-1 py-1.5 rounded text-slate-600 hover:text-slate-900 font-label-md text-label-md text-center transition-all font-medium">
+        Dijkstra
+      </button>
+</div>
+<!-- Parameter Inputs Grid (Mobile Pair) -->
+<div class="grid grid-cols-2 gap-space-xs">
+<!-- Start Node Selector -->
+<div class="flex flex-col gap-1 bg-slate-50 border border-slate-200 p-2 rounded">
+<label class="font-label-sm text-label-sm text-slate-500 uppercase flex items-center justify-between font-bold">
+<span>Source Node</span>
+<span class="text-cyan-700 font-bold">V₀</span>
+</label>
+<div class="flex items-center justify-between bg-white border border-slate-200 px-2 py-1.5 rounded text-slate-800 font-code-md text-code-md shadow-xs">
+<span class="flex items-center gap-1 text-cyan-700 font-bold truncate">
+<span class="material-symbols-outlined text-[15px]">trip_origin</span>
+            Node A (Key: 0)
+          </span>
+<span class="material-symbols-outlined text-[16px] text-slate-400">expand_more</span>
+</div>
+</div>
+<!-- Target Node Selector -->
+<div class="flex flex-col gap-1 bg-slate-50 border border-slate-200 p-2 rounded">
+<label class="font-label-sm text-label-sm text-slate-500 uppercase flex items-center justify-between font-bold">
+<span>Target Node</span>
+<span class="text-teal-700 font-bold">V_dest</span>
+</label>
+<div class="flex items-center justify-between bg-white border border-slate-200 px-2 py-1.5 rounded text-slate-800 font-code-md text-code-md shadow-xs">
+<span class="flex items-center gap-1 text-teal-700 font-bold truncate">
+<span class="material-symbols-outlined text-[15px]">flag</span>
+            Node F (Key: 5)
+          </span>
+<span class="material-symbols-outlined text-[16px] text-slate-400">expand_more</span>
+</div>
+</div>
+</div>
+<!-- BFS Execution State & In-Memory Queue Display -->
+<div class="flex flex-col gap-space-xs bg-white border border-slate-200 p-space-sm rounded-lg shadow-sm">
+<!-- Stepping Diagnostic Header -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="px-2 py-0.5 rounded bg-amber-100 text-amber-900 border border-amber-200 font-label-sm text-label-sm font-bold uppercase">BFS In-Flight</span>
+<span class="text-slate-900 font-headline-sm text-headline-sm font-bold">Step 3 of 7</span>
+</div>
+<span class="font-code-sm text-code-sm text-teal-700 font-semibold bg-teal-50 px-2 py-0.5 rounded border border-teal-200">Runtime: 12.4ms</span>
+</div>
+<!-- Verbal Step Explanation -->
+<div class="flex items-start gap-2 bg-slate-50 border border-slate-200 p-2.5 rounded">
+<span class="material-symbols-outlined text-amber-600 text-[18px] flex-shrink-0 mt-0.5">psychology</span>
+<p class="font-body-sm text-body-sm text-slate-700 leading-snug">
+          Dequeued <strong class="text-teal-700 font-semibold">Node C</strong>. Enqueuing unvisited neighbors: <strong class="text-amber-700 font-semibold">Node D (w:8)</strong> and <strong class="text-slate-900 font-semibold">Node E (w:1)</strong>.
+        </p>
+</div>
+<!-- Queue FIFO Visualizer -->
+<div class="flex flex-col gap-1 mt-0.5">
+<div class="flex items-center justify-between font-label-sm text-label-sm text-slate-500 font-bold">
+<span>FIFO QUEUE: [HEAD → TAIL]</span>
+<span>COUNT: 3</span>
+</div>
+<div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+<!-- Queue Item 1 (Head) -->
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-teal-50 text-teal-900 font-code-md text-code-md ring-1 ring-teal-300 flex-shrink-0 font-bold shadow-xs">
+<span class="w-1.5 h-1.5 rounded-full bg-teal-600"></span>
+<span>C</span>
+<span class="text-[10px] px-1 rounded bg-teal-100 text-teal-800 font-medium">HEAD</span>
+</div>
+<span class="material-symbols-outlined text-[14px] text-slate-400 flex-shrink-0">arrow_forward</span>
+<!-- Queue Item 2 -->
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-50 text-amber-900 font-code-md text-code-md ring-1 ring-amber-300 flex-shrink-0 font-bold shadow-xs">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-ping"></span>
+<span>D</span>
+<span class="text-[10px] px-1 rounded bg-amber-100 text-amber-800 font-medium">EVAL</span>
+</div>
+<span class="material-symbols-outlined text-[14px] text-slate-400 flex-shrink-0">arrow_forward</span>
+<!-- Queue Item 3 (Tail) -->
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded bg-slate-100 text-slate-800 font-code-md text-code-md border border-slate-200 flex-shrink-0 font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+<span>E</span>
+<span class="text-[10px] px-1 rounded bg-slate-200 text-slate-600 font-medium">NEW</span>
+</div>
+</div>
+</div>
+<!-- Playback Control Surface -->
+<div class="flex flex-col gap-space-xs pt-1 border-t border-slate-100">
+<!-- Scrubber Progress Bar -->
+<div class="flex items-center gap-2">
+<span class="font-code-sm text-code-sm text-slate-500 font-semibold">S0</span>
+<div class="flex-1 h-2 bg-slate-200 rounded-full overflow-hidden relative">
+<div class="h-full bg-cyan-600 rounded-full transition-all duration-300 shadow-xs" style="width: 42.8%;"></div>
+</div>
+<span class="font-code-sm text-code-sm text-cyan-700 font-bold">S3</span>
+<span class="font-code-sm text-code-sm text-slate-500 font-semibold">S7</span>
+</div>
+<!-- Buttons & Speed Selectors -->
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-1">
+<button class="w-9 h-9 rounded bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 active:scale-95 flex items-center justify-center transition-all shadow-xs" id="ctrl-reset" title="Reset BFS">
+<span class="material-symbols-outlined text-[18px]">replay</span>
+</button>
+<button class="w-9 h-9 rounded bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 active:scale-95 flex items-center justify-center transition-all shadow-xs" id="ctrl-prev" title="Step Previous">
+<span class="material-symbols-outlined text-[18px]">skip_previous</span>
+</button>
+<button class="w-10 h-10 rounded bg-cyan-700 text-white active:scale-95 shadow-md flex items-center justify-center transition-all hover:bg-cyan-800" id="ctrl-play" title="Play BFS">
+<span class="material-symbols-outlined text-[24px]">play_arrow</span>
+</button>
+<button class="w-9 h-9 rounded bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 active:scale-95 flex items-center justify-center transition-all shadow-xs" id="ctrl-next" title="Step Next">
+<span class="material-symbols-outlined text-[18px]">skip_next</span>
+</button>
+</div>
+<!-- Speed Multiplier Tag -->
+<div class="flex items-center gap-1 bg-slate-100 border border-slate-200 p-1 rounded">
+<button class="px-1.5 py-0.5 rounded text-slate-600 font-code-sm text-code-sm font-medium hover:text-slate-900">0.5x</button>
+<button class="px-1.5 py-0.5 rounded bg-white text-cyan-800 font-code-sm text-code-sm font-bold shadow-xs border border-slate-200">1.0x</button>
+<button class="px-1.5 py-0.5 rounded text-slate-600 font-code-sm text-code-sm font-medium hover:text-slate-900">2.0x</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Review-1 Evidence Section: Python / FastAPI JSON Schema Payload -->
+<div class="flex flex-col px-gutter-mobile py-space-sm gap-space-xs">
+<div class="bg-white border border-slate-200 rounded-lg p-space-sm flex flex-col gap-space-xs shadow-sm">
+<!-- Section Header -->
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-cyan-700 text-[20px]">schema</span>
+<div>
+<div class="font-headline-sm text-headline-sm font-bold text-slate-900">FastAPI Graph Schema</div>
+<div class="font-code-sm text-code-sm text-teal-700 font-medium">Review-1 Deliverable: Model Validation Ready</div>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="flex items-center gap-1 px-2.5 py-1 rounded bg-slate-100 border border-slate-200 text-slate-700 hover:text-cyan-800 hover:bg-cyan-50 hover:border-cyan-200 active:scale-95 font-label-sm text-label-sm transition-all shadow-xs font-semibold" id="btn-copy-json">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span id="copy-status">COPY JSON</span>
+</button>
+</div>
+</div>
+<!-- Formatted Monospace Code Viewport with Clean Light Syntax Highlighting -->
+<div class="relative bg-slate-50 border border-slate-200 p-space-sm rounded font-code-sm text-code-sm text-slate-800 overflow-x-auto shadow-inner leading-relaxed">
+<pre class="m-0 text-[11px] font-code-sm"><span class="text-slate-700">{</span>
+  <span class="text-sky-700 font-semibold">"project"</span>: <span class="text-emerald-700 font-medium">"BIS586_GraphEngine"</span>,
+  <span class="text-sky-700 font-semibold">"directed"</span>: <span class="text-purple-700 font-bold">true</span>,
+  <span class="text-sky-700 font-semibold">"weighted"</span>: <span class="text-purple-700 font-bold">true</span>,
+  <span class="text-sky-700 font-semibold">"algorithm"</span>: <span class="text-emerald-700 font-medium">"BFS"</span>,
+  <span class="text-sky-700 font-semibold">"start_node"</span>: <span class="text-emerald-700 font-medium">"A"</span>,
+  <span class="text-sky-700 font-semibold">"target_node"</span>: <span class="text-emerald-700 font-medium">"F"</span>,
+  <span class="text-sky-700 font-semibold">"nodes"</span>: <span class="text-slate-600">[</span>
+    <span class="text-slate-700">{</span><span class="text-sky-700 font-semibold">"id"</span>: <span class="text-emerald-700">"A"</span>, <span class="text-sky-700 font-semibold">"x"</span>: <span class="text-amber-700 font-semibold">30</span>, <span class="text-sky-700 font-semibold">"y"</span>: <span class="text-amber-700 font-semibold">120</span><span class="text-slate-700">}</span>,
+    <span class="text-slate-700">{</span><span class="text-sky-700 font-semibold">"id"</span>: <span class="text-emerald-700">"B"</span>, <span class="text-sky-700 font-semibold">"x"</span>: <span class="text-amber-700 font-semibold">140</span>, <span class="text-sky-700 font-semibold">"y"</span>: <span class="text-amber-700 font-semibold">50</span><span class="text-slate-700">}</span>,
+    <span class="text-slate-700">{</span><span class="text-sky-700 font-semibold">"id"</span>: <span class="text-emerald-700">"C"</span>, <span class="text-sky-700 font-semibold">"x"</span>: <span class="text-amber-700 font-semibold">140</span>, <span class="text-sky-700 font-semibold">"y"</span>: <span class="text-amber-700 font-semibold">190</span><span class="text-slate-700">}</span>,
+    <span class="text-slate-700">{</span><span class="text-sky-700 font-semibold">"id"</span>: <span class="text-emerald-700">"D"</span>, <span class="text-sky-700 font-semibold">"x"</span>: <span class="text-amber-700 font-semibold">260</span>, <span class="text-sky-700 font-semibold">"y"</span>: <span class="text-amber-700 font-semibold">95</span><span class="text-slate-700">}</span>,
+    <span class="text-slate-700">{</span><span class="text-sky-700 font-semibold">"id"</span>: <span class="text-emerald-700">"E"</span>, <span class="text-sky-700 font-semibold">"x"</span>: <span class="text-amber-700 font-semibold">260</span>, <span class="text-sky-700 font-semibold">"y"</span>: <span class="text-amber-700 font-semibold">240</span><span class="text-slate-700">}</span>,
+    <span class="text-slate-700">{</span><span class="text-sky-700 font-semibold">"id"</span>: <span class="text-emerald-700">"F"</span>, <span class="text-sky-700 font-semibold">"x"</span>: <span class="text-amber-700 font-semibold">340</span>, <span class="text-sky-700 font-semibold">"y"</span>: <span class="text-amber-700 font-semibold">150</span><span class="text-slate-700">}</span>
+  <span class="text-slate-600">]</span>,
+  <span class="text-sky-700 font-semibold">"edges"</span>: <span class="text-slate-600">[</span>
+    <span class="text-slate-700">{</span><span class="text-sky-700 font-semibold">"u"</span>: <span class="text-emerald-700">"A"</span>, <span class="text-sky-700 font-semibold">"v"</span>: <span class="text-emerald-700">"B"</span>, <span class="text-sky-700 font-semibold">"weight"</span>: <span class="text-amber-700 font-semibold">4</span><span class="text-slate-700">}</span>,
+    <span class="text-slate-700">{</span><span class="text-sky-700 font-semibold">"u"</span>: <span class="text-emerald-700">"A"</span>, <span class="text-sky-700 font-semibold">"v"</span>: <span class="text-emerald-700">"C"</span>, <span class="text-sky-700 font-semibold">"weight"</span>: <span class="text-amber-700 font-semibold">2</span><span class="text-slate-700">}</span>,
+    <span class="text-slate-700">{</span><span class="text-sky-700 font-semibold">"u"</span>: <span class="text-emerald-700">"B"</span>, <span class="text-sky-700 font-semibold">"v"</span>: <span class="text-emerald-700">"D"</span>, <span class="text-sky-700 font-semibold">"weight"</span>: <span class="text-amber-700 font-semibold">5</span><span class="text-slate-700">}</span>,
+    <span class="text-slate-700">{</span><span class="text-sky-700 font-semibold">"u"</span>: <span class="text-emerald-700">"C"</span>, <span class="text-sky-700 font-semibold">"v"</span>: <span class="text-emerald-700">"E"</span>, <span class="text-sky-700 font-semibold">"weight"</span>: <span class="text-amber-700 font-semibold">1</span><span class="text-slate-700">}</span>,
+    <span class="text-slate-700">{</span><span class="text-sky-700 font-semibold">"u"</span>: <span class="text-emerald-700">"C"</span>, <span class="text-sky-700 font-semibold">"v"</span>: <span class="text-emerald-700">"D"</span>, <span class="text-sky-700 font-semibold">"weight"</span>: <span class="text-amber-700 font-semibold">8</span><span class="text-slate-700">}</span>,
+    <span class="text-slate-700">{</span><span class="text-sky-700 font-semibold">"u"</span>: <span class="text-emerald-700">"D"</span>, <span class="text-sky-700 font-semibold">"v"</span>: <span class="text-emerald-700">"F"</span>, <span class="text-sky-700 font-semibold">"weight"</span>: <span class="text-amber-700 font-semibold">3</span><span class="text-slate-700">}</span>
+  <span class="text-slate-600">]</span>,
+  <span class="text-sky-700 font-semibold">"trace_events"</span>: <span class="text-amber-700 font-semibold">7</span>
+<span class="text-slate-700">}</span></pre>
+</div>
+<!-- Action Footer for Manim Pipe -->
+<div class="flex items-center justify-between pt-1">
+<div class="flex items-center gap-1.5 text-slate-600 font-code-sm text-code-sm">
+<span class="material-symbols-outlined text-[16px] text-teal-600">check_circle</span>
+<span>Ready for Manim Video Generation</span>
+</div>
+<button class="px-2.5 py-1.5 rounded bg-teal-600 text-white hover:bg-teal-700 font-label-sm text-label-sm font-semibold active:scale-95 transition-all shadow-sm" id="btn-export-manim">
+          GENERATE MANIM
+        </button>
+</div>
+</div>
+</div>
+</div>
+<script>
+  (function initGraphWorkspace() {
+    const copyBtn = document.getElementById('copy-status');
+    const copyTrigger = document.getElementById('btn-copy-json');
+    if (copyTrigger && copyBtn) {
+      copyTrigger.addEventListener('click', () => {
+        copyBtn.innerText = 'COPIED!';
+        copyBtn.parentElement.classList.add('bg-teal-600', 'text-white');
+        setTimeout(() => {
+          copyBtn.innerText = 'COPY JSON';
+          copyBtn.parentElement.classList.remove('bg-teal-600', 'text-white');
+        }, 1800);
+      });
+    }
+
+    const toggleDirected = document.getElementById('toggle-directed');
+    if (toggleDirected) {
+      toggleDirected.addEventListener('click', () => {
+        const isDirected = toggleDirected.innerText.includes('DIRECTED');
+        if (isDirected) {
+          toggleDirected.innerHTML = '<span class="material-symbols-outlined text-[14px]">horizontal_rule</span><span>UNDIRECTED</span>';
+          toggleDirected.className = 'flex items-center gap-1 px-2.5 py-1 rounded bg-slate-100 border border-slate-300 text-slate-700 font-label-sm text-label-sm shadow-xs transition-transform active:scale-95 font-semibold';
+        } else {
+          toggleDirected.innerHTML = '<span class="material-symbols-outlined text-[14px]">arrow_right_alt</span><span>DIRECTED</span>';
+          toggleDirected.className = 'flex items-center gap-1 px-2.5 py-1 rounded bg-cyan-700 text-white font-label-sm text-label-sm shadow-sm transition-transform active:scale-95 font-semibold';
+        }
+      });
+    }
+
+    const playBtn = document.getElementById('ctrl-play');
+    let isPlaying = false;
+    if (playBtn) {
+      playBtn.addEventListener('click', () => {
+        isPlaying = !isPlaying;
+        playBtn.innerHTML = isPlaying 
+          ? '<span class="material-symbols-outlined text-[24px]">pause</span>'
+          : '<span class="material-symbols-outlined text-[24px]">play_arrow</span>';
+      });
+    }
+  })();
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-white/95 backdrop-blur-xl border-t border-slate-200 shadow-[0_-1px_6px_rgba(0,0,0,0.04)]" data-active-classes="text-cyan-700 bg-cyan-50 font-semibold"><div class="flex items-center justify-around h-16 px-space-xs"><a aria-current="page" class="flex-1 flex flex-col items-center justify-center min-h-[44px] h-14 rounded mx-0.5 transition-colors gap-0.5 text-cyan-700 bg-cyan-50 font-semibold border border-cyan-200/60" data-path="canvas-editor" href="#"><span class="material-symbols-outlined text-[20px]">draw</span><span class="font-label-sm text-label-sm tracking-tight">Editor</span></a><a class="flex-1 flex flex-col items-center justify-center min-h-[44px] h-14 rounded mx-0.5 text-slate-600 hover:text-slate-900 transition-colors gap-0.5" data-path="algorithms" href="#"><span class="material-symbols-outlined text-[20px]">account_tree</span><span class="font-label-sm text-label-sm tracking-tight">Algorithms</span></a><a class="flex-1 flex flex-col items-center justify-center min-h-[44px] h-14 rounded mx-0.5 text-slate-600 hover:text-slate-900 transition-colors gap-0.5" data-path="trace-and-json" href="#"><span class="material-symbols-outlined text-[20px]">terminal</span><span class="font-label-sm text-label-sm tracking-tight">Trace/JSON</span></a><a class="flex-1 flex flex-col items-center justify-center min-h-[44px] h-14 rounded mx-0.5 text-slate-600 hover:text-slate-900 transition-colors gap-0.5" data-path="playback" href="#"><span class="material-symbols-outlined text-[20px]">play_circle</span><span class="font-label-sm text-label-sm tracking-tight">Playback</span></a></div></nav></body></html>

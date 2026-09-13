@@ -1,0 +1,197 @@
+{
+  "algorithm": "dfs",
+  "start": "A",
+  "graph": {
+    "directed": false,
+    "weighted": false,
+    "nodes": [
+      {
+        "id": "A"
+      },
+      {
+        "id": "B"
+      },
+      {
+        "id": "C"
+      },
+      {
+        "id": "D"
+      }
+    ],
+    "edges": [
+      {
+        "source": "A",
+        "target": "B"
+      },
+      {
+        "source": "A",
+        "target": "C"
+      },
+      {
+        "source": "B",
+        "target": "D"
+      }
+    ]
+  },
+  "states": [
+    {
+      "step": 0,
+      "event": "init",
+      "current": null,
+      "visited": [],
+      "frontier": [
+        "A"
+      ],
+      "parent": {},
+      "selected_edges": [],
+      "final_path": [],
+      "message": "Start DFS at A. Stack = [A]"
+    },
+    {
+      "step": 1,
+      "event": "visit",
+      "current": "A",
+      "visited": [
+        "A"
+      ],
+      "frontier": [
+        "C",
+        "B"
+      ],
+      "parent": {
+        "C": "A",
+        "B": "A"
+      },
+      "selected_edges": [],
+      "final_path": [],
+      "message": "Visit A. Stack = ['C', 'B']"
+    },
+    {
+      "step": 2,
+      "event": "visit",
+      "current": "B",
+      "visited": [
+        "A",
+        "B"
+      ],
+      "frontier": [
+        "C",
+        "D"
+      ],
+      "parent": {
+        "C": "A",
+        "B": "A",
+        "D": "B"
+      },
+      "selected_edges": [
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "final_path": [],
+      "message": "Visit B. Stack = ['C', 'D']"
+    },
+    {
+      "step": 3,
+      "event": "visit",
+      "current": "D",
+      "visited": [
+        "A",
+        "B",
+        "D"
+      ],
+      "frontier": [
+        "C"
+      ],
+      "parent": {
+        "C": "A",
+        "B": "A",
+        "D": "B"
+      },
+      "selected_edges": [
+        [
+          "A",
+          "B"
+        ],
+        [
+          "B",
+          "D"
+        ]
+      ],
+      "final_path": [],
+      "message": "Visit D. Stack = ['C']"
+    },
+    {
+      "step": 4,
+      "event": "visit",
+      "current": "C",
+      "visited": [
+        "A",
+        "B",
+        "D",
+        "C"
+      ],
+      "frontier": [],
+      "parent": {
+        "C": "A",
+        "B": "A",
+        "D": "B"
+      },
+      "selected_edges": [
+        [
+          "A",
+          "B"
+        ],
+        [
+          "B",
+          "D"
+        ],
+        [
+          "A",
+          "C"
+        ]
+      ],
+      "final_path": [],
+      "message": "Visit C."
+    },
+    {
+      "step": 5,
+      "event": "done",
+      "current": null,
+      "visited": [
+        "A",
+        "B",
+        "D",
+        "C"
+      ],
+      "frontier": [],
+      "parent": {
+        "C": "A",
+        "B": "A",
+        "D": "B"
+      },
+      "selected_edges": [
+        [
+          "A",
+          "B"
+        ],
+        [
+          "B",
+          "D"
+        ],
+        [
+          "A",
+          "C"
+        ]
+      ],
+      "final_path": [
+        "A",
+        "B",
+        "D",
+        "C"
+      ],
+      "message": "DFS complete. Order: A -> B -> D -> C"
+    }
+  ]
+}

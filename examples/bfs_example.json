@@ -1,0 +1,26 @@
+{
+  "algorithm": "bfs",
+  "start": "A",
+  "target": "E",
+  "graph": {
+    "directed": false,
+    "weighted": false,
+    "nodes": [{ "id": "A" }, { "id": "B" }, { "id": "C" }, { "id": "D" }, { "id": "E" }],
+    "edges": [
+      { "source": "A", "target": "B" },
+      { "source": "A", "target": "C" },
+      { "source": "B", "target": "D" },
+      { "source": "C", "target": "D" },
+      { "source": "D", "target": "E" }
+    ]
+  },
+  "states": [
+    { "step": 0, "event": "init", "current": null, "visited": [], "frontier": ["A"], "parent": {}, "message": "Start BFS at A. Queue = [A]" },
+    { "step": 1, "event": "visit", "current": "A", "visited": ["A"], "frontier": ["B", "C"], "parent": { "B": "A", "C": "A" }, "selected_edges": [["A", "B"], ["A", "C"]], "message": "Visit A. Enqueue neighbors B, C" },
+    { "step": 2, "event": "visit", "current": "B", "visited": ["A", "B"], "frontier": ["C", "D"], "parent": { "B": "A", "C": "A", "D": "B" }, "current_edge": { "source": "A", "target": "B" }, "selected_edges": [["A", "B"], ["A", "C"], ["B", "D"]], "message": "Dequeue B. Visit B. Enqueue D" },
+    { "step": 3, "event": "visit", "current": "C", "visited": ["A", "B", "C"], "frontier": ["D"], "parent": { "B": "A", "C": "A", "D": "B" }, "current_edge": { "source": "A", "target": "C" }, "selected_edges": [["A", "B"], ["A", "C"], ["B", "D"]], "message": "Dequeue C. Visit C. D already queued" },
+    { "step": 4, "event": "visit", "current": "D", "visited": ["A", "B", "C", "D"], "frontier": ["E"], "parent": { "B": "A", "C": "A", "D": "B", "E": "D" }, "current_edge": { "source": "B", "target": "D" }, "selected_edges": [["A", "B"], ["A", "C"], ["B", "D"], ["D", "E"]], "message": "Dequeue D. Visit D. Enqueue E" },
+    { "step": 5, "event": "visit", "current": "E", "visited": ["A", "B", "C", "D", "E"], "frontier": [], "parent": { "B": "A", "C": "A", "D": "B", "E": "D" }, "current_edge": { "source": "D", "target": "E" }, "selected_edges": [["A", "B"], ["A", "C"], ["B", "D"], ["D", "E"]], "message": "Dequeue E = target. BFS found E" },
+    { "step": 6, "event": "path_found", "current": null, "visited": ["A", "B", "C", "D", "E"], "frontier": [], "parent": { "B": "A", "C": "A", "D": "B", "E": "D" }, "selected_edges": [["A", "B"], ["B", "D"], ["D", "E"]], "final_path": ["A", "B", "D", "E"], "message": "Shortest path (3 hops): A -> B -> D -> E" }
+  ]
+}
