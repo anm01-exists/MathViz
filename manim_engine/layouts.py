@@ -13,7 +13,7 @@ import math
 CIRCLE_RADIUS = 2.2
 X_SCALE = 1.0
 Y_SCALE = 1.0
-MAX_EXTENT = 3.0  # clamp manual coordinates into the Manim frame
+MAX_EXTENT = 7.0  # clamp manual coordinates into the Manim frame
 
 
 def _clamp(v: float) -> float:

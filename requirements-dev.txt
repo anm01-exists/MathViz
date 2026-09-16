@@ -1,0 +1,4 @@
+# MathViz Unified - development dependencies
+-r requirements.txt
+pytest>=8
+httpx>=0.24

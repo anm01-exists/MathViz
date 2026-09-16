@@ -1,7 +1,0 @@
-# MathViz Manim engine dependencies (Role 3)
-manim>=0.19,<0.21
-pytest>=8
-# System requirement (not pip-installable): ffmpeg on PATH.
-# Windows:  winget install ffmpeg     (or: choco install ffmpeg)
-# Ubuntu:   sudo apt install ffmpeg
-# macOS:    brew install ffmpeg

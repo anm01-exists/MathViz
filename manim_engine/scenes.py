@@ -30,6 +30,7 @@ from manim import (
     UP,
     LEFT,
     RIGHT,
+    DL,
     FadeIn,
     Scene,
     Text,
@@ -37,6 +38,7 @@ from manim import (
     Write,
     Rectangle,
     Line,
+    Circle,
     config,
 )
 
@@ -45,6 +47,10 @@ try:
     from .layouts import compute_positions
     from .schemas import normalize_input
     from .styles import (
+        ACCENT_GREEN,
+        ACCENT_GREEN_DARK,
+        ACCENT_ORANGE,
+        ACCENT_YELLOW_DARK,
         CAPTION_FONT_SIZE,
         TITLE_FONT_SIZE,
         PAPER_WHITE,
@@ -60,6 +66,10 @@ except ImportError:  # manim standalone file mode
     from manim_engine.layouts import compute_positions
     from manim_engine.schemas import normalize_input
     from manim_engine.styles import (
+        ACCENT_GREEN,
+        ACCENT_GREEN_DARK,
+        ACCENT_ORANGE,
+        ACCENT_YELLOW_DARK,
         CAPTION_FONT_SIZE,
         TITLE_FONT_SIZE,
         PAPER_WHITE,
@@ -155,6 +165,25 @@ class _MathVizBase(Scene):
             y += PAPER_GRID_SPACING
         return lines
 
+    def _make_legend(self) -> VGroup:
+        """Small color-key chips (frontier/current/visited/path) for the video."""
+        items = [
+            ("Frontier", ACCENT_YELLOW_DARK),
+            ("Current", ACCENT_ORANGE),
+            ("Visited", ACCENT_GREEN_DARK),
+            ("Path", ACCENT_GREEN),
+        ]
+        chips = VGroup()
+        for label, color in items:
+            chip = VGroup(
+                Circle(radius=0.11, color=color, fill_color=color, fill_opacity=1.0),
+                Text(label, font_size=13, color=INK_DARK),
+            ).arrange(RIGHT, buff=0.08)
+            chips.add(chip)
+        legend = chips.arrange(RIGHT, buff=0.35)
+        legend.to_corner(DL, buff=0.45)
+        return legend
+
     def _setup(self, payload: dict):
         algo = payload["algorithm"]
         title_text = TITLES.get(algo, TITLES["static"])
@@ -180,9 +209,10 @@ class _MathVizBase(Scene):
         caption.to_edge(DOWN, buff=0.5)
         step_label = Text("", font_size=CAPTION_FONT_SIZE - 4, color=INK_MEDIUM)
         step_label.next_to(caption, UP, buff=0.1)
+        legend = self._make_legend()
 
-        # Add background first, then title, canvas, caption
-        self.add(paper_bg, title, canvas, caption, step_label)
+        # Add background first, then title, canvas, legend, caption
+        self.add(paper_bg, title, canvas, legend, caption, step_label)
         return mv_graph, caption, step_label
 
     def _show_state(self, mv: MathVizGraph, caption, step_label,
@@ -193,8 +223,17 @@ class _MathVizBase(Scene):
         new_caption = Text(state.get("message", ""), font_size=CAPTION_FONT_SIZE, color=INK_DARK)
         new_caption.to_edge(DOWN, buff=0.5)
         total = max(len(payload.get("states", [])), 1)
-        new_step = Text(f"step {state.get('step', 0) + 1}/{total} · {state.get('event', '')}",
-                        font_size=CAPTION_FONT_SIZE - 4, color=INK_MEDIUM)
+        extra = ""
+        if self.algorithm in ("bfs", "dfs"):
+            name = "queue" if self.algorithm == "bfs" else "stack"
+            frontier = state.get("frontier") or []
+            extra = f" · {name}: {' → '.join(frontier) if frontier else '∅'}"
+        elif self.show_distances:
+            settled = state.get("finalized") or state.get("visited") or []
+            extra = f" · settled {len(settled)}"
+        new_step = Text(
+            f"step {state.get('step', 0) + 1}/{total} · {state.get('event', '')}{extra}",
+            font_size=CAPTION_FONT_SIZE - 4, color=INK_MEDIUM)
         new_step.next_to(new_caption, UP, buff=0.1)
         if animate:
             self.play(caption.animate.become(new_caption),

@@ -10,7 +10,7 @@ CLI:
 
 Output convention:
     <media_dir>/<algorithm>_<input_stem>_<quality>.mp4
-e.g. media_out/bfs_bfs_example_m.mp4
+e.g. media/bfs_bfs_example_m.mp4
 
 Quality flags: l = 480p, m = 720p (default), h = 1080p, k = 4k.
 Requires: manim + ffmpeg on PATH (ffmpeg is bundled with most Manim
@@ -55,7 +55,7 @@ def _manim_exe() -> str:
     return f"{sys.executable} -m manim"  # fallback: python -m manim
 
 
-def render_from_json(input_json: str | Path, media_dir: str | Path = "media_out",
+def render_from_json(input_json: str | Path, media_dir: str | Path = "media",
                      quality: str = "m", output_format: str = "mp4",
                      dry_run: bool = False) -> Path:
     """Render an animation input JSON to video. Returns the output video path."""
@@ -116,7 +116,7 @@ def render_from_json(input_json: str | Path, media_dir: str | Path = "media_out"
 def main(argv: list[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="MathViz Manim renderer (Role 3 entry point)")
     parser.add_argument("input", help="animation input JSON file")
-    parser.add_argument("--media-dir", default="media_out", help="output directory")
+    parser.add_argument("--media-dir", default="media", help="output directory")
     parser.add_argument("--quality", default="m", choices=["l", "m", "h", "k"])
     parser.add_argument("--format", default="mp4", dest="fmt",
                         help="mp4 (default), webm, mov, png (no ffmpeg needed), gif")
