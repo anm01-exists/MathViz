@@ -1,0 +1,35 @@
+{
+  "type": "derivative_rule",
+  "method": "product_rule",
+  "expression": "x**2*(x+1)",
+  "variable": "x",
+  "u": "x**2",
+  "v": "x + 1",
+  "u_derivative": "2*x",
+  "v_derivative": "1",
+  "derivative": "x*(3*x + 2)",
+  "steps": [
+    {
+      "step": 1,
+      "type": "identify",
+      "message": "Identify the two factors."
+    },
+    {
+      "step": 2,
+      "type": "apply_rule",
+      "message": "Apply (uv)' = u'v + uv'."
+    },
+    {
+      "step": 3,
+      "type": "differentiate",
+      "message": "Differentiate each factor."
+    },
+    {
+      "step": 4,
+      "type": "result",
+      "message": "Simplify the result.",
+      "expression": "x*(3*x + 2)"
+    }
+  ],
+  "result": "x*(3*x + 2)"
+}

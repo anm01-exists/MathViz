@@ -1,0 +1,31 @@
+{
+  "type": "two_sided_limit",
+  "method": "compare_one_sided_limits",
+  "expression": "1/x",
+  "variable": "x",
+  "point": 0,
+  "left_result": "-oo",
+  "right_result": "oo",
+  "exists": false,
+  "steps": [
+    {
+      "step": 1,
+      "type": "left_hand",
+      "message": "Calculate the left-hand limit.",
+      "result": "-oo"
+    },
+    {
+      "step": 2,
+      "type": "right_hand",
+      "message": "Calculate the right-hand limit.",
+      "result": "oo"
+    },
+    {
+      "step": 3,
+      "type": "comparison",
+      "message": "Compare the two one-sided limits.",
+      "result": "does_not_exist"
+    }
+  ],
+  "result": "does_not_exist"
+}

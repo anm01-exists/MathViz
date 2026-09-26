@@ -1,0 +1,62 @@
+{
+  "type": "one_sided_limit",
+  "expression": "1/x",
+  "variable": "x",
+  "point": 0,
+  "left": {
+    "type": "one_sided_limit",
+    "method": "symbolic_limit",
+    "expression": "1/x",
+    "variable": "x",
+    "point": 0,
+    "direction": "-",
+    "side": "left",
+    "result": "-oo",
+    "steps": [
+      {
+        "step": 1,
+        "type": "identify_side",
+        "message": "Approach 0 from the left side."
+      },
+      {
+        "step": 2,
+        "type": "calculate",
+        "message": "Calculate the left-hand limit."
+      },
+      {
+        "step": 3,
+        "type": "result",
+        "message": "The left-hand limit is -oo.",
+        "expression": "-oo"
+      }
+    ]
+  },
+  "right": {
+    "type": "one_sided_limit",
+    "method": "symbolic_limit",
+    "expression": "1/x",
+    "variable": "x",
+    "point": 0,
+    "direction": "+",
+    "side": "right",
+    "result": "oo",
+    "steps": [
+      {
+        "step": 1,
+        "type": "identify_side",
+        "message": "Approach 0 from the right side."
+      },
+      {
+        "step": 2,
+        "type": "calculate",
+        "message": "Calculate the right-hand limit."
+      },
+      {
+        "step": 3,
+        "type": "result",
+        "message": "The right-hand limit is oo.",
+        "expression": "oo"
+      }
+    ]
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "type": "derivative_applications",
+  "method": "critical_points_and_second_derivative",
+  "expression": "x**3-3*x",
+  "variable": "x",
+  "first_derivative": "3*x**2 - 3",
+  "second_derivative": "6*x",
+  "critical_points": [
+    "-1",
+    "1"
+  ],
+  "classifications": [
+    {
+      "point": "-1",
+      "second_derivative_value": "-6",
+      "classification": "local maximum"
+    },
+    {
+      "point": "1",
+      "second_derivative_value": "6",
+      "classification": "local minimum"
+    }
+  ],
+  "steps": [
+    {
+      "step": 1,
+      "type": "differentiate",
+      "message": "Find the first derivative: 3*x**2 - 3"
+    },
+    {
+      "step": 2,
+      "type": "critical_points",
+      "message": "Set the first derivative equal to zero and find the critical points."
+    },
+    {
+      "step": 3,
+      "type": "second_derivative",
+      "message": "Find the second derivative: 6*x"
+    },
+    {
+      "step": 4,
+      "type": "classify",
+      "message": "Use the second derivative to classify the critical points."
+    }
+  ]
+}

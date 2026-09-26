@@ -64,3 +64,14 @@ class RenderResponse(BaseModel):
     video_url: str
     filename: str
     log: str
+class CalculusSolveRequest(BaseModel):
+    problem_type: str
+    expression: str
+    variable: str = "x"
+    point: Optional[str] = None
+    direction: Optional[str] = None
+
+
+class CalculusSolveResponse(BaseModel):
+    problem_type: str
+    solution: Dict[str, Any]

@@ -1,0 +1,27 @@
+{
+  "type": "limit_at_infinity",
+  "method": "symbolic_limit",
+  "expression": "1/x",
+  "variable": "x",
+  "direction": "+",
+  "target": "\u221e",
+  "result": "0",
+  "steps": [
+    {
+      "step": 1,
+      "type": "identify",
+      "message": "Find the limit as x approaches \u221e."
+    },
+    {
+      "step": 2,
+      "type": "evaluate",
+      "message": "Analyze the behavior of the expression as the variable grows."
+    },
+    {
+      "step": 3,
+      "type": "result",
+      "message": "The limit is 0.",
+      "expression": "0"
+    }
+  ]
+}

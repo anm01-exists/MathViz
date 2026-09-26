@@ -1,0 +1,40 @@
+{
+  "type": "limit",
+  "method": "symbolic_limit",
+  "expression": "(x**2 - 4)/(x - 2)",
+  "variable": "x",
+  "point": 2,
+  "steps": [
+    {
+      "step": 1,
+      "type": "original",
+      "expression": "(x**2 - 4)/(x - 2)",
+      "message": "Start with the given limit."
+    },
+    {
+      "step": 2,
+      "type": "substitution",
+      "expression": "nan",
+      "message": "Substitute the approaching value."
+    },
+    {
+      "step": 3,
+      "type": "factorization",
+      "expression": "x + 2",
+      "message": "Factor the expression if necessary."
+    },
+    {
+      "step": 4,
+      "type": "simplification",
+      "expression": "x + 2",
+      "message": "Simplify the expression."
+    },
+    {
+      "step": 5,
+      "type": "result",
+      "expression": "4",
+      "message": "The limit is obtained."
+    }
+  ],
+  "result": "4"
+}

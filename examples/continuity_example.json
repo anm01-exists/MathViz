@@ -1,0 +1,31 @@
+{
+  "type": "continuity",
+  "method": "limit_and_function_value",
+  "expression": "x**2",
+  "variable": "x",
+  "point": 2,
+  "function_value": "4",
+  "limit_value": "4",
+  "is_continuous": true,
+  "steps": [
+    {
+      "step": 1,
+      "type": "function_value",
+      "message": "Find f(2).",
+      "result": "4"
+    },
+    {
+      "step": 2,
+      "type": "limit",
+      "message": "Find the limit as x approaches 2.",
+      "result": "4"
+    },
+    {
+      "step": 3,
+      "type": "comparison",
+      "message": "Compare the function value with the limit.",
+      "result": "continuous"
+    }
+  ],
+  "result": "continuous"
+}

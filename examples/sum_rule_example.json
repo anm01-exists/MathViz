@@ -1,0 +1,38 @@
+{
+  "type": "derivative_rule",
+  "method": "sum_rule",
+  "expression": "x**3 + x**2",
+  "variable": "x",
+  "terms": [
+    "x**3",
+    "x**2"
+  ],
+  "term_derivatives": [
+    "3*x**2",
+    "2*x"
+  ],
+  "derivative": "x*(3*x + 2)",
+  "steps": [
+    {
+      "step": 1,
+      "type": "split",
+      "message": "Differentiate each term separately."
+    },
+    {
+      "step": 2,
+      "type": "differentiate_terms",
+      "message": "Apply the derivative rule to each term.",
+      "expression": [
+        "3*x**2",
+        "2*x"
+      ]
+    },
+    {
+      "step": 3,
+      "type": "combine",
+      "message": "Add the derivatives together.",
+      "expression": "x*(3*x + 2)"
+    }
+  ],
+  "result": "x*(3*x + 2)"
+}

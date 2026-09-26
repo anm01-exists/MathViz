@@ -170,8 +170,98 @@
 
       <!-- ===== Right column: Controls ===== -->
       <div class="space-y-6">
-        <!-- Algorithm -->
-        <section class="card p-4">
+        
+    <!-- ===== Calculus Solver ===== -->
+    <section class="card p-4">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-semibold text-ink">Calculus Solver</h2>
+        <span class="badge badge-cyan">Symbolic + Visual</span>
+      </div>
+
+      <div class="space-y-4">
+
+        <div>
+          <label class="block text-xs font-medium text-ink-dim mb-1">
+            Problem Type
+          </label>
+          <select id="calculus-type" class="select-field">
+            <option value="limit">Limit</option>
+            <option value="one_sided_limit">One-Sided Limit</option>
+            <option value="two_sided_limit">Two-Sided Limit</option>
+            <option value="limit_at_infinity">Limit at Infinity</option>
+            <option value="continuity">Continuity</option>
+            <option value="derivative">Derivative</option>
+            <option value="tangent_line">Tangent Line</option>
+            <option value="power_rule">Power Rule</option>
+            <option value="sum_rule">Sum Rule</option>
+            <option value="product_rule">Product Rule</option>
+            <option value="quotient_rule">Quotient Rule</option>
+            <option value="chain_rule">Chain Rule</option>
+            <option value="derivative_applications">
+              Applications of Derivatives
+            </option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-ink-dim mb-1">
+            Expression
+          </label>
+          <input
+            id="calculus-expression"
+            class="input-field"
+            type="text"
+            placeholder="Example: x**2 + 3*x"
+          >
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-ink-dim mb-1">
+            Variable
+          </label>
+          <input
+            id="calculus-variable"
+            class="input-field"
+            type="text"
+            value="x"
+          >
+        </div>
+
+        <div id="calculus-point-field">
+          <label class="block text-xs font-medium text-ink-dim mb-1">
+            Point
+          </label>
+          <input
+            id="calculus-point"
+            class="input-field"
+            type="text"
+            placeholder="Example: 2"
+          >
+        </div>
+
+        <div id="calculus-direction-field" class="hidden">
+          <label class="block text-xs font-medium text-ink-dim mb-1">
+            Direction
+          </label>
+          <select id="calculus-direction" class="select-field">
+            <option value="-">From the left</option>
+            <option value="+">From the right</option>
+          </select>
+        </div>
+
+        <button
+          id="btn-calculus-solve"
+          class="btn-primary w-full py-2.5 !text-base"
+        >
+          ∑ Solve Calculus
+        </button>
+
+      </div>
+    </section>
+
+    <!-- Algorithm -->
+    <section class="card p-4">
+       
           <h2 class="font-semibold text-ink mb-3">Run Algorithm</h2>
           <div class="flex gap-2 mb-4" role="tablist">
             <button id="tab-bfs" role="tab" aria-selected="true" class="tab-pill btn-primary flex-1 px-3 py-1.5 text-sm">BFS</button>
@@ -795,6 +885,82 @@
       a.download = currentVideoUrl.split('/').pop();
       a.click();
     });
+    // ============ Calculus Solver ============
+async function solveCalculus() {
+  const btn = document.getElementById('btn-calculus-solve');
+
+  const problemType = document.getElementById('calculus-type').value;
+  const expression = document.getElementById('calculus-expression').value.trim();
+  const variable =
+    document.getElementById('calculus-variable').value.trim() || 'x';
+
+  const point = document.getElementById('calculus-point').value.trim();
+  const direction = document.getElementById('calculus-direction').value;
+
+  if (!expression) {
+    showToast('Enter a calculus expression first', 'error');
+    return;
+  }
+
+  const body = {
+    problem_type: problemType,
+    expression: expression,
+    variable: variable
+  };
+
+  if (point) {
+    body.point = point;
+  }
+
+  if (problemType === 'one_sided_limit') {
+    body.direction = direction;
+  }
+
+  setStatus('Rendering calculus video…', 'running');
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Rendering…';
+
+  try {
+    const renderRes = await fetch(
+      `${API_BASE}/api/calculus/render`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      }
+    );
+
+    const renderResult = await renderRes.json();
+
+    if (!renderRes.ok) {
+      throw new Error(
+        renderResult.detail || 'Calculus video rendering failed'
+      );
+    }
+
+    renderVideo(renderResult.video_url);
+
+    setStatus('Video ready', 'ready');
+    showToast('Calculus video ready!', 'success');
+
+    console.log('Calculus render result:', renderResult);
+
+  } catch (error) {
+    setStatus('Error', 'error');
+    showToast(error.message, 'error');
+    console.error('Calculus render error:', error);
+
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '∑ Solve Calculus';
+  }
+}
+document
+  .getElementById('btn-calculus-solve')
+  .addEventListener('click', solveCalculus);
   </script>
 </body>
 </html>

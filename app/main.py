@@ -18,8 +18,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
 from app import config
-from app.api import algorithms, examples, health, render
-
+from app.api import algorithms, calculus, examples, health, render
 DESCRIPTION = __doc__ or "MathViz Unified API"
 
 
@@ -42,6 +41,7 @@ def create_app() -> FastAPI:
 
     # API routers
     app.include_router(algorithms.router)
+    app.include_router(calculus.router)
     app.include_router(render.router)
     app.include_router(examples.router)
     app.include_router(health.router)

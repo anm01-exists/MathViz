@@ -1,0 +1,27 @@
+{
+  "type": "derivative",
+  "method": "symbolic_differentiation",
+  "expression": "x**2",
+  "variable": "x",
+  "derivative": "2*x",
+  "steps": [
+    {
+      "step": 1,
+      "type": "function",
+      "message": "Start with the given function.",
+      "expression": "x**2"
+    },
+    {
+      "step": 2,
+      "type": "differentiate",
+      "message": "Differentiate with respect to x."
+    },
+    {
+      "step": 3,
+      "type": "result",
+      "message": "The derivative is obtained.",
+      "expression": "2*x"
+    }
+  ],
+  "result": "2*x"
+}

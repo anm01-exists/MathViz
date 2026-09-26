@@ -1,0 +1,37 @@
+{
+  "type": "tangent_line",
+  "expression": "x**2",
+  "variable": "x",
+  "point": 1,
+  "function_value": "1",
+  "derivative": "2*x",
+  "slope": "2",
+  "tangent_line": "2*x - 1",
+  "steps": [
+    {
+      "step": 1,
+      "type": "function_value",
+      "message": "Find f(1).",
+      "result": "1"
+    },
+    {
+      "step": 2,
+      "type": "derivative",
+      "message": "Find the derivative.",
+      "result": "2*x"
+    },
+    {
+      "step": 3,
+      "type": "slope",
+      "message": "Evaluate the derivative at x = 1.",
+      "result": "2"
+    },
+    {
+      "step": 4,
+      "type": "tangent",
+      "message": "Construct the tangent line.",
+      "result": "2*x - 1"
+    }
+  ],
+  "result": "2*x - 1"
+}
