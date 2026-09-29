@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MathViz — Graph Algorithm Visualizer</title>
+  <title>MathViz — Interactive Math Visualizer</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script>
@@ -796,5 +796,286 @@
       a.click();
     });
   </script>
+<script>
+(() => {
+  const tabList = document.querySelector('[role="tablist"]');
+  const algorithmSection = tabList.closest('section');
+  const algorithmInputs = algorithmSection.querySelector('.space-y-4');
+  const graphSection = document.querySelector('#graph-canvas').closest('section');
+  const videoSection = document.querySelector('#video-player').closest('section');
+  const jsonSection = document.querySelector('#json-output').closest('details');
+  const leftColumn = graphSection.parentElement;
+  const tab = document.createElement('button');
+  tab.type = 'button';
+  tab.className = 'tab-pill btn-secondary flex-1 px-2 py-1.5 text-sm';
+  tab.textContent = 'Probability';
+  tab.setAttribute('role', 'tab');
+  tab.setAttribute('aria-selected', 'false');
+  tabList.append(tab);
+
+  const controls = document.createElement('div');
+  controls.className = 'hidden space-y-4';
+  controls.innerHTML = [
+    '<div><label for="card-event" class="block text-xs font-medium text-ink-dim mb-1">Event to find</label>',
+    '<select id="card-event" class="select-field"><option value="heart">A heart</option><option value="red">Any red card</option><option value="ace">An ace</option><option value="spade">A spade</option><option value="king">A king</option></select></div>',
+    '<div><label for="card-count" class="block text-xs font-medium text-ink-dim mb-1">Cards in your hand</label><input id="card-count" class="input-field" type="number" min="1" max="52" value="1" inputmode="numeric"></div>',
+    '<button id="card-draw" type="button" class="btn-primary w-full">Draw next card</button>',
+    '<button id="card-reset" type="button" class="btn-secondary w-full">Shuffle and reset</button>',
+    '<div class="border-t border-paper-dim pt-4"><label for="card-trials" class="block text-xs font-medium text-ink-dim mb-1">Simulation trials</label>',
+    '<select id="card-trials" class="select-field"><option value="20">20</option><option value="100" selected>100</option><option value="500">500</option><option value="1000">1,000</option></select>',
+    '<button id="card-simulate" type="button" class="btn-primary w-full mt-3">Run simulation</button></div>'
+  ].join('');
+  algorithmInputs.after(controls);
+
+  const lab = document.createElement('section');
+  lab.className = 'hidden grid lg:grid-cols-2 gap-6';
+  lab.setAttribute('aria-label', 'Card probability lesson and experiment');
+  lab.innerHTML = [
+    '<section class="card-elevated p-5" aria-labelledby="card-lesson-heading"><div class="flex items-start justify-between gap-3 mb-4"><div>',
+    '<p class="text-xs uppercase tracking-wide text-cyan-dark font-semibold">Short animated lesson</p><h2 id="card-lesson-heading" class="font-semibold text-ink text-lg mt-1">How card probability works</h2>',
+    '<p class="text-sm text-ink-dim mt-1">A guided visual using your selected event and hand size.</p></div><span id="lesson-progress" class="badge badge-cyan" aria-live="polite">1 / 4</span></div>',
+    '<div class="lesson-stage rounded-xl border border-paper-dim bg-white p-5" aria-live="polite"><div id="lesson-cards" class="flex items-center justify-center gap-3 min-h-24" aria-hidden="true"></div>',
+    '<h3 id="lesson-title" class="text-center text-lg font-semibold text-ink mt-4"></h3><p id="lesson-caption" class="text-center text-sm text-ink-dim mt-2 min-h-10"></p>',
+    '<p id="lesson-equation" class="lesson-equation text-center text-ink mt-3 rounded-lg bg-paper p-3"></p></div>',
+    '<div class="flex flex-wrap items-center justify-center gap-2 mt-4"><button id="lesson-back" type="button" class="btn-secondary" aria-label="Previous lesson scene">Back</button>',
+    '<button id="lesson-play" type="button" class="btn-primary">Play lesson</button><button id="lesson-next" type="button" class="btn-secondary" aria-label="Next lesson scene">Next</button>',
+    '<button id="lesson-replay" type="button" class="btn-secondary">Replay</button></div>',
+    '<p class="text-xs text-ink-light text-center mt-3">The lesson pauses when you change the event or hand size.</p></section>',
+    '<section class="card p-5" aria-labelledby="card-lab-heading"><div class="flex items-start justify-between gap-3"><div>',
+    '<p class="text-xs uppercase tracking-wide text-cyan-dark font-semibold">Try it yourself</p><h2 id="card-lab-heading" class="font-semibold text-ink text-lg mt-1">A shuffled 52-card deck</h2>',
+    '<p id="deck-status" class="text-sm text-ink-dim mt-1"></p></div><span class="badge badge-teal">Without replacement</span></div>',
+    '<div class="mt-4 p-3 bg-paper rounded-lg"><p class="text-xs text-ink-dim">Your drawn cards</p><div id="card-hand" class="mt-2 flex flex-wrap gap-2" aria-live="polite"></div></div>',
+    '<div class="grid sm:grid-cols-2 gap-3 mt-4"><div class="p-3 bg-paper rounded-lg"><p class="text-xs text-ink-dim">Favorable hands</p><p id="card-favorable" class="font-mono font-semibold mt-1"></p></div>',
+    '<div class="p-3 bg-paper rounded-lg"><p class="text-xs text-ink-dim">Exact chance of at least one match</p><p id="card-exact" class="font-mono font-semibold mt-1"></p></div></div>',
+    '<p id="card-result" class="text-sm text-ink-dim mt-3" aria-live="polite"></p><div class="border-t border-paper-dim mt-5 pt-4"><h3 class="font-medium text-ink">Experiment</h3>',
+    '<p class="text-xs text-ink-dim mt-1">Each trial shuffles a fresh deck, then draws the same number of cards.</p>',
+    '<div id="card-chart" class="simulation-chart flex items-end gap-px mt-3" role="img" aria-label="Simulation results will appear here"></div>',
+    '<p id="card-simulation-result" class="text-sm text-ink-dim mt-2" aria-live="polite">Run a simulation to compare observed and exact probability.</p></div></section></section>'
+  ].join('');
+  leftColumn.append(lab);
+
+  const style = document.createElement('style');
+  style.textContent = [
+    '.lesson-equation{font-family:"JetBrains Mono",monospace;font-size:.9rem;font-variant-numeric:tabular-nums}',
+    '.lesson-card{width:3.8rem;height:5.2rem;border:1px solid #d7d9e8;border-radius:.55rem;background:#fff;box-shadow:0 3px 10px #171b2614;display:flex;flex-direction:column;justify-content:space-between;padding:.45rem;font-family:"JetBrains Mono",monospace;animation:card-arrive .35s ease both}',
+    '.lesson-card.is-hit{border-color:#06b6d4;box-shadow:0 0 0 3px #06b6d422}.lesson-card.red-card,.hand-card.red-card{color:#e11d48}.lesson-card.black-card,.hand-card.black-card{color:#171b26}',
+    '.hand-card{width:3.2rem;height:4.2rem;border:1px solid #d7d9e8;border-radius:.5rem;background:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:.4rem;font-family:"JetBrains Mono",monospace;box-shadow:0 2px 6px #171b2610}',
+    '.simulation-chart{height:5rem}.simulation-bar{flex:1;min-width:2px;background:#06b6d4;border-radius:2px 2px 0 0;transition:height .12s}',
+    '@keyframes card-arrive{from{opacity:.25;transform:translateY(-12px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}',
+    '@media (prefers-reduced-motion:reduce){.lesson-card,.simulation-bar{animation:none!important;transition:none!important}}'
+  ].join('');
+  document.head.append(style);
+
+  const $ = (id) => document.getElementById(id);
+  const suits = ['S', 'H', 'D', 'C'];
+  const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+  const suitNames = {S: 'spades', H: 'hearts', D: 'diamonds', C: 'clubs'};
+  const suitMarks = {S: '&spades;', H: '&hearts;', D: '&diams;', C: '&clubs;'};
+  const eventNames = {heart: 'a heart', red: 'a red card', ace: 'an ace', spade: 'a spade', king: 'a king'};
+  const makeDeck = () => suits.flatMap((suit) => ranks.map((rank) => ({suit, rank})));
+  let deck = [];
+  let hand = [];
+  let lessonStep = 0;
+  let lessonTimer = null;
+  let simulationRunning = false;
+
+  function drawCount() {
+    const value = Number.parseInt($('card-count').value, 10);
+    return Math.max(1, Math.min(52, Number.isFinite(value) ? value : 1));
+  }
+  function isMatch(card, event = $('card-event').value) {
+    if (event === 'heart') return card.suit === 'H';
+    if (event === 'red') return card.suit === 'H' || card.suit === 'D';
+    if (event === 'ace') return card.rank === 'A';
+    if (event === 'spade') return card.suit === 'S';
+    return card.rank === 'K';
+  }
+  function favorableCardCount(event = $('card-event').value) {
+    return makeDeck().filter((card) => isMatch(card, event)).length;
+  }
+  function choose(total, count) {
+    if (count < 0 || count > total) return 0;
+    const k = Math.min(count, total - count);
+    let result = 1;
+    for (let i = 1; i <= k; i += 1) result = result * (total - k + i) / i;
+    return Math.round(result);
+  }
+  function exactProbability(count = drawCount(), event = $('card-event').value) {
+    const matching = favorableCardCount(event);
+    const allHands = choose(52, count);
+    const noMatchHands = choose(52 - matching, count);
+    return allHands === 0 ? 0 : (allHands - noMatchHands) / allHands;
+  }
+  function percent(value) { return (value * 100).toFixed(1) + '%'; }
+  function shuffle(cards) {
+    for (let i = cards.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [cards[i], cards[j]] = [cards[j], cards[i]];
+    }
+    return cards;
+  }
+  function cardElement(card, lessonCard) {
+    const element = document.createElement('span');
+    element.className = (lessonCard ? 'lesson-card' : 'hand-card') +
+      ((card.suit === 'H' || card.suit === 'D') ? ' red-card' : ' black-card') +
+      (isMatch(card) ? ' is-hit' : '');
+    element.setAttribute('aria-label', card.rank + ' of ' + suitNames[card.suit]);
+    element.innerHTML = '<b>' + card.rank + '</b><strong>' + suitMarks[card.suit] + '</strong>';
+    return element;
+  }
+  function resetDeck() {
+    deck = shuffle(makeDeck());
+    hand = [];
+  }
+  function renderHand() {
+    const target = $('card-hand');
+    target.replaceChildren();
+    if (!hand.length) {
+      const empty = document.createElement('span');
+      empty.className = 'text-sm text-ink-light';
+      empty.textContent = 'No cards drawn yet.';
+      target.append(empty);
+    } else hand.forEach((card) => target.append(cardElement(card, false)));
+    $('deck-status').textContent = deck.length + ' cards remain · ' + hand.length + ' of ' + drawCount() + ' drawn';
+    $('card-result').textContent = !hand.length ? 'Draw a card to try the event.' :
+      (hand.some((card) => isMatch(card)) ? 'Your hand contains ' + eventNames[$('card-event').value] + '.' :
+        'No match yet. The remaining cards stay in the deck.');
+    const total = choose(52, drawCount());
+    const favorable = total - choose(52 - favorableCardCount(), drawCount());
+    $('card-favorable').textContent = favorable.toLocaleString() + ' of ' + total.toLocaleString() + ' possible hands';
+    $('card-exact').textContent = percent(exactProbability());
+  }
+
+  function renderLesson() {
+    const event = $('card-event').value;
+    const count = drawCount();
+    const matching = favorableCardCount(event);
+    const total = choose(52, count);
+    const noMatch = choose(52 - matching, count);
+    const scenes = [
+      ['Start with the whole deck', 'A standard deck has 52 distinct cards. Each card is one equally likely outcome for a single draw.', 'sample space = 52 cards'],
+      ['Count the cards that match', 'For ' + eventNames[event] + ', there are ' + matching + ' favorable cards in the full deck.', matching + ' favorable outcomes / 52 total outcomes = ' + percent(matching / 52)],
+      ['For a hand, count combinations', 'Draws are without replacement, so count distinct hands. Subtract hands with no match from all possible hands.', 'P(at least one match) = 1 - C(' + (52 - matching) + ', ' + count + ') / C(52, ' + count + ')'],
+      ['Compare exact chance with trials', 'The exact answer comes from counting. A simulation samples shuffled hands; its estimate varies, especially with few trials.', 'exact: ' + percent(total ? (total - noMatch) / total : 0) + ' · simulation: compare below']
+    ];
+    const scene = scenes[lessonStep];
+    $('lesson-title').textContent = scene[0];
+    $('lesson-caption').textContent = scene[1];
+    $('lesson-equation').textContent = scene[2];
+    $('lesson-progress').textContent = (lessonStep + 1) + ' / ' + scenes.length;
+    const visual = $('lesson-cards');
+    visual.replaceChildren();
+    const samples = lessonStep === 1
+      ? [{rank: 'A', suit: 'H'}, {rank: '5', suit: 'D'}, {rank: 'K', suit: 'S'}, {rank: '10', suit: 'C'}]
+      : [{rank: 'A', suit: 'S'}, {rank: '5', suit: 'H'}, {rank: 'Q', suit: 'D'}, {rank: '10', suit: 'C'}];
+    samples.forEach((card) => visual.append(cardElement(card, true)));
+    $('lesson-back').disabled = lessonStep === 0;
+    $('lesson-next').disabled = lessonStep === scenes.length - 1;
+    $('lesson-play').textContent = lessonTimer ? 'Pause lesson' : 'Play lesson';
+  }
+  function stopLesson() {
+    if (lessonTimer !== null) window.clearInterval(lessonTimer);
+    lessonTimer = null;
+    renderLesson();
+  }
+  function startLesson() {
+    if (lessonTimer !== null) { stopLesson(); return; }
+    if (lessonStep === 3) lessonStep = 0;
+    lessonTimer = window.setInterval(() => {
+      if (lessonStep >= 3) { stopLesson(); return; }
+      lessonStep += 1;
+      renderLesson();
+    }, 4200);
+    renderLesson();
+  }
+  function renderChart(values, exact) {
+    const chart = $('card-chart');
+    chart.replaceChildren();
+    chart.setAttribute('aria-label', 'Observed probability ' + percent(values[values.length - 1] || 0) +
+      '; exact probability ' + percent(exact));
+    values.forEach((value) => {
+      const bar = document.createElement('span');
+      bar.className = 'simulation-bar';
+      bar.style.height = Math.max(3, Math.min(100, value * 100)) + '%';
+      bar.title = 'Observed ' + percent(value);
+      chart.append(bar);
+    });
+  }
+  async function runSimulation() {
+    if (simulationRunning) return;
+    simulationRunning = true;
+    $('card-simulate').disabled = true;
+    $('card-simulation-result').textContent = 'Sampling shuffled hands…';
+    const trials = Number.parseInt($('card-trials').value, 10);
+    const count = drawCount();
+    const event = $('card-event').value;
+    const exact = exactProbability(count, event);
+    const sampleDeck = makeDeck();
+    let matches = 0;
+    const observed = [];
+    const interval = Math.max(1, Math.floor(trials / 60));
+    for (let trial = 1; trial <= trials; trial += 1) {
+      shuffle(sampleDeck);
+      if (sampleDeck.slice(0, count).some((card) => isMatch(card, event))) matches += 1;
+      if (trial % interval === 0 || trial === trials) {
+        observed.push(matches / trial);
+        renderChart(observed, exact);
+        $('card-simulation-result').textContent = trial + ' trials · ' + matches + ' matches · observed ' +
+          percent(matches / trial) + ' · exact ' + percent(exact);
+        await new Promise((resolve) => window.setTimeout(resolve, 12));
+      }
+    }
+    simulationRunning = false;
+    $('card-simulate').disabled = false;
+  }
+  function showProbability(show) {
+    graphSection.classList.toggle('hidden', show);
+    videoSection.classList.toggle('hidden', show);
+    jsonSection.classList.toggle('hidden', show);
+    algorithmInputs.classList.toggle('hidden', show);
+    algorithmSection.querySelector('h2').textContent = show ? 'Card Probability Lab' : 'Run Algorithm';
+    controls.classList.toggle('hidden', !show);
+    lab.classList.toggle('hidden', !show);
+    tab.setAttribute('aria-selected', show ? 'true' : 'false');
+    tab.classList.toggle('btn-primary', show);
+    tab.classList.toggle('btn-secondary', !show);
+    tabList.querySelectorAll('.tab-pill').forEach((button) => {
+      if (button === tab) return;
+      button.classList.toggle('btn-primary', !show && button.getAttribute('aria-selected') === 'true');
+      button.classList.toggle('btn-secondary', show || button.getAttribute('aria-selected') !== 'true');
+    });
+    if (!show) stopLesson();
+  }
+
+  tab.addEventListener('click', () => showProbability(true));
+  tabList.querySelectorAll('.tab-pill').forEach((button) => {
+    if (button !== tab) button.addEventListener('click', () => showProbability(false));
+  });
+  $('card-event').addEventListener('change', () => {
+    stopLesson(); resetDeck(); renderHand(); renderLesson();
+  });
+  $('card-count').addEventListener('change', () => {
+    $('card-count').value = String(drawCount());
+    stopLesson(); resetDeck(); renderHand(); renderLesson();
+  });
+  $('card-draw').addEventListener('click', () => {
+    if (hand.length >= drawCount() || !deck.length) return;
+    hand.push(deck.pop());
+    renderHand();
+  });
+  $('card-reset').addEventListener('click', () => { resetDeck(); renderHand(); });
+  $('card-simulate').addEventListener('click', runSimulation);
+  $('lesson-back').addEventListener('click', () => { stopLesson(); lessonStep = Math.max(0, lessonStep - 1); renderLesson(); });
+  $('lesson-next').addEventListener('click', () => { stopLesson(); lessonStep = Math.min(3, lessonStep + 1); renderLesson(); });
+  $('lesson-play').addEventListener('click', startLesson);
+  $('lesson-replay').addEventListener('click', () => { stopLesson(); lessonStep = 0; startLesson(); });
+
+  const subtitle = document.querySelector('header p');
+  if (subtitle) subtitle.textContent = 'Interactive math visualizations';
+  resetDeck();
+  renderHand();
+  renderLesson();
+})();
+</script>
 </body>
 </html>
