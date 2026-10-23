@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MathViz — Interactive Math Visualizer</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script>
     tailwind.config = {
@@ -56,6 +58,11 @@
     .graph-node.selected circle { fill: #cffafe; stroke: #06b6d4; stroke-width: 3; }
     .edge-line { transition: stroke 0.15s; }
     .edge-line:hover { stroke: #06b6d4 !important; }
+    .calc-equation-preview,
+    #calc-result-equation,
+    .calc-step-equation { min-width: 0; overflow-x: auto; }
+    .calc-step-card { border-left: 3px solid #d7d9e8; }
+    .calc-step-number { min-width: 1.75rem; height: 1.75rem; }
   </style>
 </head>
 <body class="min-h-screen paper-bg">
@@ -1088,6 +1095,9 @@
 
   const algorithmSection = tabList.closest('section');
   const algorithmInputs = algorithmSection.querySelector('.space-y-4');
+  const probabilityControls = document.getElementById('card-event')?.closest('.space-y-4');
+  const rightColumn = algorithmSection.parentElement;
+  const executionSection = document.getElementById('exec-display')?.closest('section');
   const graphSection = document.querySelector('#graph-canvas')?.closest('section');
   const videoSection = document.querySelector('#video-player')?.closest('section');
   const jsonSection = document.querySelector('#json-output')?.closest('details');
@@ -1132,43 +1142,118 @@
       Enter a calculus expression to solve it and generate an animation.
     </p>
 
-    <div>
-      <label for="calc-type" class="block text-sm mb-1">Problem type</label>
-      <select id="calc-type" class="select-field">
-        <option value="limit">Limit</option>
-        <option value="derivative" selected>Derivative</option>
-        <option value="tangent_line">Tangent line</option>
-        <option value="continuity">Continuity</option>
-        <option value="power_rule">Power rule</option>
-        <option value="sum_rule">Sum rule</option>
-        <option value="product_rule">Product rule</option>
-        <option value="quotient_rule">Quotient rule</option>
-        <option value="chain_rule">Chain rule</option>
-        <option value="one_sided_limit">One-sided limit</option>
-        <option value="two_sided_limit">Two-sided limit</option>
-        <option value="limit_at_infinity">Limit at infinity</option>
-        <option value="derivative_applications">Derivative applications</option>
-      </select>
+    <div id="calc-mode-tabs" role="tablist" aria-label="Calculus problem type"
+      class="flex flex-wrap gap-2 border-b border-paper-dim pb-3">
+      <button id="calc-tab-derivative" type="button" role="tab"
+        aria-selected="true" aria-controls="calc-panel-derivative" tabindex="0"
+        class="btn-primary">Derivatives</button>
+      <button id="calc-tab-limit" type="button" role="tab"
+        aria-selected="false" aria-controls="calc-panel-limit" tabindex="-1"
+        class="btn-secondary">Limits</button>
+      <button id="calc-tab-continuity" type="button" role="tab"
+        aria-selected="false" aria-controls="calc-panel-continuity" tabindex="-1"
+        class="btn-secondary">Continuity</button>
+      <button id="calc-tab-chain-rule" type="button" role="tab"
+        aria-selected="false" aria-controls="calc-panel-chain-rule" tabindex="-1"
+        class="btn-secondary">Chain Rule</button>
     </div>
 
-    <div>
-      <label for="calc-expression" class="block text-sm mb-1">Expression</label>
-      <input id="calc-expression" class="input-field"
-        value="x**2 + 3*x + 2"
-        placeholder="Example: x**2 + 3*x + 2">
-      <p class="text-xs text-ink-dim mt-1">
-        Use ** for powers, e.g. x**2.
-      </p>
+    <div id="calc-panel-derivative" role="tabpanel" aria-labelledby="calc-tab-derivative"
+      data-problem-type="derivative" class="space-y-4">
+      <div>
+        <p class="block text-sm mb-2">Derivative topic</p>
+        <div id="calc-derivative-topics" role="group" aria-label="Derivative topic"
+          class="flex flex-wrap gap-2">
+          <button type="button" data-problem-type="derivative" aria-pressed="true" class="btn-primary text-sm">General Derivative</button>
+          <button type="button" data-problem-type="power_rule" aria-pressed="false" class="btn-secondary text-sm">Power Rule</button>
+          <button type="button" data-problem-type="sum_rule" aria-pressed="false" class="btn-secondary text-sm">Sum Rule</button>
+          <button type="button" data-problem-type="product_rule" aria-pressed="false" class="btn-secondary text-sm">Product Rule</button>
+          <button type="button" data-problem-type="quotient_rule" aria-pressed="false" class="btn-secondary text-sm">Quotient Rule</button>
+          <button type="button" data-problem-type="tangent_line" aria-pressed="false" class="btn-secondary text-sm">Tangent Line</button>
+          <button type="button" data-problem-type="derivative_applications" aria-pressed="false" class="btn-secondary text-sm">Derivative Applications</button>
+        </div>
+      </div>
+      <div>
+        <label for="calc-derivative-expression" class="block text-sm mb-1">Function f(x)</label>
+        <input id="calc-derivative-expression" name="expression" class="input-field"
+          value="x**2 + 3*x + 2" placeholder="Example: x**2 + 3*x + 2">
+        <p class="text-xs text-ink-dim mt-1">Use ** for powers, e.g. x**2.</p>
+      </div>
+      <div>
+        <label for="calc-derivative-variable" class="block text-sm mb-1">Differentiate with respect to</label>
+        <input id="calc-derivative-variable" name="variable" class="input-field" value="x">
+      </div>
+      <div id="calc-derivative-point-field" class="hidden">
+        <label for="calc-derivative-point" class="block text-sm mb-1">Point for tangent line (x = a)</label>
+        <input id="calc-derivative-point" name="point" class="input-field" value="1">
+      </div>
     </div>
 
-    <div>
-      <label for="calc-variable" class="block text-sm mb-1">Variable</label>
-      <input id="calc-variable" class="input-field" value="x">
+    <div id="calc-panel-limit" role="tabpanel" aria-labelledby="calc-tab-limit"
+      data-problem-type="limit" class="hidden space-y-4">
+      <div>
+        <p class="block text-sm mb-2">Limit topic</p>
+        <div id="calc-limit-topics" role="group" aria-label="Limit topic"
+          class="flex flex-wrap gap-2">
+          <button type="button" data-problem-type="limit" aria-pressed="true" class="btn-primary text-sm">Limit at a Point</button>
+          <button type="button" data-problem-type="one_sided_limit" aria-pressed="false" class="btn-secondary text-sm">One-Sided Limit</button>
+          <button type="button" data-problem-type="two_sided_limit" aria-pressed="false" class="btn-secondary text-sm">Two-Sided Limit</button>
+          <button type="button" data-problem-type="limit_at_infinity" aria-pressed="false" class="btn-secondary text-sm">Limit at Infinity</button>
+        </div>
+      </div>
+      <div>
+        <label for="calc-limit-expression" class="block text-sm mb-1">Function f(x)</label>
+        <input id="calc-limit-expression" name="expression" class="input-field"
+          value="(x**2 - 1)/(x - 1)" placeholder="Example: (x**2 - 1)/(x - 1)">
+        <p class="text-xs text-ink-dim mt-1">Use ** for powers, e.g. x**2.</p>
+      </div>
+      <div>
+        <label for="calc-limit-variable" class="block text-sm mb-1">Variable</label>
+        <input id="calc-limit-variable" name="variable" class="input-field" value="x">
+      </div>
+      <div id="calc-limit-point-field">
+        <label for="calc-limit-point" class="block text-sm mb-1">Approach value a (x → a)</label>
+        <input id="calc-limit-point" name="point" class="input-field" value="1">
+      </div>
+      <div id="calc-limit-direction-field" class="hidden">
+        <label id="calc-limit-direction-label" for="calc-limit-direction" class="block text-sm mb-1">Direction</label>
+        <select id="calc-limit-direction" name="direction" class="select-field">
+          <option value="+">From the right / positive infinity (+)</option>
+          <option value="-">From the left / negative infinity (-)</option>
+        </select>
+      </div>
     </div>
 
-    <div>
-      <label for="calc-point" class="block text-sm mb-1">Point (if needed)</label>
-      <input id="calc-point" class="input-field" value="1">
+    <div id="calc-panel-continuity" role="tabpanel" aria-labelledby="calc-tab-continuity"
+      data-problem-type="continuity" class="hidden space-y-4">
+      <div>
+        <label for="calc-continuity-expression" class="block text-sm mb-1">Function f(x)</label>
+        <input id="calc-continuity-expression" name="expression" class="input-field"
+          value="x**2 + 3*x + 2" placeholder="Example: x**2 + 3*x + 2">
+        <p class="text-xs text-ink-dim mt-1">Use ** for powers, e.g. x**2.</p>
+      </div>
+      <div>
+        <label for="calc-continuity-variable" class="block text-sm mb-1">Variable</label>
+        <input id="calc-continuity-variable" name="variable" class="input-field" value="x">
+      </div>
+      <div>
+        <label for="calc-continuity-point" class="block text-sm mb-1">Check continuity at x = a</label>
+        <input id="calc-continuity-point" name="point" class="input-field" value="1">
+      </div>
+    </div>
+
+    <div id="calc-panel-chain-rule" role="tabpanel" aria-labelledby="calc-tab-chain-rule"
+      data-problem-type="chain_rule" class="hidden space-y-4">
+      <div>
+        <label for="calc-chain-rule-expression" class="block text-sm mb-1">Composite function f(g(x))</label>
+        <input id="calc-chain-rule-expression" name="expression" class="input-field"
+          value="(3*x + 1)**2" placeholder="Example: (3*x + 1)**2">
+        <p class="text-xs text-ink-dim mt-1">Enter a composite function using ** for powers.</p>
+      </div>
+      <div>
+        <label for="calc-chain-rule-variable" class="block text-sm mb-1">Differentiate with respect to</label>
+        <input id="calc-chain-rule-variable" name="variable" class="input-field" value="x">
+      </div>
     </div>
 
     <div class="flex flex-wrap gap-2">
@@ -1180,8 +1265,18 @@
 
     <p id="calc-status" class="text-sm" role="status"></p>
 
-    <pre id="calc-result"
-      class="hidden whitespace-pre-wrap break-words rounded-lg p-3 bg-paper text-sm"></pre>
+    <div id="calc-result" class="hidden rounded-lg p-3 bg-paper text-sm">
+      <section class="rounded-xl border border-cyan-200 bg-white p-4 shadow-sm"
+        aria-labelledby="calc-final-heading">
+        <p id="calc-final-heading" class="text-xs uppercase tracking-wide font-semibold text-cyan-dark">Final Answer</p>
+        <p id="calc-result-conclusion" class="mt-1 font-medium text-ink"></p>
+        <div id="calc-result-equation" class="mt-2 font-mono text-ink"></div>
+      </section>
+      <section class="mt-4" aria-labelledby="calc-steps-heading">
+        <h3 id="calc-steps-heading" class="font-semibold text-ink">Step-by-Step Solution</h3>
+        <ol id="calc-result-steps" class="mt-3 space-y-3"></ol>
+      </section>
+    </div>
 
     <video id="calc-video" class="hidden" controls playsinline></video>
   `;
@@ -1219,6 +1314,32 @@ panel.style.boxShadow = '0 8px 30px rgba(40, 45, 80, 0.08)';
       border-radius: 8px;
       background: white;
       color: #202333;
+    }
+
+    #calculus-panel [role="tabpanel"] {
+      min-width: 0;
+    }
+
+    #calc-mode-tabs [role="tab"] {
+      border-radius: 8px;
+      transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
+    }
+
+    #calc-mode-tabs [role="tab"][aria-selected="true"] {
+      background: #ecfeff;
+      box-shadow: inset 0 0 0 1px #a5f3fc;
+      color: #0e7490;
+      font-weight: 600;
+    }
+
+    #calc-mode-tabs [role="tab"][aria-selected="false"] {
+      background: #ffffff;
+      color: #3d494c;
+    }
+
+    #calc-mode-tabs [role="tab"][aria-selected="false"]:hover {
+      background: #faf8ff;
+      border-color: #94a3b8;
     }
 
     #calc-video {
@@ -1264,34 +1385,32 @@ panel.style.boxShadow = '0 8px 30px rgba(40, 45, 80, 0.08)';
   const originalGridColumns = mainGrid.style.gridTemplateColumns;
 
   function showCalculus(active, clickedTab = null) {
-  panel.classList.toggle('hidden', !active);
+    panel.classList.toggle('hidden', !active);
 
-  // Hide the complete original Graph Theory layout
-  mainGrid.querySelectorAll(':scope > *').forEach(element => {
-    if (element !== panel) {
-      element.classList.toggle('hidden', active);
+    if (active) {
+      leftColumn.classList.add('hidden');
+      rightColumn.classList.remove('hidden');
+      algorithmInputs.classList.add('hidden');
+      probabilityControls?.classList.add('hidden');
+      executionSection?.classList.add('hidden');
+      algorithmSection.querySelector('h2').textContent = 'Visualizers';
+      mainGrid.style.gridTemplateColumns = 'minmax(0, 1fr)';
+    } else {
+      leftColumn.classList.remove('hidden');
+      executionSection?.classList.remove('hidden');
+      mainGrid.style.gridTemplateColumns = originalGridColumns;
     }
-  });
 
-  // Show the Calculus panel on its own
-  if (active) {
-    panel.classList.remove('hidden');
-    mainGrid.style.gridTemplateColumns = 'minmax(0, 1fr)';
-  } else {
-    mainGrid.style.gridTemplateColumns = originalGridColumns;
+    tabList.querySelectorAll('[role="tab"]').forEach(button => {
+      const selected = active
+        ? button === tab
+        : button === clickedTab;
+
+      button.setAttribute('aria-selected', String(selected));
+      button.classList.toggle('btn-primary', selected);
+      button.classList.toggle('btn-secondary', !selected);
+    });
   }
-
-  // Update tab appearance
-  tabList.querySelectorAll('[role="tab"]').forEach(button => {
-    const selected = active
-      ? button === tab
-      : button === clickedTab;
-
-    button.setAttribute('aria-selected', String(selected));
-    button.classList.toggle('btn-primary', selected);
-    button.classList.toggle('btn-secondary', !selected);
-  });
-}
 
   tab.addEventListener('click', () => showCalculus(true));
 
@@ -1299,15 +1418,610 @@ panel.style.boxShadow = '0 8px 30px rgba(40, 45, 80, 0.08)';
     button.addEventListener('click', () => showCalculus(false, button));
   });
 
+  const calculusTabs = [...panel.querySelectorAll('[role="tab"]')];
+  const calculusPanels = [...panel.querySelectorAll('[role="tabpanel"]')];
+  const derivativePanel = document.getElementById('calc-panel-derivative');
+  const limitPanel = document.getElementById('calc-panel-limit');
+  const derivativeTopics = document.getElementById('calc-derivative-topics');
+  const limitTopics = document.getElementById('calc-limit-topics');
+  const derivativePointField = document.getElementById('calc-derivative-point-field');
+  const limitPointField = document.getElementById('calc-limit-point-field');
+  const limitDirectionField = document.getElementById('calc-limit-direction-field');
+  const limitDirectionLabel = document.getElementById('calc-limit-direction-label');
+  const equationInputs = [...panel.querySelectorAll('input[name="expression"]')];
+
+  function stripOuterParentheses(value) {
+    let source = value.trim();
+    while (source.startsWith('(') && source.endsWith(')')) {
+      let depth = 0;
+      let wrapsAll = true;
+      for (let index = 0; index < source.length; index++) {
+        if (source[index] === '(') depth++;
+        if (source[index] === ')') depth--;
+        if (depth === 0 && index < source.length - 1) {
+          wrapsAll = false;
+          break;
+        }
+      }
+      if (!wrapsAll || depth !== 0) break;
+      source = source.slice(1, -1).trim();
+    }
+    return source;
+  }
+
+  function splitTopLevelFraction(source) {
+    let depth = 0;
+    for (let index = 0; index < source.length; index++) {
+      if (source[index] === '(') depth++;
+      if (source[index] === ')') depth--;
+      if (source[index] === '/' && depth === 0) {
+        return [source.slice(0, index), source.slice(index + 1)];
+      }
+    }
+    return null;
+  }
+
+  function expressionToTex(value) {
+    let source = String(value ?? '').trim();
+    if (!source) return '';
+    if (/\\(?:frac|lim|int|sqrt|sum|prod|partial|infty|cdot)\b/.test(source)) return source;
+
+    let integralMatch = source.match(/^Integral\((.*),\s*\(([A-Za-z]\w*),\s*([^,]+),\s*([^,)]+)\)\)$/);
+    if (integralMatch) {
+      return `\\int_{${expressionToTex(integralMatch[3])}}^{${expressionToTex(integralMatch[4])}} ${expressionToTex(integralMatch[1])}\\,d${expressionToTex(integralMatch[2])}`;
+    }
+    integralMatch = source.match(/^Integral\((.*),\s*([A-Za-z]\w*)\)$/);
+    if (integralMatch) {
+      return `\\int ${expressionToTex(integralMatch[1])}\\,d${expressionToTex(integralMatch[2])}`;
+    }
+    const derivativeMatch = source.match(/^Derivative\((.*),\s*([A-Za-z]\w*)\)$/);
+    if (derivativeMatch) {
+      return `\\frac{d}{d${expressionToTex(derivativeMatch[2])}}\\left(${expressionToTex(derivativeMatch[1])}\\right)`;
+    }
+
+    source = stripOuterParentheses(source);
+    const fractionParts = splitTopLevelFraction(source);
+    if (fractionParts) {
+      const equalsIndex = fractionParts[0].lastIndexOf('=');
+      if (equalsIndex !== -1) {
+        const leftSide = fractionParts[0].slice(0, equalsIndex);
+        const numerator = fractionParts[0].slice(equalsIndex + 1);
+        return `${expressionToTex(leftSide)} = \\frac{${expressionToTex(stripOuterParentheses(numerator))}}{${expressionToTex(stripOuterParentheses(fractionParts[1]))}}`;
+      }
+      return `\\frac{${expressionToTex(stripOuterParentheses(fractionParts[0]))}}{${expressionToTex(stripOuterParentheses(fractionParts[1]))}}`;
+    }
+
+    source = source
+      .replace(/\*\*\s*\(([^()]*)\)/g, '^{$1}')
+      .replace(/\*\*\s*([A-Za-z0-9.]+)/g, '^{$1}')
+      .replace(/\bsqrt\(([^()]*)\)/g, '\\sqrt{$1}')
+      .replace(/\b(sin|cos|tan|asin|acos|atan|log|ln|exp)\(([^()]*)\)/g, '\\$1\\left($2\\right)')
+      .replace(/\bAbs\(([^()]*)\)/g, '\\left|$1\\right|')
+      .replace(/\boo\b/g, '\\infty')
+      .replace(/\bpi\b/g, '\\pi')
+      .replace(/²/g, '^{2}')
+      .replace(/³/g, '^{3}')
+      .replace(/([0-9])\s*\*\s*([A-Za-z])/g, '$1$2')
+      .replace(/\*/g, '\\cdot ');
+    return source;
+  }
+
+  function renderMath(target, tex, fallback, displayMode = false) {
+    target.replaceChildren();
+    if (!window.katex) {
+      target.textContent = fallback;
+      return;
+    }
+    try {
+      window.katex.render(tex, target, {
+        displayMode,
+        output: 'htmlAndMathml',
+        strict: 'error',
+        throwOnError: true,
+        trust: false
+      });
+    } catch (error) {
+      console.warn('KaTeX could not render this equation.', error);
+      target.textContent = fallback;
+    }
+  }
+
+  equationInputs.forEach(input => {
+    const preview = document.createElement('div');
+    preview.className = 'calc-equation-preview mt-2 min-h-6 text-ink';
+    preview.setAttribute('aria-label', 'Formatted equation preview');
+    input.parentElement.append(preview);
+    const updatePreview = () => renderMath(preview, expressionToTex(input.value), input.value);
+    input.addEventListener('input', updatePreview);
+    updatePreview();
+  });
+  window.addEventListener('load', () => {
+    equationInputs.forEach(input => input.dispatchEvent(new Event('input')));
+  }, { once: true });
+
+  const methodLabels = {
+    symbolic_limit: 'Symbolic limit',
+    compare_one_sided_limits: 'Comparison of one-sided limits',
+    limit_and_function_value: 'Limit and function-value comparison',
+    symbolic_differentiation: 'Symbolic differentiation',
+    power_rule: 'Power Rule',
+    sum_rule: 'Sum Rule',
+    product_rule: 'Product Rule',
+    quotient_rule: 'Quotient Rule',
+    chain_rule: 'Chain Rule',
+    critical_points_and_second_derivative: 'Critical points and second derivative'
+  };
+
+  function finalAnswer(payload, solution) {
+    const variable = expressionToTex(solution.variable ?? payload.variable);
+    const point = expressionToTex(solution.point ?? payload.point);
+    const result = solution.result ?? solution.derivative ?? solution.tangent_line ??
+      solution.first_derivative ?? '';
+
+    if (payload.problem_type === 'continuity') {
+      const state = solution.is_continuous === true
+        ? 'The function is continuous at this point.'
+        : solution.is_continuous === false
+          ? 'The function is not continuous at this point.'
+          : `Result: ${solution.result ?? 'No continuity result was returned.'}`;
+      return {
+        text: state,
+        tex: `f(${point}) = ${expressionToTex(solution.function_value ?? '')},\\quad \\lim_{${variable}\\to ${point}} f(${variable}) = ${expressionToTex(solution.limit_value ?? '')}`
+      };
+    }
+    if (payload.problem_type === 'tangent_line') {
+      return {text: 'Tangent line', tex: `y = ${expressionToTex(solution.tangent_line ?? result)}`};
+    }
+    if (['limit', 'one_sided_limit', 'two_sided_limit', 'limit_at_infinity'].includes(payload.problem_type)) {
+      const doesNotExist = result === 'does_not_exist';
+      let target = point;
+      if (payload.problem_type === 'limit_at_infinity') {
+        target = payload.direction === '-' ? '-\\infty' : '\\infty';
+      } else if (payload.problem_type === 'one_sided_limit') {
+        target += payload.direction === '-' ? '^{-}' : '^{+}';
+      }
+      return {
+        text: doesNotExist ? 'The two-sided limit does not exist.' : 'Limit',
+        tex: `\\lim_{${variable}\\to ${target}} f(${variable}) = ${doesNotExist ? '\\text{does not exist}' : expressionToTex(result)}`
+      };
+    }
+    if (payload.problem_type === 'derivative_applications') {
+      const classifications = solution.classifications?.map(item =>
+        `${item.classification} at x = ${item.point}`
+      ).join('; ');
+      return {
+        text: classifications || 'Derivative applications',
+        tex: `f'(${variable}) = ${expressionToTex(solution.first_derivative ?? result)}${solution.second_derivative !== undefined ? `,\\quad f''(${variable}) = ${expressionToTex(solution.second_derivative)}` : ''}`
+      };
+    }
+    if (payload.problem_type === 'derivative' || payload.problem_type.endsWith('_rule')) {
+      return {
+        text: 'Derivative',
+        tex: `\\frac{d}{d${variable}} f(${variable}) = ${expressionToTex(result)}`
+      };
+    }
+    return {text: 'Result', tex: expressionToTex(result)};
+  }
+
+  function appendEquation(container, value) {
+    const values = Array.isArray(value) ? value : [value];
+    values.filter(item => item !== null && item !== undefined && item !== '').forEach(item => {
+      const equation = document.createElement('div');
+      equation.className = 'calc-step-equation mt-2 rounded-lg bg-paper px-3 py-2 text-ink';
+      renderMath(equation, expressionToTex(item), String(item));
+      container.append(equation);
+    });
+  }
+
+  function stepEquations(step, solution) {
+    const equations = [];
+    if (step.expression !== undefined && !(step.type === 'differentiate_terms' && Array.isArray(step.expression))) {
+      equations.push(step.expression);
+    }
+    if (step.result !== undefined &&
+        !['exists', 'does_not_exist', 'continuous', 'not_continuous'].includes(step.result)) {
+      equations.push(step.result);
+    }
+
+    switch (step.type) {
+      case 'identify':
+        if (solution.u !== undefined && solution.v !== undefined) {
+          equations.push(`u = ${solution.u},\\quad v = ${solution.v}`);
+        }
+        if (solution.outer_function && solution.inner_function) {
+          equations.push(`\\text{outer} = ${solution.outer_function},\\quad \\text{inner} = ${solution.inner_function}`);
+        }
+        break;
+      case 'differentiate':
+        if (solution.u_prime !== undefined && solution.v_prime !== undefined) {
+          equations.push(`u' = ${solution.u_prime},\\quad v' = ${solution.v_prime}`);
+        }
+        if (solution.first_derivative !== undefined) {
+          equations.push(`f'(${solution.variable}) = ${solution.first_derivative}`);
+        }
+        break;
+      case 'differentiate_terms':
+        if (solution.terms && solution.term_derivatives &&
+            solution.terms.length === solution.term_derivatives.length) {
+          solution.terms.forEach((term, index) => {
+            equations.push(`\\frac{d}{d${expressionToTex(solution.variable)}}\\left(${expressionToTex(term)}\\right) = ${expressionToTex(solution.term_derivatives[index])}`);
+          });
+        } else {
+          if (solution.terms) equations.push(solution.terms);
+          if (solution.term_derivatives) equations.push(solution.term_derivatives);
+        }
+        break;
+      case 'apply_rule':
+        if (solution.method === 'product_rule' &&
+            solution.u !== undefined && solution.v !== undefined &&
+            solution.u_derivative !== undefined && solution.v_derivative !== undefined) {
+          equations.push(
+            `${expressionToTex(solution.u_derivative)}\\left(${expressionToTex(solution.v)}\\right) + ` +
+            `${expressionToTex(solution.u)}\\left(${expressionToTex(solution.v_derivative)}\\right)`
+          );
+        }
+        if (typeof step.message === 'string') {
+          const formula = step.message.includes(':')
+            ? step.message.slice(step.message.lastIndexOf(':') + 1).trim()
+            : step.message;
+          if (formula.includes('=')) equations.push(formula);
+        }
+        break;
+      case 'critical_points':
+        if (solution.critical_points) equations.push(solution.critical_points);
+        break;
+      case 'second_derivative':
+        if (solution.second_derivative !== undefined) equations.push(`f''(${solution.variable}) = ${solution.second_derivative}`);
+        break;
+      case 'classify':
+        if (solution.classifications?.length) {
+          solution.classifications.forEach(item => {
+            equations.push(`x = ${item.point},\\quad f''(x) = ${item.second_derivative_value},\\quad \\text{${item.classification}}`);
+          });
+        }
+        break;
+    }
+    return equations;
+  }
+
+  function splitAdditiveTerms(expression) {
+    const terms = [];
+    let depth = 0;
+    let start = 0;
+    for (let index = 0; index < expression.length; index++) {
+      const character = expression[index];
+      if (character === '(') depth++;
+      if (character === ')') depth--;
+      if (depth === 0 && index > start &&
+          (character === '+' || character === '-') &&
+          !['*', '/', '^'].includes(expression[index - 1])) {
+        terms.push(expression.slice(start, index).trim());
+        start = index;
+      }
+    }
+    terms.push(expression.slice(start).trim());
+    return terms
+      .map(term => term.startsWith('+') ? term.slice(1).trim() : term)
+      .filter(Boolean);
+  }
+
+  function parseNumericCoefficient(value) {
+    if (!value) return 1;
+    if (value === '-') return -1;
+    if (value === '+') return 1;
+    const parts = value.split('/');
+    const numerator = Number(parts[0]);
+    const denominator = parts.length === 2 ? Number(parts[1]) : 1;
+    if (!Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator === 0) return null;
+    return numerator / denominator;
+  }
+
+  function parseMonomial(term, variable) {
+    const source = term.replace(/\s+/g, '');
+    const constant = source.match(/^([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:\/\d+(?:\.\d*)?)?)$/);
+    if (constant) {
+      const coefficient = parseNumericCoefficient(constant[1]);
+      return coefficient === null ? null : {coefficient, exponent: 0};
+    }
+
+    const variablePattern = variable.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const coefficientPattern = '[+-]?(?:(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:/\\d+(?:\\.\\d*)?)?)?';
+    const match = source.match(new RegExp(
+      `^(${coefficientPattern})\\*?${variablePattern}(?:\\*\\*([+-]?\\d+))?$`
+    ));
+    if (!match) return null;
+    const coefficient = parseNumericCoefficient(match[1]);
+    const exponent = match[2] === undefined ? 1 : Number(match[2]);
+    if (coefficient === null || !Number.isInteger(exponent)) return null;
+    return {coefficient, exponent};
+  }
+
+  function polynomialTerms(expression, variable) {
+    const terms = splitAdditiveTerms(String(expression));
+    const parsed = terms.map(term => ({term, monomial: parseMonomial(term, variable)}));
+    return parsed.every(item => item.monomial) ? parsed : null;
+  }
+
+  function polynomialCoefficients(terms) {
+    const coefficients = new Map();
+    terms.forEach(({monomial}) => {
+      coefficients.set(
+        monomial.exponent,
+        (coefficients.get(monomial.exponent) || 0) + monomial.coefficient
+      );
+    });
+    return coefficients;
+  }
+
+  function samePolynomial(left, right) {
+    const leftCoefficients = polynomialCoefficients(left);
+    const rightCoefficients = polynomialCoefficients(right);
+    const exponents = new Set([...leftCoefficients.keys(), ...rightCoefficients.keys()]);
+    return [...exponents].every(exponent =>
+      Math.abs((leftCoefficients.get(exponent) || 0) - (rightCoefficients.get(exponent) || 0)) < 1e-10
+    );
+  }
+
+  function numberTex(value) {
+    if (Number.isInteger(value)) return String(value);
+    return String(Number(value.toPrecision(10)));
+  }
+
+  function monomialTex(coefficient, exponent, variable) {
+    if (coefficient === 0) return '0';
+    const sign = coefficient < 0 ? '-' : '';
+    const magnitude = Math.abs(coefficient);
+    const coefficientTex = magnitude === 1 && exponent !== 0 ? '' : numberTex(magnitude);
+    const variableTex = exponent === 0
+      ? ''
+      : exponent === 1
+        ? expressionToTex(variable)
+        : `${expressionToTex(variable)}^{${exponent}}`;
+    return `${sign}${coefficientTex}${variableTex}` || '0';
+  }
+
+  function verifiedMonomialDerivativeSteps(payload, solution) {
+    if (!['derivative', 'power_rule'].includes(payload.problem_type)) return null;
+    const expression = solution.expression ?? payload.expression;
+    const derivative = solution.derivative ?? solution.result;
+    if (typeof derivative !== 'string') return null;
+
+    const terms = polynomialTerms(expression, payload.variable);
+    const returnedTerms = polynomialTerms(derivative, payload.variable);
+    if (!terms || !returnedTerms) return null;
+
+    const differentiatedTerms = terms.map(({term, monomial}) => ({
+      term,
+      coefficient: monomial.coefficient * monomial.exponent,
+      exponent: monomial.exponent - 1
+    }));
+    const calculated = differentiatedTerms.map(({coefficient, exponent}) => ({
+      monomial: {coefficient, exponent}
+    }));
+    if (!samePolynomial(calculated, returnedTerms)) return null;
+
+    const variable = expressionToTex(payload.variable);
+    return [
+      ...differentiatedTerms.map(({term, coefficient, exponent}) => {
+        const monomial = parseMonomial(term, payload.variable);
+        const isConstant = monomial.exponent === 0;
+        const derivativeTex = monomialTex(coefficient, exponent, payload.variable);
+        let rightSide = derivativeTex;
+        if (!isConstant && monomial.coefficient !== 1 && monomial.coefficient !== -1 &&
+            monomial.exponent !== 1) {
+          const innerDerivative = monomialTex(monomial.exponent, exponent, payload.variable);
+          rightSide = `${numberTex(monomial.coefficient)}\\left(${innerDerivative}\\right) = ${derivativeTex}`;
+        }
+        return {
+          title: isConstant
+            ? 'Constant rule'
+            : monomial.coefficient === 1
+              ? 'Power rule'
+              : 'Constant-multiple rule',
+          message: '',
+          equations: [`\\frac{d}{d${variable}}\\left(${expressionToTex(term)}\\right) = ${rightSide}`]
+        };
+      }),
+      {
+        title: 'Final result',
+        message: '',
+        equations: [`f'(${variable}) = ${expressionToTex(derivative)}`]
+      }
+    ];
+  }
+
+  function renderSolutionSteps(payload, solution) {
+    const list = document.getElementById('calc-result-steps');
+    list.replaceChildren();
+    let number = 0;
+
+    const addCard = (title, message, equations = []) => {
+      number += 1;
+      const item = document.createElement('li');
+      item.className = 'calc-step-card rounded-r-lg border border-paper-dim bg-white p-3';
+
+      const header = document.createElement('div');
+      header.className = 'flex items-start gap-3';
+      const badge = document.createElement('span');
+      badge.className = 'calc-step-number flex shrink-0 items-center justify-center rounded-full bg-cyan-50 text-xs font-semibold text-cyan-dark';
+      badge.textContent = String(number);
+      const body = document.createElement('div');
+      body.className = 'min-w-0 flex-1';
+      const heading = document.createElement('h4');
+      heading.className = 'font-medium text-ink';
+      heading.textContent = title;
+      body.append(heading);
+
+      if (message) {
+        const explanation = document.createElement('p');
+        explanation.className = 'mt-1 text-sm leading-relaxed text-ink-dim';
+        explanation.textContent = message;
+        body.append(explanation);
+      }
+      equations.filter(value => value !== undefined && value !== null && value !== '').forEach(value => {
+        appendEquation(body, value);
+      });
+      header.append(badge, body);
+      item.append(header);
+      list.append(item);
+    };
+
+    const expression = solution.expression ?? payload.expression;
+    if (expression) {
+      addCard('Given', 'Start with the function provided.', [
+        `f(${solution.variable ?? payload.variable}) = ${expressionToTex(expression)}`
+      ]);
+    }
+
+    const monomialSteps = verifiedMonomialDerivativeSteps(payload, solution);
+    if (monomialSteps) {
+      monomialSteps.forEach(step => addCard(step.title, step.message, step.equations));
+      return;
+    }
+
+    const methodLabel = methodLabels[solution.method];
+    if (methodLabel) {
+      addCard('Method', methodLabel);
+    }
+
+    if (Array.isArray(solution.steps)) {
+      solution.steps.forEach(step => {
+        if (!step || typeof step !== 'object') return;
+        const stepType = String(step.type ?? 'Step').replace(/_/g, ' ');
+        let title = stepType.charAt(0).toUpperCase() + stepType.slice(1);
+        if (['derivative', 'power_rule', 'sum_rule', 'product_rule', 'quotient_rule', 'chain_rule']
+          .includes(payload.problem_type) && step.type === 'result') {
+          title = 'Final result';
+        } else if (payload.problem_type === 'sum_rule' && step.type === 'combine') {
+          title = 'Final result';
+        } else if (payload.problem_type === 'tangent_line' && step.type === 'tangent') {
+          title = 'Final result';
+        }
+        let message = typeof step.message === 'string' ? step.message : '';
+        if (payload.problem_type === 'chain_rule' && step.type === 'identify' &&
+            (!solution.outer_function || !solution.inner_function)) {
+          message = 'The solver did not identify a specific inner or outer function.';
+        }
+        addCard(title, message, stepEquations(step, solution));
+      });
+    }
+
+    if (payload.problem_type === 'derivative_applications') {
+      if (solution.first_derivative !== undefined && !solution.steps?.some(step => step.type === 'differentiate')) {
+        addCard('First derivative', '', [`f'(${solution.variable}) = ${solution.first_derivative}`]);
+      }
+      if (solution.second_derivative !== undefined && !solution.steps?.some(step => step.type === 'second_derivative')) {
+        addCard('Second derivative', '', [`f''(${solution.variable}) = ${solution.second_derivative}`]);
+      }
+      if (solution.critical_points !== undefined && !solution.steps?.some(step => step.type === 'critical_points')) {
+        addCard('Critical points', '', [solution.critical_points]);
+      }
+    }
+
+    if (!number) addCard('Solution', 'The solver did not return any step-by-step details.');
+  }
+
+  function updateDerivativeTopic() {
+    const selectedTopic = derivativeTopics.querySelector('[aria-pressed="true"]');
+    derivativePanel.dataset.problemType = selectedTopic.dataset.problemType;
+    derivativePointField.classList.toggle('hidden', selectedTopic.dataset.problemType !== 'tangent_line');
+  }
+
+  function updateLimitTopic() {
+    const selectedTopic = limitTopics.querySelector('[aria-pressed="true"]');
+    const problemType = selectedTopic.dataset.problemType;
+    const needsPoint = problemType !== 'limit_at_infinity';
+    const needsDirection = ['one_sided_limit', 'limit_at_infinity'].includes(problemType);
+    limitPanel.dataset.problemType = problemType;
+    limitPointField.classList.toggle('hidden', !needsPoint);
+    limitDirectionField.classList.toggle('hidden', !needsDirection);
+    limitDirectionLabel.textContent = problemType === 'limit_at_infinity'
+      ? 'Direction at infinity'
+      : 'Approach from';
+    limitDirectionField.querySelector('option[value="+"]').textContent =
+      problemType === 'limit_at_infinity' ? 'Positive infinity (+)' : 'From the right (+)';
+    limitDirectionField.querySelector('option[value="-"]').textContent =
+      problemType === 'limit_at_infinity' ? 'Negative infinity (-)' : 'From the left (-)';
+  }
+
+  updateDerivativeTopic();
+  updateLimitTopic();
+
+  function clearCalculusOutput() {
+    const status = document.getElementById('calc-status');
+    const result = document.getElementById('calc-result');
+    const video = document.getElementById('calc-video');
+    status.textContent = '';
+    result.classList.add('hidden');
+    video.pause();
+    video.removeAttribute('src');
+    video.classList.add('hidden');
+  }
+
+  function bindSubtopicButtons(group, updateTopic) {
+    group.addEventListener('click', event => {
+      const selectedButton = event.target.closest('button[data-problem-type]');
+      if (!selectedButton) return;
+      group.querySelectorAll('button[data-problem-type]').forEach(button => {
+        const selected = button === selectedButton;
+        button.setAttribute('aria-pressed', String(selected));
+        button.classList.toggle('btn-primary', selected);
+        button.classList.toggle('btn-secondary', !selected);
+      });
+      updateTopic();
+      clearCalculusOutput();
+    });
+  }
+  bindSubtopicButtons(derivativeTopics, updateDerivativeTopic);
+  bindSubtopicButtons(limitTopics, updateLimitTopic);
+
+  function selectCalculusTab(selectedTab) {
+    const selectedPanelId = selectedTab.getAttribute('aria-controls');
+    calculusTabs.forEach(button => {
+      const selected = button === selectedTab;
+      button.setAttribute('aria-selected', String(selected));
+      button.tabIndex = selected ? 0 : -1;
+      button.classList.toggle('btn-primary', selected);
+      button.classList.toggle('btn-secondary', !selected);
+    });
+    calculusPanels.forEach(tabPanel => {
+      tabPanel.classList.toggle('hidden', tabPanel.id !== selectedPanelId);
+    });
+
+    clearCalculusOutput();
+  }
+
+  calculusTabs.forEach((button, index) => {
+    button.addEventListener('click', () => selectCalculusTab(button));
+    button.addEventListener('keydown', event => {
+      let nextIndex = null;
+      if (event.key === 'ArrowRight') nextIndex = (index + 1) % calculusTabs.length;
+      if (event.key === 'ArrowLeft') nextIndex = (index - 1 + calculusTabs.length) % calculusTabs.length;
+      if (event.key === 'Home') nextIndex = 0;
+      if (event.key === 'End') nextIndex = calculusTabs.length - 1;
+      if (nextIndex !== null) {
+        event.preventDefault();
+        calculusTabs[nextIndex].focus();
+        selectCalculusTab(calculusTabs[nextIndex]);
+      }
+    });
+  });
+
   // Data sent to the FastAPI backend
   function getPayload() {
-    return {
-      problem_type: document.getElementById('calc-type').value,
-      expression: document.getElementById('calc-expression').value.trim(),
-      variable: document.getElementById('calc-variable').value.trim(),
-      point: document.getElementById('calc-point').value.trim(),
-      direction: 'right'
+    const activePanel = calculusPanels.find(tabPanel => !tabPanel.classList.contains('hidden'));
+    const pointInput = activePanel.querySelector('[name="point"]');
+    const directionInput = activePanel.querySelector('[name="direction"]');
+    const payload = {
+      problem_type: activePanel.dataset.problemType,
+      expression: activePanel.querySelector('[name="expression"]').value.trim(),
+      variable: activePanel.querySelector('[name="variable"]').value.trim(),
+      point: pointInput && !pointInput.closest('.hidden') ? pointInput.value.trim() : ''
     };
+    if (directionInput && !directionInput.closest('.hidden')) {
+      payload.direction = directionInput.value;
+    }
+    return payload;
   }
 
   // Solve the expression or render its animation
@@ -1319,6 +2033,16 @@ panel.style.boxShadow = '0 8px 30px rgba(40, 45, 80, 0.08)';
 
     if (!payload.expression || !payload.variable) {
       status.textContent = 'Please enter an expression and variable.';
+      return;
+    }
+    if ([
+      'limit',
+      'one_sided_limit',
+      'two_sided_limit',
+      'continuity',
+      'tangent_line'
+    ].includes(payload.problem_type) && !payload.point) {
+      status.textContent = 'Please enter the point required for this problem.';
       return;
     }
 
@@ -1349,7 +2073,16 @@ panel.style.boxShadow = '0 8px 30px rgba(40, 45, 80, 0.08)';
       }
 
       if (endpoint.endsWith('/solve')) {
-        result.textContent = JSON.stringify(data, null, 2);
+        const solution = data.solution || data;
+        const answer = finalAnswer(payload, solution);
+        document.getElementById('calc-result-conclusion').textContent = answer.text;
+        renderMath(
+          document.getElementById('calc-result-equation'),
+          answer.tex,
+          answer.text,
+          true
+        );
+        renderSolutionSteps(payload, solution);
         result.classList.remove('hidden');
         status.textContent = 'Solution ready!';
       } else {
