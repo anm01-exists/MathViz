@@ -1,2115 +1,1831 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MathViz — Interactive Math Visualizer</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            paper: '#faf8ff',
-            'paper-dim': '#d7d9e8',
-            ink: '#171b26',
-            'ink-dim': '#3d494c',
-            'ink-light': '#6d797d',
-            cyan: '#06b6d4',
-            'cyan-dark': '#0891b2',
-            teal: '#14b8a6',
-            amber: '#f59e0b',
-            rose: '#f43f5e',
-          },
-          fontFamily: {
-            sans: ['Inter', 'system-ui', 'sans-serif'],
-            mono: ['JetBrains Mono', 'monospace'],
-          },
-        }
-      }
-    }
-  </script>
-  <style>
-    * { box-sizing: border-box; }
-    body { font-family: 'Inter', system-ui, sans-serif; background: #faf8ff; color: #171b26; }
-    .paper-bg { background: #faf8ff; background-image: radial-gradient(#94a3b8 1px, transparent 1px); background-size: 32px 32px; }
-    .btn-primary { @apply bg-cyan-600 text-white px-4 py-2 rounded-lg font-medium transition-all hover:bg-cyan-700 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed; }
-    .btn-secondary { @apply bg-white text-ink border border-paper-dim px-4 py-2 rounded-lg font-medium transition-all hover:bg-paper-dim active:scale-[0.98]; }
-    .input-field { @apply w-full bg-white border border-paper-dim px-3 py-2 rounded-lg text-ink placeholder-ink-light font-mono text-sm focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500; }
-    .select-field { @apply w-full bg-white border border-paper-dim px-3 py-2 rounded-lg text-ink font-mono text-sm focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500; }
-    .card { @apply bg-white border border-paper-dim rounded-xl shadow-sm; }
-    .card-elevated { @apply bg-white border border-paper-dim rounded-xl shadow-lg; }
-    .badge { @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium font-mono; }
-    .badge-cyan { @apply bg-cyan-100 text-cyan-800 border border-cyan-200; }
-    .badge-teal { @apply bg-teal-100 text-teal-800 border border-teal-200; }
-    .badge-rose { @apply bg-rose-100 text-rose-800 border border-rose-200; }
-    .video-container { @apply bg-ink rounded-lg overflow-hidden; }
-    .toast { @apply fixed bottom-6 right-6 px-4 py-3 rounded-lg shadow-lg font-medium font-mono text-sm z-50 animate-slide-up; }
-    .toast-success { @apply bg-teal-600 text-white; }
-    .toast-error { @apply bg-rose-600 text-white; }
-    .toast-info { @apply bg-cyan-600 text-white; }
-    @keyframes slide-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    .animate-slide-up { animation: slide-up 0.3s ease-out; }
-    .graph-node circle { transition: fill 0.15s, stroke 0.15s; }
-    .graph-node:hover circle { fill: #e0f2fe; stroke: #06b6d4; }
-    .graph-node.selected circle { fill: #cffafe; stroke: #06b6d4; stroke-width: 3; }
-    .edge-line { transition: stroke 0.15s; }
-    .edge-line:hover { stroke: #06b6d4 !important; }
-    .calc-equation-preview,
-    #calc-result-equation,
-    .calc-step-equation { min-width: 0; overflow-x: auto; }
-    .calc-step-card { border-left: 3px solid #d7d9e8; }
-    .calc-step-number { min-width: 1.75rem; height: 1.75rem; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MathViz — Interactive Math Visualizer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.22/dist/katex.min.js"></script>
+
+<style>
+/* ===== Base (default = NEUTRAL theme: BFS / DFS / Dijkstra / Probability) ===== */
+:root{
+  --bg:#ffffff; --surface:#fff; --muted:#f3f3f3; --border:#e2e2e2;
+  --text:#111111; --text2:#6b6b6b;
+  --primary:#111111; --primary-d:#000000; --accent:#e6e6e6; --warm:#8a8a8a; --danger:#b4412f;
+  --primary-rgb:17,17,17;
+  --bd2:#cfcfcf;          /* soft accent border */
+  --ink2:#333333;         /* secondary ink */
+  --canvas:#ffffff;       /* canvas / code background */
+  --node-hover:#f2f2f2;
+  --vid:#111111; --vid-fg:#9a9a9a;
+  --ok:#2b2b2b;           /* success toast */
+  --dots:radial-gradient(circle at 2px 2px, rgba(0,0,0,.18) 1.2px, transparent 1.6px);
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+}
+
+/* ===== CALCULUS theme (green) — applied when body[data-theme="calc"] ===== */
+body[data-theme="calc"]{
+  --bg:#f7f6f0; --surface:#fff; --muted:#eaf1ec; --border:#dce5de;
+  --text:#202923; --text2:#65736a;
+  --primary:#176b55; --primary-d:#105642; --accent:#d5e6da; --warm:#c47752;
+  --primary-rgb:23,107,85;
+  --bd2:#b9d3c2; --ink2:#34483d; --canvas:#fbfbf7; --node-hover:#eef6f1;
+  --vid:#14201a; --vid-fg:#9fb3a8; --ok:#0f7a5c;
+  --dots:none;
+}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background-color:var(--bg);background-image:var(--dots);background-size:24px 24px;color:var(--text);font:400 15px/1.55 var(--sans)}
+h1,h2,h3,h4,p,ol,ul{margin:0;padding:0}
+ol,ul{list-style:none}
+button,input,select,textarea{font-family:inherit}
+
+/* ===== Header ===== */
+.topbar{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.topbar-in{max-width:1200px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.logo{flex:none;width:38px;height:38px;border-radius:10px;background:var(--primary);color:#fff;display:grid;place-items:center}
+.logo svg{width:22px;height:22px}
+.brand h1{font-size:1.15rem;line-height:1.2;font-weight:700}
+.brand p{font:500 .72rem/1.3 var(--mono);color:var(--text2)}
+.pill{flex:none;display:inline-flex;align-items:center;gap:8px;padding:5px 12px;border-radius:999px;border:1px solid var(--border);background:var(--muted);font:500 .78rem/1 var(--mono);color:var(--primary)}
+.pill i{width:8px;height:8px;border-radius:50%;background:var(--primary)}
+.pill[data-state="running"]{color:#8a6100}
+.pill[data-state="running"] i{background:#e0a100;animation:pulse 1s ease-in-out infinite}
+.pill[data-state="error"]{color:var(--danger)}
+.pill[data-state="error"] i{background:var(--danger)}
+@keyframes pulse{50%{opacity:.35}}
+
+/* ===== Layout ===== */
+.container{max-width:1200px;margin:0 auto;padding:24px 20px 56px}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:24px;align-items:start}
+.col{display:flex;flex-direction:column;gap:24px;min-width:0}
+.stack{display:flex;flex-direction:column;gap:20px}
+.stack-sm{display:flex;flex-direction:column;gap:12px}
+.narrow{max-width:920px;margin:0 auto}
+@media (max-width:960px){.layout{grid-template-columns:minmax(0,1fr)}}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;box-shadow:0 6px 20px rgba(0,0,0,.05)}
+.card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.card-head h2,.card h2{font-size:1.1rem;font-weight:700;letter-spacing:-.01em}
+.sub{color:var(--text2);font-size:.9rem}
+.eyebrow{font-size:.7rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--primary)}
+@media (max-width:560px){.card{padding:18px}}
+
+/* Neutral theme: flat, borderless cards so the dotted page shows through */
+body[data-theme="neutral"] .card{background:transparent;border-color:transparent;box-shadow:none}
+body[data-theme="neutral"] .stat,
+body[data-theme="neutral"] .msg{background:transparent}
+
+/* ===== Segmented tabs ===== */
+.seg{display:grid;grid-template-columns:repeat(var(--n,4),minmax(0,1fr));gap:4px;padding:5px;background:var(--muted);border:1px solid var(--border);border-radius:14px}
+.seg button{min-height:42px;padding:8px 10px;border:1px solid transparent;border-radius:10px;background:transparent;color:var(--ink2);font:500 .92rem/1.2 var(--sans);cursor:pointer;transition:background .15s,color .15s,box-shadow .15s}
+.seg button:hover{background:var(--accent);color:var(--primary)}
+.seg button[aria-selected="true"]{background:var(--primary);color:#fff;font-weight:600;box-shadow:0 2px 6px rgba(var(--primary-rgb),.25)}
+.seg button:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.viz-tabs{margin-bottom:24px}
+@media (max-width:640px){.seg{grid-template-columns:repeat(var(--n-sm,2),minmax(0,1fr))}}
+
+/* ===== Buttons ===== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:10px 20px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--text);font:600 .92rem/1.2 var(--sans);cursor:pointer;transition:background .15s,box-shadow .15s,transform .1s}
+.btn:hover{background:var(--muted)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.btn:focus-visible,.chip:focus-visible,.tool:focus-visible{outline:2px solid var(--primary);outline-offset:2px}
+.btn-primary{background:var(--primary);border-color:var(--primary);color:#fff}
+.btn-primary:hover{background:var(--primary-d);border-color:var(--primary-d)}
+.btn-warm{background:var(--warm);border-color:var(--warm);color:#fff}
+.btn-warm:hover{background:#b0653f;border-color:#b0653f}
+.btn-sm{min-height:36px;padding:6px 14px;font-size:.82rem}
+.btn-block{width:100%}
+.btn-row{display:flex;flex-wrap:wrap;gap:12px}
+
+/* ===== Forms ===== */
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field>label,.label{font-size:.82rem;font-weight:600;color:var(--text2)}
+.field small{font-size:.78rem;color:var(--text2)}
+input[type="text"],input[type="number"],select{width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:#fff;color:var(--text);font-size:15px}
+input[type="text"].expr{font-size:16px}
+input:focus,select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(var(--primary-rgb),.15)}
+.check{display:inline-flex;align-items:center;gap:8px;font-size:.88rem;color:var(--text2);cursor:pointer}
+.check input{width:16px;height:16px;accent-color:var(--primary)}
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{padding:7px 14px;border:1px solid var(--border);border-radius:999px;background:var(--muted);color:var(--ink2);font:500 .82rem/1.25 var(--sans);cursor:pointer;transition:background .15s,color .15s}
+.chip:hover{background:var(--accent);color:var(--primary)}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--bd2);color:var(--primary);font-weight:600}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:8px}
+.tool{min-width:40px;min-height:36px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--muted);color:var(--ink2);font:500 .82rem/1 var(--mono);cursor:pointer;transition:background .15s,color .15s}
+.tool:hover{background:var(--accent);color:var(--primary)}
+.tool:active{transform:translateY(1px)}
+
+.preview{min-height:46px;padding:8px 14px;border-radius:10px;background:var(--muted);overflow-x:auto;display:flex;align-items:center;font-size:1.1rem}
+.preview.empty{color:var(--text2);font-size:.88rem}
+.preview .katex{font-size:1.1em}
+
+.status{padding:10px 14px;border:1px solid var(--border);border-radius:10px;background:var(--muted);font-size:.9rem}
+.status:empty{display:none}
+.status[data-state="loading"],.status[data-state="success"]{color:var(--primary);border-color:var(--bd2)}
+.status[data-state="error"]{color:var(--danger);background:#fbf1ee;border-color:#ecc9c0}
+
+/* ===== Graph editor ===== */
+.hints{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.hint{padding:4px 10px;border-radius:999px;background:var(--muted);border:1px solid var(--border);font:500 .72rem/1.3 var(--mono);color:var(--ink2)}
+.canvas{position:relative;height:440px;background:var(--canvas);border:1px solid var(--border);border-radius:12px;overflow:hidden;touch-action:none;user-select:none;-webkit-user-select:none}
+.canvas svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+#canvas-toolbar{position:absolute;top:10px;right:10px;display:flex;gap:4px;padding:4px;background:rgba(255,255,255,.95);border:1px solid var(--border);border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+#canvas-toolbar button{width:34px;height:34px;display:grid;place-items:center;border:0;border-radius:8px;background:transparent;color:var(--text2);cursor:pointer}
+#canvas-toolbar button:hover{background:var(--muted);color:var(--primary)}
+#canvas-toolbar button.danger:hover{background:#fbf1ee;color:var(--danger)}
+#canvas-toolbar svg{position:static;width:18px;height:18px}
+#editor-stat{position:absolute;left:10px;bottom:10px;padding:3px 10px;background:rgba(255,255,255,.92);border:1px solid var(--border);border-radius:8px;font:500 .7rem/1.4 var(--mono);color:var(--text2)}
+.toggles{display:flex;flex-wrap:wrap;align-items:center;gap:8px 24px;margin-top:14px}
+.toggles .sub{margin-left:auto;font-size:.8rem}
+.graph-node circle{transition:fill .15s,stroke .15s}
+.graph-node:hover circle{fill:var(--node-hover);stroke:var(--primary)}
+.graph-node.selected circle{fill:var(--accent);stroke:var(--primary);stroke-width:3}
+.edge:hover .edge-line{stroke:var(--primary)}
+
+.video{position:relative;aspect-ratio:16/9;background:var(--vid);border-radius:12px;overflow:hidden}
+.video video{position:absolute;inset:0;width:100%;height:100%;background:var(--vid)}
+.video-ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;text-align:center;color:var(--vid-fg);font:500 .85rem/1.4 var(--mono)}
+.video-ph svg{width:52px;height:52px;opacity:.5}
+
+.stat{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 14px;background:var(--muted);border-radius:10px;font-size:.88rem}
+.stat span:first-child{color:var(--text2)}
+.stat b{font:600 .85rem var(--mono)}
+.msg{padding:10px 14px;background:var(--muted);border-radius:10px;font:400 .8rem/1.5 var(--mono);color:var(--text2)}
+
+details.card>summary{display:flex;align-items:center;justify-content:space-between;gap:12px;cursor:pointer;font-weight:700;list-style:none}
+details.card>summary::-webkit-details-marker{display:none}
+details.card[open]>summary{margin-bottom:14px}
+.json{margin:0;max-height:320px;overflow:auto;padding:14px;background:var(--canvas);border:1px solid var(--border);border-radius:10px;font:400 .75rem/1.55 var(--mono)}
+
+/* ===== Probability ===== */
+.deck-row{display:flex;flex-wrap:wrap;gap:8px}
+.lesson-stage{border:1px solid var(--border);border-radius:12px;padding:22px 18px;background:#fff}
+#lesson-cards{display:flex;justify-content:center;gap:12px;min-height:96px;flex-wrap:wrap}
+.lesson-card,.hand-card{display:flex;flex-direction:column;justify-content:space-between;background:#fff;border:1px solid var(--border);font-family:var(--mono);font-weight:600}
+.lesson-card{width:62px;height:86px;padding:8px;border-radius:10px;box-shadow:0 3px 10px rgba(0,0,0,.1);animation:card-in .35s ease both}
+.hand-card{width:52px;height:70px;padding:6px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.lesson-card strong,.hand-card strong{align-self:flex-end;font-size:1.15em}
+.red-card{color:#c0392b}
+.black-card{color:var(--text)}
+.is-hit{border-color:var(--primary)!important;box-shadow:0 0 0 3px rgba(var(--primary-rgb),.2)!important}
+@keyframes card-in{from{opacity:.2;transform:translateY(-12px) scale(.94)}to{opacity:1;transform:none}}
+.lesson-title{text-align:center;font-size:1.05rem;font-weight:700;margin-top:16px}
+.lesson-caption{text-align:center;color:var(--text2);font-size:.9rem;margin-top:6px;min-height:44px}
+.lesson-eq{margin-top:12px;padding:12px;border-radius:10px;background:var(--muted);text-align:center;font:500 .88rem/1.5 var(--mono);overflow-x:auto}
+.lesson-controls{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:16px}
+.tile{padding:12px 14px;background:var(--muted);border-radius:10px}
+.tile p:first-child{font-size:.78rem;color:var(--text2)}
+.tile .val{margin-top:2px;font:600 .9rem/1.4 var(--mono)}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.chart{position:relative;display:flex;align-items:flex-end;gap:2px;height:96px;margin-top:12px;padding:0 2px;background:var(--canvas);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.bar{flex:1;min-width:2px;background:var(--primary);opacity:.85;border-radius:2px 2px 0 0;transition:height .12s}
+.exact-line{position:absolute;left:0;right:0;border-top:2px dashed var(--warm);pointer-events:none}
+hr.sep{border:0;border-top:1px solid var(--border);margin:20px 0}
+
+/* ===== Calculus ===== */
+.answer{padding:20px;border:1px solid var(--bd2);border-radius:14px;background:#fff}
+.answer .concl{margin-top:4px;font-weight:600}
+.answer-eq{margin-top:12px;padding:14px;border-radius:10px;background:var(--muted);overflow-x:auto;font-size:1.15rem}
+.answer-eq .katex-display{margin:0}
+.steps{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+.step{display:flex;gap:14px;padding:14px 16px;background:#fff;border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:4px 12px 12px 4px}
+.step-n{flex:none;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--primary);display:grid;place-items:center;font-size:.78rem;font-weight:700}
+.step-b{min-width:0;flex:1}
+.step-b h4{font-size:.95rem;font-weight:600}
+.step-b p{margin-top:2px;font-size:.88rem;color:var(--text2)}
+.step-eq{margin-top:8px;padding:8px 12px;border-radius:8px;background:var(--muted);overflow-x:auto}
+.result-wrap{padding:18px;border:1px solid var(--border);border-radius:14px;background:var(--bg)}
+#calc-video{display:block;width:100%;aspect-ratio:16/9;background:var(--vid);border-radius:12px}
+
+/* ===== Toast + footer ===== */
+.toast{position:fixed;right:20px;bottom:20px;z-index:50;max-width:min(380px,calc(100vw - 40px));padding:12px 18px;border-radius:10px;color:#fff;font:500 .85rem/1.4 var(--mono);box-shadow:0 10px 30px rgba(0,0,0,.18);animation:toast-in .3s ease-out}
+.toast-info{background:var(--primary)}.toast-success{background:var(--ok)}.toast-error{background:var(--danger)}
+@keyframes toast-in{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+footer{border-top:1px solid var(--border);padding:18px 20px;text-align:center;font-size:.82rem;color:var(--text2)}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
 </head>
-<body class="min-h-screen paper-bg">
-  <!-- Header -->
-  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-xl border-b border-paper-dim">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-lg bg-cyan-600 flex items-center justify-center text-white shadow-sm">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-        </div>
-        <div>
-          <h1 class="font-bold text-lg text-ink leading-tight">MathViz</h1>
-          <p class="text-[11px] text-ink-dim font-mono">Graph Algorithm Visualizer</p>
-        </div>
+
+<body data-theme="neutral">
+<header class="topbar">
+  <div class="topbar-in">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 4H6l6.5 8L6 20h12"/></svg>
       </div>
-      <div class="flex items-center gap-2">
-        <span id="status-pill" class="badge badge-cyan inline-flex items-center gap-1.5">
-          <span id="status-dot" class="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse"></span>
-          <span id="status-text">Ready</span>
-        </span>
+      <div>
+        <h1>MathViz</h1>
+        <p>Interactive math visualizations</p>
       </div>
     </div>
-  </header>
+    <span id="status-pill" class="pill" data-state="ready"><i></i><span id="status-text">Ready</span></span>
+  </div>
+</header>
 
-  <main class="max-w-7xl mx-auto px-4 py-6">
-    <div class="grid lg:grid-cols-3 gap-6">
-      <!-- ===== Left column: Editor + Video ===== -->
-      <div class="lg:col-span-2 space-y-6">
-        <!-- Graph Editor -->
-        <section class="card p-4">
-          <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
-            <h2 class="font-semibold text-ink">Graph Editor</h2>
-            <div class="flex items-center gap-1.5 flex-wrap">
-              <span class="badge badge-cyan">Click canvas → node</span>
-              <span class="badge badge-teal">Drag node → node → edge</span>
-              <span class="badge badge-rose">Click node → select / ✕</span>
-              <span class="badge">Click edge → delete / weight</span>
+<main class="container">
+  <!-- Visualizer tabs -->
+  <nav id="viz-tabs" class="seg viz-tabs" style="--n:5;--n-sm:3" role="tablist" aria-label="Visualizers">
+    <button type="button" role="tab" data-tab="bfs" aria-selected="true">BFS</button>
+    <button type="button" role="tab" data-tab="dfs" aria-selected="false">DFS</button>
+    <button type="button" role="tab" data-tab="dijkstra" aria-selected="false">Dijkstra</button>
+    <button type="button" role="tab" data-tab="probability" aria-selected="false">Probability</button>
+    <button type="button" role="tab" data-tab="calculus" aria-selected="false">Calculus</button>
+  </nav>
+
+  <!-- ================= GRAPH VIEW (BFS / DFS / Dijkstra) ================= -->
+  <section id="view-graph" class="layout" aria-label="Graph algorithms">
+    <div class="col">
+      <article class="card">
+        <div class="card-head"><h2>Graph Editor</h2></div>
+        <div class="hints">
+          <span class="hint">Click canvas → add node</span>
+          <span class="hint">Drag node → node = edge</span>
+          <span class="hint">Drag node → empty = move</span>
+          <span class="hint">Click node → select / ×</span>
+          <span class="hint">Click edge → delete / weight</span>
+        </div>
+
+        <div class="canvas" id="graph-canvas">
+          <svg id="graph-svg" aria-label="Graph canvas">
+            <defs>
+              <pattern id="editor-grid" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.2" fill="#888" fill-opacity=".4"/></pattern>
+              <marker id="arrow" markerWidth="10" markerHeight="8" refX="9" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L9,3 Z" fill="#111"/></marker>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#editor-grid)"/>
+            <g id="edges-layer"></g>
+            <g id="nodes-layer"></g>
+            <g id="drag-layer" style="pointer-events:none"></g>
+          </svg>
+          <div id="canvas-toolbar">
+            <button type="button" id="btn-example-graph" title="Load example graph" aria-label="Load example graph">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="8" r="2.5"/><circle cx="12" cy="18" r="2.5"/><path d="M8.2 7l7.5.7M7.5 8.2l3.2 7.6M16.8 10.2l-3.5 6"/></svg>
+            </button>
+            <button type="button" id="btn-clear-graph" class="danger" title="Clear graph" aria-label="Clear graph">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 002 2h6a2 2 0 002-2l1-12M9 7V4h6v3"/></svg>
+            </button>
+          </div>
+          <span id="editor-stat">0 nodes · 0 edges</span>
+        </div>
+
+        <div class="toggles">
+          <label class="check"><input id="directed-toggle" type="checkbox"> Directed (arrows)</label>
+          <label class="check"><input id="weighted-toggle" type="checkbox"> Weighted (needed for Dijkstra)</label>
+          <span class="sub">Double-click a node to rename</span>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-head">
+          <h2>Animation</h2>
+          <button type="button" id="btn-download" class="btn btn-sm" disabled>Download MP4</button>
+        </div>
+        <div class="video">
+          <video id="video-player" controls preload="metadata" hidden></video>
+          <div id="video-placeholder" class="video-ph">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M10 8.8l5 3.2-5 3.2z"/></svg>
+            <span>Draw a graph, pick an algorithm, and hit Run.</span>
+          </div>
+        </div>
+      </article>
+
+      <details class="card">
+        <summary>
+          <span>Animation JSON <span class="sub" style="font-weight:400">(generated by the algorithm engine)</span></span>
+          <button type="button" id="btn-copy-json" class="btn btn-sm" onclick="event.preventDefault()">Copy JSON</button>
+        </summary>
+        <pre id="json-output" class="json">Run an algorithm to generate the animation JSON.</pre>
+      </details>
+    </div>
+
+    <aside class="col">
+      <article class="card">
+        <h2 id="algo-title" style="margin-bottom:16px">Run BFS</h2>
+        <div class="stack-sm">
+          <div class="field">
+            <label for="start-node">Start node</label>
+            <select id="start-node"></select>
+          </div>
+          <div class="field" id="target-field">
+            <label for="target-node">Target node <span id="target-optional">(optional)</span></label>
+            <select id="target-node"></select>
+          </div>
+          <div class="field">
+            <label for="quality">Quality</label>
+            <select id="quality">
+              <option value="l">Low (480p) — fastest</option>
+              <option value="m" selected>Medium (720p)</option>
+              <option value="h">High (1080p)</option>
+            </select>
+          </div>
+          <button type="button" id="btn-run" class="btn btn-primary btn-block" style="margin-top:6px">▶ Run &amp; Render</button>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2 style="margin-bottom:16px">Execution</h2>
+        <div class="stack-sm">
+          <div class="stat"><span>Algorithm</span><b id="exec-algo">—</b></div>
+          <div class="stat"><span>Step</span><b id="exec-step">0 / 0</b></div>
+          <div class="stat"><span>Visited</span><b id="exec-visited">0</b></div>
+          <div class="stat"><span>Frontier</span><b id="exec-frontier">0</b></div>
+          <p id="exec-message" class="msg">Draw a graph to begin.</p>
+        </div>
+      </article>
+    </aside>
+  </section>
+
+  <!-- ================= PROBABILITY VIEW ================= -->
+  <section id="view-prob" class="layout" hidden aria-label="Card probability">
+    <div class="col">
+      <article class="card" aria-labelledby="lesson-heading">
+        <div class="card-head">
+          <div>
+            <p class="eyebrow">Short animated lesson</p>
+            <h2 id="lesson-heading" style="margin-top:2px">How card probability works</h2>
+            <p class="sub" style="margin-top:4px">A guided visual using your selected event and hand size.</p>
+          </div>
+          <span id="lesson-progress" class="hint" aria-live="polite">1 / 4</span>
+        </div>
+        <div class="lesson-stage" aria-live="polite">
+          <div id="lesson-cards" aria-hidden="true"></div>
+          <h3 id="lesson-title" class="lesson-title"></h3>
+          <p id="lesson-caption" class="lesson-caption"></p>
+          <div id="lesson-eq" class="lesson-eq"></div>
+        </div>
+        <div class="lesson-controls">
+          <button type="button" id="lesson-back" class="btn btn-sm">Back</button>
+          <button type="button" id="lesson-play" class="btn btn-primary btn-sm">Play lesson</button>
+          <button type="button" id="lesson-next" class="btn btn-sm">Next</button>
+          <button type="button" id="lesson-replay" class="btn btn-sm">Replay</button>
+        </div>
+      </article>
+
+      <article class="card" aria-labelledby="lab-heading">
+        <div class="card-head">
+          <div>
+            <p class="eyebrow">Try it yourself</p>
+            <h2 id="lab-heading" style="margin-top:2px">A shuffled 52-card deck</h2>
+            <p id="deck-status" class="sub" style="margin-top:4px"></p>
+          </div>
+          <span class="hint">Without replacement</span>
+        </div>
+
+        <div class="tile">
+          <p>Your drawn cards</p>
+          <div id="card-hand" class="deck-row" style="margin-top:8px;min-height:70px;align-items:center" aria-live="polite"></div>
+        </div>
+        <p id="card-result" class="sub" style="margin-top:12px" aria-live="polite"></p>
+
+        <div class="grid-2" style="margin-top:12px">
+          <div class="tile"><p>Favorable hands</p><p id="card-favorable" class="val"></p></div>
+          <div class="tile"><p>Exact chance of at least one match</p><p id="card-exact" class="val"></p></div>
+        </div>
+
+        <hr class="sep">
+        <h3 style="font-size:1rem">Experiment</h3>
+        <p class="sub" style="margin-top:2px">Each trial shuffles a fresh deck, then draws the same number of cards. The dashed line is the exact probability.</p>
+        <div id="card-chart" class="chart" role="img" aria-label="Simulation results will appear here"></div>
+        <p id="card-simulation-result" class="sub" style="margin-top:10px" aria-live="polite">Run a simulation to compare observed and exact probability.</p>
+      </article>
+    </div>
+
+    <aside class="col">
+      <article class="card">
+        <h2 style="margin-bottom:16px">Card Probability Lab</h2>
+        <div class="stack-sm">
+          <div class="field">
+            <label for="card-event">Event to find</label>
+            <select id="card-event">
+              <option value="heart">A heart</option>
+              <option value="red">Any red card</option>
+              <option value="ace">An ace</option>
+              <option value="spade">A spade</option>
+              <option value="king">A king</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="card-count">Cards in your hand</label>
+            <input id="card-count" type="number" min="1" max="52" value="1" inputmode="numeric">
+          </div>
+          <button type="button" id="card-draw" class="btn btn-primary btn-block">Draw next card</button>
+          <button type="button" id="card-reset" class="btn btn-block">Shuffle and reset</button>
+          <hr class="sep" style="margin:8px 0">
+          <div class="field">
+            <label for="card-trials">Simulation trials</label>
+            <select id="card-trials">
+              <option value="20">20</option>
+              <option value="100" selected>100</option>
+              <option value="500">500</option>
+              <option value="1000">1,000</option>
+            </select>
+          </div>
+          <button type="button" id="card-simulate" class="btn btn-primary btn-block">Run simulation</button>
+        </div>
+      </article>
+    </aside>
+  </section>
+
+  <!-- ================= CALCULUS VIEW ================= -->
+  <section id="view-calc" hidden aria-label="Calculus visualizer">
+    <div class="narrow stack">
+      <article class="card stack">
+        <div>
+          <h2 style="font-size:1.4rem;letter-spacing:-.02em">Calculus Visualizer</h2>
+          <p class="sub" style="margin-top:6px">Enter a calculus expression to solve it and generate an animation.</p>
+        </div>
+
+        <div id="calc-modes" class="seg" style="--n:4;--n-sm:2" role="tablist" aria-label="Calculus problem type">
+          <button type="button" role="tab" id="calc-tab-derivative" aria-selected="true" aria-controls="calc-panel-derivative">Derivatives</button>
+          <button type="button" role="tab" id="calc-tab-limit" aria-selected="false" aria-controls="calc-panel-limit" tabindex="-1">Limits</button>
+          <button type="button" role="tab" id="calc-tab-continuity" aria-selected="false" aria-controls="calc-panel-continuity" tabindex="-1">Continuity</button>
+          <button type="button" role="tab" id="calc-tab-chain" aria-selected="false" aria-controls="calc-panel-chain" tabindex="-1">Chain Rule</button>
+        </div>
+
+        <div class="stack-sm">
+          <p class="label">Math input toolbar</p>
+          <div id="calc-toolbar" class="toolbar" role="toolbar" aria-label="Insert mathematical notation">
+            <button type="button" class="tool" data-insert="sin()" data-cursor="4" aria-label="Insert sine">sin</button>
+            <button type="button" class="tool" data-insert="cos()" data-cursor="4" aria-label="Insert cosine">cos</button>
+            <button type="button" class="tool" data-insert="tan()" data-cursor="4" aria-label="Insert tangent">tan</button>
+            <button type="button" class="tool" data-insert="log()" data-cursor="4" aria-label="Insert logarithm">log</button>
+            <button type="button" class="tool" data-insert="ln()" data-cursor="3" aria-label="Insert natural logarithm">ln</button>
+            <button type="button" class="tool" data-insert="sqrt()" data-cursor="5" aria-label="Insert square root">sqrt</button>
+            <button type="button" class="tool" data-insert="^()" data-cursor="2" aria-label="Insert power">xⁿ</button>
+            <button type="button" class="tool" data-insert="²" aria-label="Insert square">x²</button>
+            <button type="button" class="tool" data-insert="³" aria-label="Insert cube">x³</button>
+            <button type="button" class="tool" data-insert="()/()" data-cursor="1" aria-label="Insert fraction">a/b</button>
+            <button type="button" class="tool" data-insert="()" data-cursor="1" aria-label="Insert parentheses">( )</button>
+            <button type="button" class="tool" data-insert="+" aria-label="Plus">+</button>
+            <button type="button" class="tool" data-insert="−" aria-label="Minus">−</button>
+            <button type="button" class="tool" data-insert="×" aria-label="Multiply">×</button>
+            <button type="button" class="tool" data-insert="/" aria-label="Divide">/</button>
+            <button type="button" class="tool" data-insert="=" aria-label="Equals">=</button>
+          </div>
+          <p class="sub" style="font-size:.8rem">Click into the function box, then use a button to insert at the cursor. Powers can be typed as x^2 or x².</p>
+        </div>
+
+        <!-- Derivatives -->
+        <div id="calc-panel-derivative" class="calc-mode-panel stack" role="tabpanel" aria-labelledby="calc-tab-derivative" data-problem-type="derivative">
+          <div class="stack-sm">
+            <p class="label">Derivative topic</p>
+            <div class="chips" role="group" aria-label="Derivative topic">
+              <button type="button" class="chip" data-problem-type="derivative" aria-pressed="true">General Derivative</button>
+              <button type="button" class="chip" data-problem-type="power_rule" aria-pressed="false">Power Rule</button>
+              <button type="button" class="chip" data-problem-type="sum_rule" aria-pressed="false">Sum Rule</button>
+              <button type="button" class="chip" data-problem-type="product_rule" aria-pressed="false">Product Rule</button>
+              <button type="button" class="chip" data-problem-type="quotient_rule" aria-pressed="false">Quotient Rule</button>
+              <button type="button" class="chip" data-problem-type="tangent_line" aria-pressed="false">Tangent Line</button>
+              <button type="button" class="chip" data-problem-type="derivative_applications" aria-pressed="false">Derivative Applications</button>
             </div>
           </div>
-
-          <div class="relative w-full h-[440px] bg-paper border border-paper-dim rounded-lg overflow-hidden select-none touch-none" id="graph-canvas">
-            <svg class="absolute inset-0 w-full h-full" id="graph-svg">
-              <defs>
-                <pattern id="editor-grid" width="24" height="24" patternUnits="userSpaceOnUse">
-                  <circle cx="2" cy="2" r="1.2" fill="#94a3b8" fill-opacity="0.35"/>
-                </pattern>
-                <marker id="edge-arrowhead" markerWidth="10" markerHeight="8" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
-                  <path d="M0,0 L0,6 L9,3 Z" fill="#171b26" stroke="none"/>
-                </marker>
-              </defs>
-              <rect width="100%" height="100%" fill="url(#editor-grid)"/>
-              <g id="edges-layer"></g>
-              <g id="drag-line-layer"></g>
-              <g id="nodes-layer"></g>
-            </svg>
-            <div id="canvas-toolbar" class="absolute top-2 right-2 flex items-center gap-1 bg-white/95 backdrop-blur border border-paper-dim rounded-lg p-1 shadow-sm">
-              <button id="btn-example-graph" title="Load example" class="w-8 h-8 flex items-center justify-center rounded text-ink-dim hover:text-cyan-700 hover:bg-cyan-50 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-              </button>
-              <button id="btn-clear-graph" title="Clear graph" class="w-8 h-8 flex items-center justify-center rounded text-ink-dim hover:text-rose-600 hover:bg-rose-50 transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-              </button>
+          <div class="field">
+            <label for="calc-derivative-expression">Function f(x)</label>
+            <input id="calc-derivative-expression" name="expression" type="text" class="expr" value="x² + 3 × x + 2" placeholder="Example: x² + 3 × x + 2" autocomplete="off" spellcheck="false">
+            <div id="calc-derivative-preview" class="preview" aria-label="Formatted equation preview"></div>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="calc-derivative-variable">Differentiate with respect to</label>
+              <input id="calc-derivative-variable" name="variable" type="text" value="x" autocomplete="off" spellcheck="false">
             </div>
-            <div class="absolute bottom-2 left-2 px-2 py-1 bg-white/90 backdrop-blur border border-paper-dim rounded text-[10px] font-mono text-ink-dim">
-              <span id="editor-stat">0 nodes · 0 edges</span>
+            <div class="field f-point" hidden>
+              <label for="calc-derivative-point">Point for tangent line (x = a)</label>
+              <input id="calc-derivative-point" name="point" type="text" value="1" autocomplete="off" spellcheck="false">
             </div>
           </div>
+        </div>
 
-          <div class="flex items-center gap-4 mt-3">
-            <label class="flex items-center gap-2 cursor-pointer text-sm text-ink-dim">
-              <input id="directed-toggle" type="checkbox" class="w-4 h-4 rounded border-paper-dim text-cyan-600 focus:ring-cyan-500">
-              Directed (arrows)
-            </label>
-            <label class="flex items-center gap-2 cursor-pointer text-sm text-ink-dim">
-              <input id="weighted-toggle" type="checkbox" class="w-4 h-4 rounded border-paper-dim text-cyan-600 focus:ring-cyan-500">
-              Weighted (needed for Dijkstra)
-            </label>
-            <span class="text-xs text-ink-light ml-auto">Double-click a node to rename</span>
-          </div>
-
-          <!-- Synced text inputs (kept in sync with the canvas) -->
-          <div class="hidden">
-            <input id="nodes-input" class="input-field">
-            <textarea id="edges-input" class="input-field"></textarea>
-          </div>
-        </section>
-
-        <!-- Video -->
-        <section class="card-elevated p-4">
-          <div class="flex items-center justify-between mb-4">
-            <h2 class="font-semibold text-ink">Animation</h2>
-            <button id="btn-download" class="btn-secondary text-sm" disabled>Download MP4</button>
-          </div>
-          <div class="video-container aspect-video relative">
-            <video id="video-player" class="w-full h-full" controls preload="metadata"></video>
-            <div id="video-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-ink-dim bg-paper">
-              <svg class="w-16 h-16 mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.553.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-              <p class="font-mono text-sm text-center px-4">Draw a graph, pick an algorithm, and hit Run.</p>
+        <!-- Limits -->
+        <div id="calc-panel-limit" class="calc-mode-panel stack" role="tabpanel" aria-labelledby="calc-tab-limit" data-problem-type="limit" hidden>
+          <div class="stack-sm">
+            <p class="label">Limit topic</p>
+            <div class="chips" role="group" aria-label="Limit topic">
+              <button type="button" class="chip" data-problem-type="limit" aria-pressed="true">Limit at a Point</button>
+              <button type="button" class="chip" data-problem-type="one_sided_limit" aria-pressed="false">One-Sided Limit</button>
+              <button type="button" class="chip" data-problem-type="two_sided_limit" aria-pressed="false">Two-Sided Limit</button>
+              <button type="button" class="chip" data-problem-type="limit_at_infinity" aria-pressed="false">Limit at Infinity</button>
             </div>
           </div>
-        </section>
-
-        <!-- JSON (collapsed) -->
-        <details class="card p-4">
-          <summary class="font-semibold text-ink cursor-pointer select-none flex items-center justify-between">
-            <span class="inline-flex items-center gap-2">Animation JSON <span class="text-[11px] font-mono text-ink-light font-normal">(generated by the algorithm engine)</span></span>
-            <button id="btn-copy-json" class="btn-secondary text-xs px-2.5 py-1" onclick="event.preventDefault()">Copy JSON</button>
-          </summary>
-          <pre id="json-output" class="mt-3 bg-paper border border-paper-dim rounded-lg p-3 max-h-80 overflow-auto text-[11px] font-mono text-ink"><code>Run an algorithm to generate the animation JSON.</code></pre>
-        </details>
-      </div>
-
-      <!-- ===== Right column: Controls ===== -->
-      <div class="space-y-6">
-        <!-- Algorithm -->
-        <section class="card p-4">
-          <h2 class="font-semibold text-ink mb-3">Run Algorithm</h2>
-          <div class="flex gap-2 mb-4" role="tablist">
-            <button id="tab-bfs" role="tab" aria-selected="true" class="tab-pill btn-primary flex-1 px-3 py-1.5 text-sm">BFS</button>
-            <button id="tab-dfs" role="tab" aria-selected="false" class="tab-pill btn-secondary flex-1 px-3 py-1.5 text-sm">DFS</button>
-            <button id="tab-dijkstra" role="tab" aria-selected="false" class="tab-pill btn-secondary flex-1 px-3 py-1.5 text-sm">Dijkstra</button>
+          <div class="field">
+            <label for="calc-limit-expression">Function f(x)</label>
+            <input id="calc-limit-expression" name="expression" type="text" class="expr" value="(x² − 1)/(x − 1)" placeholder="Example: (x² − 1)/(x − 1)" autocomplete="off" spellcheck="false">
+            <div id="calc-limit-preview" class="preview" aria-label="Formatted equation preview"></div>
           </div>
-
-          <div class="space-y-4">
-            <div>
-              <label class="block text-xs font-medium text-ink-dim mb-1">Start Node</label>
-              <select id="start-node" class="select-field"></select>
+          <div class="form-grid">
+            <div class="field">
+              <label for="calc-limit-variable">Variable</label>
+              <input id="calc-limit-variable" name="variable" type="text" value="x" autocomplete="off" spellcheck="false">
             </div>
-            <div id="target-field">
-              <label class="block text-xs font-medium text-ink-dim mb-1">Target Node <span id="target-optional" class="text-ink-light">(optional)</span></label>
-              <select id="target-node" class="select-field"></select>
+            <div class="field f-point">
+              <label for="calc-limit-point">Approach value a (x → a)</label>
+              <input id="calc-limit-point" name="point" type="text" value="1" autocomplete="off" spellcheck="false">
             </div>
-            <div>
-              <label class="block text-xs font-medium text-ink-dim mb-1">Quality</label>
-              <select id="quality" class="select-field">
-                <option value="l">Low (480p) — fastest</option>
-                <option value="m" selected>Medium (720p)</option>
-                <option value="h">High (1080p)</option>
+            <div class="field f-direction" hidden>
+              <label id="calc-limit-direction-label" for="calc-limit-direction">Direction</label>
+              <select id="calc-limit-direction" name="direction">
+                <option value="+">From the right (+)</option>
+                <option value="-">From the left (−)</option>
               </select>
             </div>
-            <button id="btn-run" class="btn-primary w-full py-2.5 !text-base">▶ Run &amp; Render</button>
           </div>
-        </section>
+        </div>
 
-        <!-- Execution status -->
-        <section class="card p-4">
-          <h2 class="font-semibold text-ink mb-3">Execution</h2>
-          <div id="exec-display" class="space-y-2.5 text-sm">
-            <div class="flex items-center justify-between p-2.5 bg-paper rounded-lg">
-              <span class="text-ink-dim">Algorithm</span>
-              <span id="exec-algo" class="font-mono font-medium text-ink">—</span>
+        <!-- Continuity -->
+        <div id="calc-panel-continuity" class="calc-mode-panel stack" role="tabpanel" aria-labelledby="calc-tab-continuity" data-problem-type="continuity" hidden>
+          <div class="field">
+            <label for="calc-continuity-expression">Function f(x)</label>
+            <input id="calc-continuity-expression" name="expression" type="text" class="expr" value="x² + 3 × x + 2" placeholder="Example: x² + 3 × x + 2" autocomplete="off" spellcheck="false">
+            <div id="calc-continuity-preview" class="preview" aria-label="Formatted equation preview"></div>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="calc-continuity-variable">Variable</label>
+              <input id="calc-continuity-variable" name="variable" type="text" value="x" autocomplete="off" spellcheck="false">
             </div>
-            <div class="flex items-center justify-between p-2.5 bg-paper rounded-lg">
-              <span class="text-ink-dim">Step</span>
-              <span id="exec-step" class="font-mono font-medium text-ink">0 / 0</span>
-            </div>
-            <div class="flex items-center justify-between p-2.5 bg-paper rounded-lg">
-              <span class="text-ink-dim">Visited</span>
-              <span id="exec-visited" class="font-mono font-medium text-ink">0</span>
-            </div>
-            <div class="flex items-center justify-between p-2.5 bg-paper rounded-lg">
-              <span class="text-ink-dim">Frontier</span>
-              <span id="exec-frontier" class="font-mono font-medium text-ink">0</span>
-            </div>
-            <div class="p-2.5 bg-paper rounded-lg">
-              <span id="exec-message" class="text-xs text-ink-dim font-mono">Draw a graph to begin.</span>
+            <div class="field f-point">
+              <label for="calc-continuity-point">Check continuity at x = a</label>
+              <input id="calc-continuity-point" name="point" type="text" value="1" autocomplete="off" spellcheck="false">
             </div>
           </div>
+        </div>
+
+        <!-- Chain rule -->
+        <div id="calc-panel-chain" class="calc-mode-panel stack" role="tabpanel" aria-labelledby="calc-tab-chain" data-problem-type="chain_rule" hidden>
+          <div class="field">
+            <label for="calc-chain-expression">Composite function f(g(x))</label>
+            <input id="calc-chain-expression" name="expression" type="text" class="expr" value="(3 × x + 1)²" placeholder="Example: (3 × x + 1)²" autocomplete="off" spellcheck="false">
+            <div id="calc-chain-preview" class="preview" aria-label="Formatted equation preview"></div>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="calc-chain-variable">Differentiate with respect to</label>
+              <input id="calc-chain-variable" name="variable" type="text" value="x" autocomplete="off" spellcheck="false">
+            </div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" id="calc-solve" class="btn btn-primary">Solve</button>
+          <button type="button" id="calc-render" class="btn btn-warm">Generate Video</button>
+        </div>
+
+        <p id="calc-status" class="status" role="status" aria-live="polite" aria-busy="false"></p>
+        <video id="calc-video" controls playsinline hidden></video>
+      </article>
+
+      <div id="calc-result" class="result-wrap" hidden>
+        <section class="answer" aria-labelledby="calc-final-heading">
+          <p id="calc-final-heading" class="eyebrow">Final answer</p>
+          <p id="calc-result-conclusion" class="concl"></p>
+          <div id="calc-result-equation" class="answer-eq"></div>
+        </section>
+        <section style="margin-top:22px" aria-labelledby="calc-steps-heading">
+          <h3 id="calc-steps-heading" style="font-size:1rem">Step-by-step solution</h3>
+          <ol id="calc-result-steps" class="steps"></ol>
         </section>
       </div>
     </div>
-  </main>
+  </section>
+</main>
 
-  <footer class="border-t border-paper-dim py-4 mt-4">
-    <div class="max-w-7xl mx-auto px-4 text-center text-sm text-ink-dim">
-      MathViz — Frontend + Algorithms + Manim Engine
-    </div>
-  </footer>
+<footer>MathViz — Frontend + Algorithms + Manim Engine</footer>
 
-  <script>
-    // ============ State ============
-    const API_BASE = '';
-    let currentVideoUrl = null;
-    let currentAnimJson = null;
-    let currentAlgo = 'bfs';
-
-    // ============ Toast ============
-    function showToast(message, type = 'info') {
-      const existing = document.querySelector('.toast');
-      if (existing) existing.remove();
-      const toast = document.createElement('div');
-      toast.className = `toast toast-${type}`;
-      toast.textContent = message;
-      document.body.appendChild(toast);
-      setTimeout(() => toast.remove(), 4000);
-    }
-
-    function setStatus(text, state = 'ready') {
-      document.getElementById('status-text').textContent = text;
-      const dot = document.getElementById('status-dot');
-      dot.className = 'w-1.5 h-1.5 rounded-full ' +
-        (state === 'running' ? 'bg-amber-500 animate-pulse'
-        : state === 'error' ? 'bg-rose-500'
-        : 'bg-teal-500 animate-pulse');
-      const pill = document.getElementById('status-pill');
-      pill.className = 'badge inline-flex items-center gap-1.5 ' +
-        (state === 'running' ? 'badge-teal' : state === 'error' ? 'badge-rose' : 'badge-cyan');
-    }
-
-    // ============ Graph Editor ============
-    const graphEditor = (() => {
-      const svg = document.getElementById('graph-svg');
-      const nodesLayer = document.getElementById('nodes-layer');
-      const edgesLayer = document.getElementById('edges-layer');
-      const dragLineLayer = document.getElementById('drag-line-layer');
-      const canvasEl = document.getElementById('graph-canvas');
-      const statEl = document.getElementById('editor-stat');
-
-      let nodes = [];
-      let edges = [];
-      let nextId = 0;
-      let selectedNode = null;
-      let dragging = null;
-      let dragStart = null;
-
-      function labelOf(id) {
-        const n = nodes.find(n => n.id === id);
-        return n ? n.label : id;
-      }
-      function idOf(label) {
-        const n = nodes.find(n => n.label === label);
-        return n ? n.id : null;
-      }
-
-      function generateLabel() {
-        const used = new Set(nodes.map(n => n.label));
-        for (let i = 0; i < 26; i++) {
-          const l = String.fromCharCode(65 + i);
-          if (!used.has(l)) return l;
-        }
-        for (let i = 1; i <= 999; i++) {
-          const l = 'N' + i;
-          if (!used.has(l)) return l;
-        }
-      }
-
-      function edgeExists(aId, bId) {
-        const directed = document.getElementById('directed-toggle').checked;
-        return edges.some(ed =>
-          (ed.source === aId && ed.target === bId) ||
-          (!directed && ed.source === bId && ed.target === aId)
-        );
-      }
-
-      function syncTextInputs() {
-        document.getElementById('nodes-input').value = nodes.map(n => n.label).join(',');
-        const weighted = document.getElementById('weighted-toggle').checked;
-        document.getElementById('edges-input').value = edges.map(e => {
-          const base = `${labelOf(e.source)},${labelOf(e.target)}`;
-          return weighted && e.weight != null ? `${base},${e.weight}` : base;
-        }).join('\n');
-      }
-
-      function syncSelects() {
-        const labels = nodes.map(n => n.label);
-        ['start-node', 'target-node'].forEach(id => {
-          const sel = document.getElementById(id);
-          const prev = sel.value;
-          sel.innerHTML = labels.map(l => `<option value="${l}">${l}</option>`).join('');
-          if (labels.includes(prev)) {
-            sel.value = prev;
-          } else {
-            sel.value = id === 'start-node' ? labels[0] : labels[labels.length - 1];
-          }
-        });
-      }
-
-      function updateStats() {
-        statEl.textContent = `${nodes.length} nodes · ${edges.length} edges`;
-      }
-
-      function render() {
-        nodesLayer.innerHTML = '';
-        edgesLayer.innerHTML = '';
-        removeDeleteBadge();
-
-        const R = 26;
-        const directed = document.getElementById('directed-toggle').checked;
-        const weighted = document.getElementById('weighted-toggle').checked;
-
-        edges.forEach((edge, idx) => {
-          const s = nodes.find(n => n.id === edge.source);
-          const t = nodes.find(n => n.id === edge.target);
-          if (!s || !t) return;
-          const dx = t.x - s.x, dy = t.y - s.y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 1) return;
-          const ux = dx / dist, uy = dy / dist;
-
-          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-          line.setAttribute('x1', s.x + ux * (R + 2));
-          line.setAttribute('y1', s.y + uy * (R + 2));
-          line.setAttribute('x2', t.x - ux * (R + 2));
-          line.setAttribute('y2', t.y - uy * (R + 2));
-          line.setAttribute('stroke', '#171b26');
-          line.setAttribute('stroke-width', '2');
-          if (directed) line.setAttribute('marker-end', 'url(#edge-arrowhead)');
-          line.classList.add('edge-line');
-          line.dataset.idx = idx;
-          line.style.cursor = 'pointer';
-          edgesLayer.appendChild(line);
-
-          if (weighted && edge.weight != null) {
-            const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            txt.setAttribute('x', (s.x + t.x) / 2);
-            txt.setAttribute('y', (s.y + t.y) / 2 - 6);
-            txt.setAttribute('text-anchor', 'middle');
-            txt.setAttribute('font-size', '11');
-            txt.setAttribute('font-family', 'JetBrains Mono, monospace');
-            txt.setAttribute('fill', '#0891b2');
-            txt.setAttribute('font-weight', '600');
-            txt.textContent = edge.weight;
-            txt.style.pointerEvents = 'none';
-            edgesLayer.appendChild(txt);
-          }
-        });
-
-        nodes.forEach((node) => {
-          const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-          g.classList.add('graph-node');
-          if (node.id === selectedNode) g.classList.add('selected');
-          g.dataset.id = node.id;
-          g.style.cursor = 'grab';
-
-          const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-          circle.setAttribute('cx', node.x);
-          circle.setAttribute('cy', node.y);
-          circle.setAttribute('r', R);
-          circle.setAttribute('fill', '#ffffff');
-          circle.setAttribute('stroke', '#171b26');
-          circle.setAttribute('stroke-width', '2.5');
-          g.appendChild(circle);
-
-          const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-          text.setAttribute('x', node.x);
-          text.setAttribute('y', node.y + 1);
-          text.setAttribute('text-anchor', 'middle');
-          text.setAttribute('dominant-baseline', 'central');
-          text.setAttribute('font-size', '14');
-          text.setAttribute('font-family', 'JetBrains Mono, monospace');
-          text.setAttribute('font-weight', '700');
-          text.setAttribute('fill', '#171b26');
-          text.textContent = node.label;
-          text.style.pointerEvents = 'none';
-          g.appendChild(text);
-
-          nodesLayer.appendChild(g);
-        });
-
-        updateStats();
-        syncTextInputs();
-        syncSelects();
-      }
-
-      function removeDeleteBadge() {
-        document.querySelectorAll('.node-delete-badge').forEach(el => el.remove());
-      }
-
-      function showDeleteBadge() {
-        removeDeleteBadge();
-        const node = nodes.find(n => n.id === selectedNode);
-        if (!node) return;
-        const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-        g.classList.add('node-delete-badge');
-        g.style.cursor = 'pointer';
-        const bx = node.x + 20, by = node.y - 20;
-        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-        rect.setAttribute('x', bx - 10); rect.setAttribute('y', by - 10);
-        rect.setAttribute('width', 20); rect.setAttribute('height', 20);
-        rect.setAttribute('rx', 4); rect.setAttribute('fill', '#f43f5e');
-        g.appendChild(rect);
-        const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        t.setAttribute('x', bx); t.setAttribute('y', by + 1);
-        t.setAttribute('text-anchor', 'middle'); t.setAttribute('dominant-baseline', 'central');
-        t.setAttribute('font-size', '13'); t.setAttribute('font-weight', '700');
-        t.setAttribute('fill', 'white'); t.textContent = '×';
-        t.style.pointerEvents = 'none';
-        g.appendChild(t);
-        g.addEventListener('click', (ev) => {
-          ev.stopPropagation();
-          edges = edges.filter(e => e.source !== selectedNode && e.target !== selectedNode);
-          nodes = nodes.filter(n => n.id !== selectedNode);
-          selectedNode = null;
-          render();
-        });
-        nodesLayer.appendChild(g);
-      }
-
-      function findNodeAt(x, y) {
-        const R = 26;
-        for (const node of nodes) {
-          const dx = node.x - x, dy = node.y - y;
-          if (Math.sqrt(dx * dx + dy * dy) <= R + 4) return node;
-        }
-        return null;
-      }
-
-      function getSVGCoords(e) {
-        const rect = svg.getBoundingClientRect();
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-        return { x: clientX - rect.left, y: clientY - rect.top };
-      }
-
-      function onPointerDown(e) {
-        if (e.target.closest('#canvas-toolbar')) return;
-        if (e.target.closest('.node-delete-badge')) return;
-        e.preventDefault();
-        const pos = getSVGCoords(e);
-        const hit = findNodeAt(pos.x, pos.y);
-
-        if (hit) {
-          dragging = hit;
-          dragStart = { x: pos.x, y: pos.y, isDrag: false };
-          return;
-        }
-        selectedNode = null;
-        const label = generateLabel();
-        nodes.push({ id: 'N' + nextId++, label, x: pos.x, y: pos.y });
-        render();
-      }
-
-      function onPointerMove(e) {
-        if (!dragging) return;
-        e.preventDefault();
-        const pos = getSVGCoords(e);
-        if (!dragStart.isDrag) {
-          const d = Math.sqrt((pos.x - dragStart.x) ** 2 + (pos.y - dragStart.y) ** 2);
-          if (d < 6) return;
-          dragStart.isDrag = true;
-        }
-        dragLineLayer.innerHTML = '';
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', dragging.x);
-        line.setAttribute('y1', dragging.y);
-        line.setAttribute('x2', pos.x);
-        line.setAttribute('y2', pos.y);
-        line.setAttribute('stroke', '#0891b2');
-        line.setAttribute('stroke-width', '2');
-        line.setAttribute('stroke-dasharray', '6 4');
-        line.style.pointerEvents = 'none';
-        dragLineLayer.appendChild(line);
-      }
-
-      function onPointerUp(e) {
-        if (!dragging) return;
-        const pos = e.changedTouches
-          ? { x: e.changedTouches[0].clientX - svg.getBoundingClientRect().left, y: e.changedTouches[0].clientY - svg.getBoundingClientRect().top }
-          : getSVGCoords(e);
-
-        if (dragStart && dragStart.isDrag) {
-          const target = findNodeAt(pos.x, pos.y);
-          if (target && target.id !== dragging.id) {
-            if (!edgeExists(dragging.id, target.id)) {
-              const weighted = document.getElementById('weighted-toggle').checked;
-              edges.push({ source: dragging.id, target: target.id, weight: weighted ? 1 : undefined });
-            }
-          } else if (!target) {
-            const w = canvasEl.clientWidth, h = canvasEl.clientHeight;
-            dragging.x = Math.max(30, Math.min(w - 30, pos.x));
-            dragging.y = Math.max(30, Math.min(h - 30, pos.y));
-          }
-        } else {
-          selectedNode = (selectedNode === dragging.id) ? null : dragging.id;
-        }
-
-        dragLineLayer.innerHTML = '';
-        dragging = null;
-        dragStart = null;
-        render();
-        if (selectedNode) showDeleteBadge();
-      }
-
-      function onEdgeClick(e) {
-        const line = e.target.closest('.edge-line');
-        if (!line) return;
-        e.stopPropagation();
-        const idx = parseInt(line.dataset.idx);
-        const weighted = document.getElementById('weighted-toggle').checked;
-        if (weighted) {
-          const w = prompt(`Weight for ${labelOf(edges[idx].source)}→${labelOf(edges[idx].target)}:`, edges[idx].weight ?? 1);
-          if (w !== null && !isNaN(parseFloat(w))) {
-            edges[idx].weight = parseFloat(w);
-            render();
-          }
-        } else {
-          edges.splice(idx, 1);
-          render();
-        }
-      }
-
-      function onNodeDblClick(e) {
-        const g = e.target.closest('.graph-node');
-        if (!g) return;
-        e.stopPropagation();
-        const node = nodes.find(n => n.id === g.dataset.id);
-        if (!node) return;
-        const newLabel = prompt('Rename node:', node.label);
-        if (newLabel && newLabel.trim() && !nodes.some(n => n.label === newLabel.trim() && n.id !== node.id)) {
-          node.label = newLabel.trim();
-          render();
-        }
-      }
-
-      canvasEl.addEventListener('mousedown', onPointerDown);
-      canvasEl.addEventListener('mousemove', onPointerMove);
-      canvasEl.addEventListener('mouseup', onPointerUp);
-      canvasEl.addEventListener('touchstart', onPointerDown, { passive: false });
-      canvasEl.addEventListener('touchmove', onPointerMove, { passive: false });
-      canvasEl.addEventListener('touchend', onPointerUp);
-      canvasEl.addEventListener('dblclick', onNodeDblClick);
-      edgesLayer.addEventListener('click', onEdgeClick);
-
-      document.getElementById('btn-clear-graph').addEventListener('click', () => {
-        nodes = []; edges = []; nextId = 0; selectedNode = null;
-        render();
-      });
-
-      function loadExample() {
-        const w = canvasEl.clientWidth || 800;
-        const h = canvasEl.clientHeight || 440;
-        const cx = w / 2, cy = h / 2;
-        nodes = [
-          { id: 'N0', label: 'A', x: cx, y: cy - 150 },
-          { id: 'N1', label: 'B', x: cx - 170, y: cy - 30 },
-          { id: 'N2', label: 'C', x: cx + 170, y: cy - 30 },
-          { id: 'N3', label: 'D', x: cx - 100, y: cy + 130 },
-          { id: 'N4', label: 'E', x: cx + 100, y: cy + 130 },
-        ];
-        edges = [
-          { source: 'N0', target: 'N1', weight: 4 },
-          { source: 'N0', target: 'N2', weight: 2 },
-          { source: 'N1', target: 'N3', weight: 5 },
-          { source: 'N2', target: 'N4', weight: 6 },
-          { source: 'N1', target: 'N2', weight: 1 },
-          { source: 'N3', target: 'N4', weight: 3 },
-        ];
-        nextId = 5;
-        selectedNode = null;
-        render();
-      }
-      document.getElementById('btn-example-graph').addEventListener('click', loadExample);
-
-      // Load example on startup so the canvas is never empty
-      loadExample();
-
-      document.getElementById('directed-toggle').addEventListener('change', render);
-      document.getElementById('weighted-toggle').addEventListener('change', (ev) => {
-        if (ev.target.checked) {
-          const weighted = true;
-          edges.forEach(e => { if (e.weight == null) e.weight = 1; });
-        }
-        render();
-      });
-
-      return {
-        getNodes: () => nodes,
-        getEdges: () => edges,
-      };
-    })();
-
-    function graphFromSync() {
-      // Build the payload from the live editor state so node positions on the
-      // canvas are preserved in the Manim render.
-      const editorNodes = graphEditor.getNodes();
-      const editorEdges = graphEditor.getEdges();
-      const directed = document.getElementById('directed-toggle').checked;
-      const weighted = document.getElementById('weighted-toggle').checked;
-
-      // Fit the canvas layout into the Manim frame (target box) using a uniform
-      // scale so the editor proportions are kept exactly — just bigger, not
-      // stretched or squashed.
-      const TARGET_W = 12.4;   // usable frame width  (~ +-6.2)
-      const TARGET_H = 5.2;    // usable frame height (~ +-2.6)
-
-      const xs = editorNodes.map(n => n.x);
-      const ys = editorNodes.map(n => n.y);
-      if (xs.length === 0) return { directed, weighted, nodes: [], edges: [] };
-
-      const minX = Math.min(...xs), maxX = Math.max(...xs);
-      const minY = Math.min(...ys), maxY = Math.max(...ys);
-      const spanX = Math.max(maxX - minX, 1);
-      const spanY = Math.max(maxY - minY, 1);
-      const cx = (minX + maxX) / 2;
-      const cy = (minY + maxY) / 2;
-      const scale = Math.min(TARGET_W / spanX, TARGET_H / spanY);
-
-      const labelById = new Map(editorNodes.map(n => [n.id, n.label]));
-      const nodes = editorNodes.map(n => ({
-        id: n.label,
-        x: Math.round((n.x - cx) * scale * 100) / 100,
-        y: Math.round(-(n.y - cy) * scale * 100) / 100,
-      }));
-
-      const edges = editorEdges.map(e => {
-        const edge = {
-          source: labelById.get(e.source) ?? e.source,
-          target: labelById.get(e.target) ?? e.target,
-        };
-        if (e.weight != null) edge.weight = e.weight;
-        return edge;
-      });
-
-      return { directed, weighted, nodes, edges };
-    }
-
-    // ============ Tabs ============
-    const tabs = ['bfs', 'dfs', 'dijkstra'];
-    function switchTab(algo) {
-      currentAlgo = algo;
-      tabs.forEach(t => {
-        const btn = document.getElementById(`tab-${t}`);
-        const on = t === algo;
-        btn.classList.toggle('btn-primary', on);
-        btn.classList.toggle('btn-secondary', !on);
-        btn.setAttribute('aria-selected', on ? 'true' : 'false');
-      });
-      const targetLabel = document.getElementById('target-optional');
-      const targetField = document.getElementById('target-field');
-      if (algo === 'dfs') {
-        targetField.classList.add('hidden');
-      } else {
-        targetField.classList.remove('hidden');
-        targetLabel.textContent = algo === 'dijkstra' ? '(required)' : '(optional)';
-      }
-    }
-    tabs.forEach(t => document.getElementById(`tab-${t}`).addEventListener('click', () => switchTab(t)));
-
-    // ============ Video / JSON ============
-    function renderVideo(url) {
-      currentVideoUrl = url;
-      const player = document.getElementById('video-player');
-      document.getElementById('video-placeholder').style.display = 'none';
-      player.src = `${API_BASE}${url}`;
-      player.style.display = 'block';
-      const dl = document.getElementById('btn-download');
-      dl.disabled = false;
-      dl.href = `${API_BASE}${url}`;
-    }
-
-    function renderJson(json) {
-      currentAnimJson = json;
-      document.getElementById('json-output').innerHTML = `<code>${JSON.stringify(json, null, 2)}</code>`;
-    }
-
-    function updateExec(result) {
-      const anim = result.animation_input || {};
-      const states = anim.states || [];
-      const last = states[states.length - 1] || {};
-      document.getElementById('exec-algo').textContent = (anim.algorithm || '—').toUpperCase();
-      document.getElementById('exec-step').textContent = `${last.step || 0} / ${states.length}`;
-      document.getElementById('exec-visited').textContent = last.visited?.length || 0;
-      document.getElementById('exec-frontier').textContent = last.frontier?.length || 0;
-      document.getElementById('exec-message').textContent = last.message || '';
-    }
-
-    // ============ Run ============
-    async function runAlgorithm() {
-      const btn = document.getElementById('btn-run');
-      const graph = graphFromSync();
-      const start = document.getElementById('start-node').value;
-      const target = document.getElementById('target-node').value || null;
-
-      if (graph.nodes.length === 0) return showToast('Draw at least one node first', 'error');
-      if (!start) return showToast('Pick a start node', 'error');
-      if (currentAlgo === 'dijkstra') {
-        if (!graph.weighted) return showToast('Enable Weighted for Dijkstra', 'error');
-        if (!target) return showToast('Dijkstra needs a target node', 'error');
-      }
-
-      setStatus('Running ' + currentAlgo.toUpperCase() + '…', 'running');
-      btn.disabled = true;
-      btn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 inline" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Running…';
-
-      try {
-        const runRes = await fetch(`${API_BASE}/api/algorithm/run`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ algorithm: currentAlgo, start, target, graph })
-        });
-        if (!runRes.ok) {
-          const err = await runRes.json().catch(() => ({}));
-          throw new Error(err.detail || 'Algorithm failed');
-        }
-        const runResult = await runRes.json();
-
-        showToast('Algorithm done — rendering video…', 'info');
-        const renderRes = await fetch(`${API_BASE}/api/manim/render`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            animation_input: runResult.animation_input,
-            quality: document.getElementById('quality').value
-          })
-        });
-        if (!renderRes.ok) {
-          const err = await renderRes.json().catch(() => ({}));
-          throw new Error(err.detail || 'Render failed');
-        }
-        const renderResult = await renderRes.json();
-
-        renderVideo(renderResult.video_url);
-        renderJson(runResult.animation_input);
-        updateExec(runResult);
-        setStatus('Video ready', 'ready');
-        showToast('Video ready!', 'success');
-      } catch (e) {
-        setStatus('Error', 'error');
-        showToast(e.message, 'error');
-        console.error(e);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = '▶ Run & Render';
-      }
-    }
-
-    document.getElementById('btn-run').addEventListener('click', runAlgorithm);
-    document.getElementById('btn-copy-json').addEventListener('click', () => {
-      if (!currentAnimJson) return showToast('No JSON to copy', 'error');
-      navigator.clipboard.writeText(JSON.stringify(currentAnimJson, null, 2));
-      showToast('JSON copied', 'success');
-    });
-    document.getElementById('btn-download').addEventListener('click', () => {
-      if (!currentVideoUrl) return;
-      const a = document.createElement('a');
-      a.href = `${API_BASE}${currentVideoUrl}`;
-      a.download = currentVideoUrl.split('/').pop();
-      a.click();
-    });
-  </script>
 <script>
 (() => {
-  const tabList = document.querySelector('[role="tablist"]');
-  const algorithmSection = tabList.closest('section');
-  const algorithmInputs = algorithmSection.querySelector('.space-y-4');
-  const graphSection = document.querySelector('#graph-canvas').closest('section');
-  const videoSection = document.querySelector('#video-player').closest('section');
-  const jsonSection = document.querySelector('#json-output').closest('details');
-  const leftColumn = graphSection.parentElement;
-  const tab = document.createElement('button');
-  tab.type = 'button';
-  tab.className = 'tab-pill btn-secondary flex-1 px-2 py-1.5 text-sm';
-  tab.textContent = 'Probability';
-  tab.setAttribute('role', 'tab');
-  tab.setAttribute('aria-selected', 'false');
-  tabList.append(tab);
+'use strict';
 
-  const controls = document.createElement('div');
-  controls.className = 'hidden space-y-4';
-  controls.innerHTML = [
-    '<div><label for="card-event" class="block text-xs font-medium text-ink-dim mb-1">Event to find</label>',
-    '<select id="card-event" class="select-field"><option value="heart">A heart</option><option value="red">Any red card</option><option value="ace">An ace</option><option value="spade">A spade</option><option value="king">A king</option></select></div>',
-    '<div><label for="card-count" class="block text-xs font-medium text-ink-dim mb-1">Cards in your hand</label><input id="card-count" class="input-field" type="number" min="1" max="52" value="1" inputmode="numeric"></div>',
-    '<button id="card-draw" type="button" class="btn-primary w-full">Draw next card</button>',
-    '<button id="card-reset" type="button" class="btn-secondary w-full">Shuffle and reset</button>',
-    '<div class="border-t border-paper-dim pt-4"><label for="card-trials" class="block text-xs font-medium text-ink-dim mb-1">Simulation trials</label>',
-    '<select id="card-trials" class="select-field"><option value="20">20</option><option value="100" selected>100</option><option value="500">500</option><option value="1000">1,000</option></select>',
-    '<button id="card-simulate" type="button" class="btn-primary w-full mt-3">Run simulation</button></div>'
-  ].join('');
-  algorithmInputs.after(controls);
+const API_BASE = '';
+const $ = id => document.getElementById(id);
 
-  const lab = document.createElement('section');
-  lab.className = 'hidden grid lg:grid-cols-2 gap-6';
-  lab.setAttribute('aria-label', 'Card probability lesson and experiment');
-  lab.innerHTML = [
-    '<section class="card-elevated p-5" aria-labelledby="card-lesson-heading"><div class="flex items-start justify-between gap-3 mb-4"><div>',
-    '<p class="text-xs uppercase tracking-wide text-cyan-dark font-semibold">Short animated lesson</p><h2 id="card-lesson-heading" class="font-semibold text-ink text-lg mt-1">How card probability works</h2>',
-    '<p class="text-sm text-ink-dim mt-1">A guided visual using your selected event and hand size.</p></div><span id="lesson-progress" class="badge badge-cyan" aria-live="polite">1 / 4</span></div>',
-    '<div class="lesson-stage rounded-xl border border-paper-dim bg-white p-5" aria-live="polite"><div id="lesson-cards" class="flex items-center justify-center gap-3 min-h-24" aria-hidden="true"></div>',
-    '<h3 id="lesson-title" class="text-center text-lg font-semibold text-ink mt-4"></h3><p id="lesson-caption" class="text-center text-sm text-ink-dim mt-2 min-h-10"></p>',
-    '<p id="lesson-equation" class="lesson-equation text-center text-ink mt-3 rounded-lg bg-paper p-3"></p></div>',
-    '<div class="flex flex-wrap items-center justify-center gap-2 mt-4"><button id="lesson-back" type="button" class="btn-secondary" aria-label="Previous lesson scene">Back</button>',
-    '<button id="lesson-play" type="button" class="btn-primary">Play lesson</button><button id="lesson-next" type="button" class="btn-secondary" aria-label="Next lesson scene">Next</button>',
-    '<button id="lesson-replay" type="button" class="btn-secondary">Replay</button></div>',
-    '<p class="text-xs text-ink-light text-center mt-3">The lesson pauses when you change the event or hand size.</p></section>',
-    '<section class="card p-5" aria-labelledby="card-lab-heading"><div class="flex items-start justify-between gap-3"><div>',
-    '<p class="text-xs uppercase tracking-wide text-cyan-dark font-semibold">Try it yourself</p><h2 id="card-lab-heading" class="font-semibold text-ink text-lg mt-1">A shuffled 52-card deck</h2>',
-    '<p id="deck-status" class="text-sm text-ink-dim mt-1"></p></div><span class="badge badge-teal">Without replacement</span></div>',
-    '<div class="mt-4 p-3 bg-paper rounded-lg"><p class="text-xs text-ink-dim">Your drawn cards</p><div id="card-hand" class="mt-2 flex flex-wrap gap-2" aria-live="polite"></div></div>',
-    '<div class="grid sm:grid-cols-2 gap-3 mt-4"><div class="p-3 bg-paper rounded-lg"><p class="text-xs text-ink-dim">Favorable hands</p><p id="card-favorable" class="font-mono font-semibold mt-1"></p></div>',
-    '<div class="p-3 bg-paper rounded-lg"><p class="text-xs text-ink-dim">Exact chance of at least one match</p><p id="card-exact" class="font-mono font-semibold mt-1"></p></div></div>',
-    '<p id="card-result" class="text-sm text-ink-dim mt-3" aria-live="polite"></p><div class="border-t border-paper-dim mt-5 pt-4"><h3 class="font-medium text-ink">Experiment</h3>',
-    '<p class="text-xs text-ink-dim mt-1">Each trial shuffles a fresh deck, then draws the same number of cards.</p>',
-    '<div id="card-chart" class="simulation-chart flex items-end gap-px mt-3" role="img" aria-label="Simulation results will appear here"></div>',
-    '<p id="card-simulation-result" class="text-sm text-ink-dim mt-2" aria-live="polite">Run a simulation to compare observed and exact probability.</p></div></section></section>'
-  ].join('');
-  leftColumn.append(lab);
+/* =====================================================================
+   Small helpers: toast + status pill
+   ===================================================================== */
+function showToast(message, type = 'info') {
+  document.querySelectorAll('.toast').forEach(t => t.remove());
+  const toast = document.createElement('div');
+  toast.className = 'toast toast-' + type;
+  toast.setAttribute('role', 'status');
+  toast.textContent = message;
+  document.body.append(toast);
+  setTimeout(() => toast.remove(), 4000);
+}
+function setStatus(text, state = 'ready') {
+  $('status-text').textContent = text;
+  $('status-pill').dataset.state = state;
+}
 
-  const style = document.createElement('style');
-  style.textContent = [
-    '.lesson-equation{font-family:"JetBrains Mono",monospace;font-size:.9rem;font-variant-numeric:tabular-nums}',
-    '.lesson-card{width:3.8rem;height:5.2rem;border:1px solid #d7d9e8;border-radius:.55rem;background:#fff;box-shadow:0 3px 10px #171b2614;display:flex;flex-direction:column;justify-content:space-between;padding:.45rem;font-family:"JetBrains Mono",monospace;animation:card-arrive .35s ease both}',
-    '.lesson-card.is-hit{border-color:#06b6d4;box-shadow:0 0 0 3px #06b6d422}.lesson-card.red-card,.hand-card.red-card{color:#e11d48}.lesson-card.black-card,.hand-card.black-card{color:#171b26}',
-    '.hand-card{width:3.2rem;height:4.2rem;border:1px solid #d7d9e8;border-radius:.5rem;background:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:.4rem;font-family:"JetBrains Mono",monospace;box-shadow:0 2px 6px #171b2610}',
-    '.simulation-chart{height:5rem}.simulation-bar{flex:1;min-width:2px;background:#06b6d4;border-radius:2px 2px 0 0;transition:height .12s}',
-    '@keyframes card-arrive{from{opacity:.25;transform:translateY(-12px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}',
-    '@media (prefers-reduced-motion:reduce){.lesson-card,.simulation-bar{animation:none!important;transition:none!important}}'
-  ].join('');
-  document.head.append(style);
+/* =====================================================================
+   Math text -> TeX  (small expression parser; renders with KaTeX)
+   ===================================================================== */
+class Tex { constructor(s) { this.s = s; } }
+const T = s => new Tex(s);
 
-  const $ = (id) => document.getElementById(id);
-  const suits = ['S', 'H', 'D', 'C'];
-  const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-  const suitNames = {S: 'spades', H: 'hearts', D: 'diamonds', C: 'clubs'};
-  const suitMarks = {S: '&spades;', H: '&hearts;', D: '&diams;', C: '&clubs;'};
-  const eventNames = {heart: 'a heart', red: 'a red card', ace: 'an ace', spade: 'a spade', king: 'a king'};
-  const makeDeck = () => suits.flatMap((suit) => ranks.map((rank) => ({suit, rank})));
-  let deck = [];
-  let hand = [];
-  let lessonStep = 0;
-  let lessonTimer = null;
-  let simulationRunning = false;
+function normalizeMath(src) {
+  let s = String(src)
+    .replace(/[×·⋅]/g, '*').replace(/÷/g, '/').replace(/[−–—]/g, '-')
+    .replace(/²/g, '**2').replace(/³/g, '**3')
+    .replace(/π/g, 'pi').replace(/∞/g, 'oo')
+    .replace(/√\s*\(/g, 'sqrt(').replace(/\^/g, '**')
+    .replace(/\bln\s*\(/g, 'log(');
+  // implicit multiplication:  3x -> 3*x,  2(x+1) -> 2*(x+1),  (a)(b) -> (a)*(b),  (a)x -> (a)*x
+  s = s.replace(/(^|[^A-Za-z_\d.])(\d+\.?\d*)\s*(?=[A-Za-z(])/g, '$1$2*');
+  s = s.replace(/\)\s*(?=[A-Za-z0-9(])/g, ')*');
+  // bare "e" means Euler's number
+  s = s.replace(/(^|[^A-Za-z_\d.])e(?![A-Za-z_\d])/g, '$1E');
+  return s;
+}
 
-  function drawCount() {
-    const value = Number.parseInt($('card-count').value, 10);
-    return Math.max(1, Math.min(52, Number.isFinite(value) ? value : 1));
+const FN_TEX = { sin:'\\sin', cos:'\\cos', tan:'\\tan', cot:'\\cot', sec:'\\sec', csc:'\\csc',
+  asin:'\\arcsin', acos:'\\arccos', atan:'\\arctan', sinh:'\\sinh', cosh:'\\cosh', tanh:'\\tanh',
+  log:'\\ln', ln:'\\ln' };
+const SYM_TEX = { pi:'\\pi', oo:'\\infty', zoo:'\\infty', E:'e', I:'i',
+  alpha:'\\alpha', beta:'\\beta', gamma:'\\gamma', delta:'\\delta', epsilon:'\\epsilon',
+  theta:'\\theta', lambda:'\\lambda', mu:'\\mu', sigma:'\\sigma', phi:'\\phi', omega:'\\omega' };
+
+function tokenize(src) {
+  const out = []; let i = 0, m;
+  while (i < src.length) {
+    const c = src[i];
+    if (/\s/.test(c)) { i++; continue; }
+    const rest = src.slice(i);
+    if ((m = /^(\d+\.?\d*|\.\d+)/.exec(rest))) { out.push({ k:'num', v:m[0] }); i += m[0].length; continue; }
+    if ((m = /^[A-Za-z_][A-Za-z0-9_]*/.exec(rest))) { out.push({ k:'id', v:m[0] }); i += m[0].length; continue; }
+    if (rest.startsWith('**')) { out.push({ k:'op', v:'^' }); i += 2; continue; }
+    if ('+-*/^(),\''.includes(c)) { out.push({ k:'op', v:c }); i++; continue; }
+    throw new Error('Unexpected character ' + c);
   }
-  function isMatch(card, event = $('card-event').value) {
-    if (event === 'heart') return card.suit === 'H';
-    if (event === 'red') return card.suit === 'H' || card.suit === 'D';
-    if (event === 'ace') return card.rank === 'A';
-    if (event === 'spade') return card.suit === 'S';
-    return card.rank === 'K';
-  }
-  function favorableCardCount(event = $('card-event').value) {
-    return makeDeck().filter((card) => isMatch(card, event)).length;
-  }
-  function choose(total, count) {
-    if (count < 0 || count > total) return 0;
-    const k = Math.min(count, total - count);
-    let result = 1;
-    for (let i = 1; i <= k; i += 1) result = result * (total - k + i) / i;
-    return Math.round(result);
-  }
-  function exactProbability(count = drawCount(), event = $('card-event').value) {
-    const matching = favorableCardCount(event);
-    const allHands = choose(52, count);
-    const noMatchHands = choose(52 - matching, count);
-    return allHands === 0 ? 0 : (allHands - noMatchHands) / allHands;
-  }
-  function percent(value) { return (value * 100).toFixed(1) + '%'; }
-  function shuffle(cards) {
-    for (let i = cards.length - 1; i > 0; i -= 1) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [cards[i], cards[j]] = [cards[j], cards[i]];
+  return out;
+}
+
+function parseTex(src) {
+  const t = tokenize(src);
+  let p = 0;
+  const isOp = v => p < t.length && t[p].k === 'op' && t[p].v === v;
+  const expect = v => { if (!isOp(v)) throw new Error('Expected ' + v); p++; };
+  const inner = n => (n.inner !== undefined ? n.inner : n.t);
+  const paren = s => '\\left(' + s + '\\right)';
+
+  function expr() {
+    const first = term();
+    if (!(isOp('+') || isOp('-'))) return first;
+    let s = first.t;
+    while (isOp('+') || isOp('-')) {
+      const op = t[p++].v;
+      const r = term();
+      if (r.t[0] === '-') s += (op === '+' ? ' - ' : ' + ') + r.t.slice(1);
+      else s += (op === '+' ? ' + ' : ' - ') + r.t;
     }
-    return cards;
+    return { t: s, p: 1 };
   }
-  function cardElement(card, lessonCard) {
-    const element = document.createElement('span');
-    element.className = (lessonCard ? 'lesson-card' : 'hand-card') +
-      ((card.suit === 'H' || card.suit === 'D') ? ' red-card' : ' black-card') +
-      (isMatch(card) ? ' is-hit' : '');
-    element.setAttribute('aria-label', card.rank + ' of ' + suitNames[card.suit]);
-    element.innerHTML = '<b>' + card.rank + '</b><strong>' + suitMarks[card.suit] + '</strong>';
-    return element;
-  }
-  function resetDeck() {
-    deck = shuffle(makeDeck());
-    hand = [];
-  }
-  function renderHand() {
-    const target = $('card-hand');
-    target.replaceChildren();
-    if (!hand.length) {
-      const empty = document.createElement('span');
-      empty.className = 'text-sm text-ink-light';
-      empty.textContent = 'No cards drawn yet.';
-      target.append(empty);
-    } else hand.forEach((card) => target.append(cardElement(card, false)));
-    $('deck-status').textContent = deck.length + ' cards remain · ' + hand.length + ' of ' + drawCount() + ' drawn';
-    $('card-result').textContent = !hand.length ? 'Draw a card to try the event.' :
-      (hand.some((card) => isMatch(card)) ? 'Your hand contains ' + eventNames[$('card-event').value] + '.' :
-        'No match yet. The remaining cards stay in the deck.');
-    const total = choose(52, drawCount());
-    const favorable = total - choose(52 - favorableCardCount(), drawCount());
-    $('card-favorable').textContent = favorable.toLocaleString() + ' of ' + total.toLocaleString() + ' possible hands';
-    $('card-exact').textContent = percent(exactProbability());
-  }
-
-  function renderLesson() {
-    const event = $('card-event').value;
-    const count = drawCount();
-    const matching = favorableCardCount(event);
-    const total = choose(52, count);
-    const noMatch = choose(52 - matching, count);
-    const scenes = [
-      ['Start with the whole deck', 'A standard deck has 52 distinct cards. Each card is one equally likely outcome for a single draw.', 'sample space = 52 cards'],
-      ['Count the cards that match', 'For ' + eventNames[event] + ', there are ' + matching + ' favorable cards in the full deck.', matching + ' favorable outcomes / 52 total outcomes = ' + percent(matching / 52)],
-      ['For a hand, count combinations', 'Draws are without replacement, so count distinct hands. Subtract hands with no match from all possible hands.', 'P(at least one match) = 1 - C(' + (52 - matching) + ', ' + count + ') / C(52, ' + count + ')'],
-      ['Compare exact chance with trials', 'The exact answer comes from counting. A simulation samples shuffled hands; its estimate varies, especially with few trials.', 'exact: ' + percent(total ? (total - noMatch) / total : 0) + ' · simulation: compare below']
-    ];
-    const scene = scenes[lessonStep];
-    $('lesson-title').textContent = scene[0];
-    $('lesson-caption').textContent = scene[1];
-    $('lesson-equation').textContent = scene[2];
-    $('lesson-progress').textContent = (lessonStep + 1) + ' / ' + scenes.length;
-    const visual = $('lesson-cards');
-    visual.replaceChildren();
-    const samples = lessonStep === 1
-      ? [{rank: 'A', suit: 'H'}, {rank: '5', suit: 'D'}, {rank: 'K', suit: 'S'}, {rank: '10', suit: 'C'}]
-      : [{rank: 'A', suit: 'S'}, {rank: '5', suit: 'H'}, {rank: 'Q', suit: 'D'}, {rank: '10', suit: 'C'}];
-    samples.forEach((card) => visual.append(cardElement(card, true)));
-    $('lesson-back').disabled = lessonStep === 0;
-    $('lesson-next').disabled = lessonStep === scenes.length - 1;
-    $('lesson-play').textContent = lessonTimer ? 'Pause lesson' : 'Play lesson';
-  }
-  function stopLesson() {
-    if (lessonTimer !== null) window.clearInterval(lessonTimer);
-    lessonTimer = null;
-    renderLesson();
-  }
-  function startLesson() {
-    if (lessonTimer !== null) { stopLesson(); return; }
-    if (lessonStep === 3) lessonStep = 0;
-    lessonTimer = window.setInterval(() => {
-      if (lessonStep >= 3) { stopLesson(); return; }
-      lessonStep += 1;
-      renderLesson();
-    }, 4200);
-    renderLesson();
-  }
-  function renderChart(values, exact) {
-    const chart = $('card-chart');
-    chart.replaceChildren();
-    chart.setAttribute('aria-label', 'Observed probability ' + percent(values[values.length - 1] || 0) +
-      '; exact probability ' + percent(exact));
-    values.forEach((value) => {
-      const bar = document.createElement('span');
-      bar.className = 'simulation-bar';
-      bar.style.height = Math.max(3, Math.min(100, value * 100)) + '%';
-      bar.title = 'Observed ' + percent(value);
-      chart.append(bar);
-    });
-  }
-  async function runSimulation() {
-    if (simulationRunning) return;
-    simulationRunning = true;
-    $('card-simulate').disabled = true;
-    $('card-simulation-result').textContent = 'Sampling shuffled hands…';
-    const trials = Number.parseInt($('card-trials').value, 10);
-    const count = drawCount();
-    const event = $('card-event').value;
-    const exact = exactProbability(count, event);
-    const sampleDeck = makeDeck();
-    let matches = 0;
-    const observed = [];
-    const interval = Math.max(1, Math.floor(trials / 60));
-    for (let trial = 1; trial <= trials; trial += 1) {
-      shuffle(sampleDeck);
-      if (sampleDeck.slice(0, count).some((card) => isMatch(card, event))) matches += 1;
-      if (trial % interval === 0 || trial === trials) {
-        observed.push(matches / trial);
-        renderChart(observed, exact);
-        $('card-simulation-result').textContent = trial + ' trials · ' + matches + ' matches · observed ' +
-          percent(matches / trial) + ' · exact ' + percent(exact);
-        await new Promise((resolve) => window.setTimeout(resolve, 12));
-      }
+  function term() {
+    let acc = unary();
+    while (isOp('*') || isOp('/')) {
+      const op = t[p++].v;
+      const r = unary();
+      acc = op === '*' ? mul(acc, r) : { t: '\\frac{' + inner(acc) + '}{' + inner(r) + '}', p: 5 };
     }
-    simulationRunning = false;
-    $('card-simulate').disabled = false;
+    return acc;
   }
-  function showProbability(show) {
-    graphSection.classList.toggle('hidden', show);
-    videoSection.classList.toggle('hidden', show);
-    jsonSection.classList.toggle('hidden', show);
-    algorithmInputs.classList.toggle('hidden', show);
-    algorithmSection.querySelector('h2').textContent = show ? 'Card Probability Lab' : 'Run Algorithm';
-    controls.classList.toggle('hidden', !show);
-    lab.classList.toggle('hidden', !show);
-    tab.setAttribute('aria-selected', show ? 'true' : 'false');
-    tab.classList.toggle('btn-primary', show);
-    tab.classList.toggle('btn-secondary', !show);
-    tabList.querySelectorAll('.tab-pill').forEach((button) => {
-      if (button === tab) return;
-      button.classList.toggle('btn-primary', !show && button.getAttribute('aria-selected') === 'true');
-      button.classList.toggle('btn-secondary', show || button.getAttribute('aria-selected') !== 'true');
-    });
-    if (!show) stopLesson();
+  function mul(a, b) {
+    const left = a.p === 1 ? paren(a.t) : a.t;
+    const right = (b.p === 1 || b.t[0] === '-') ? paren(b.t) : b.t;
+    const leftIsNum = /^-?\d[\d.]*$/.test(a.t);
+    let sep = ' ';
+    if (/^\d/.test(right)) sep = ' \\cdot ';
+    else if (leftIsNum) sep = right.startsWith('\\frac') ? ' \\cdot ' : '';
+    return { t: left + sep + right, p: 2 };
+  }
+  function unary() {
+    if (isOp('-')) { p++; const o = unary(); return { t: '-' + o.t, p: 3 }; }
+    if (isOp('+')) { p++; return unary(); }
+    return power();
+  }
+  function power() {
+    let base = atom();
+    while (isOp("'")) { p++; base = { t: base.t + "'", p: 5 }; }
+    if (isOp('^')) {
+      p++;
+      const e = unary();
+      const et = inner(e);
+      if (base.fn) return { t: base.fn.head + '^{' + et + '}' + base.fn.arg, p: 4 };
+      const bt = base.p < 5 ? paren(base.t) : base.t;
+      return { t: bt + '^{' + et + '}', p: 4 };
+    }
+    return base;
+  }
+  function args() {
+    const list = [];
+    if (!isOp(')')) { list.push(expr()); while (isOp(',')) { p++; list.push(expr()); } }
+    expect(')');
+    return list;
+  }
+  function call(name, a) {
+    const joined = a.map(x => x.t).join(', ');
+    if (name === 'sqrt' && a.length === 1) return { t: '\\sqrt{' + a[0].t + '}', p: 5 };
+    if (name === 'exp' && a.length === 1) return { t: 'e^{' + a[0].t + '}', p: 4 };
+    if (name === 'Abs' && a.length === 1) return { t: '\\left|' + a[0].t + '\\right|', p: 5 };
+    if (name === 'log' && a.length === 2) return { t: '\\log_{' + a[1].t + '}' + paren(a[0].t), p: 5 };
+    if (FN_TEX[name]) { const arg = paren(joined); return { t: FN_TEX[name] + arg, p: 5, fn: { head: FN_TEX[name], arg } }; }
+    if (/^[fgh]$/.test(name)) return { t: name + paren(joined), p: 5 };
+    return { t: '\\operatorname{' + name.replace(/_/g, '\\_') + '}' + paren(joined), p: 5 };
+  }
+  function atom() {
+    const tk = t[p++];
+    if (!tk) throw new Error('Unexpected end');
+    if (tk.k === 'num') return { t: tk.v, p: 5 };
+    if (tk.k === 'id') {
+      if (isOp('(')) { p++; return call(tk.v, args()); }
+      const sym = SYM_TEX[tk.v];
+      if (sym) return { t: sym, p: 5 };
+      return { t: tk.v.length === 1 ? tk.v : '\\mathrm{' + tk.v.replace(/_/g, '\\_') + '}', p: 5 };
+    }
+    if (tk.k === 'op' && tk.v === '(') { const e = expr(); expect(')'); return { t: paren(e.t), p: 5, inner: e.t }; }
+    throw new Error('Unexpected token');
   }
 
-  tab.addEventListener('click', () => showProbability(true));
- tabList.querySelectorAll('.tab-pill').forEach((button) => {
-  if (button !== tab) {
-    button.addEventListener('click', () => showProbability(false));
+  const result = expr();
+  if (p !== t.length) throw new Error('Unexpected trailing input');
+  return inner(result);
+}
+
+function splitTop(s, ch) {
+  const parts = []; let depth = 0, start = 0;
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (c === '(' || c === '[') depth++;
+    else if (c === ')' || c === ']') depth--;
+    else if (c === ch && depth === 0) { parts.push(s.slice(start, i)); start = i + 1; }
   }
+  parts.push(s.slice(start));
+  return parts;
+}
+const escText = s => s.replace(/[\\{}$&#_%^~]/g, c => ({ '\\':'\\textbackslash{}', '^':'\\^{}', '~':'\\~{}' }[c] || '\\' + c));
+
+/* Convert a value (sympy string, TeX string, number, or Tex object) to TeX.
+   strict=true -> returns null when it can't be parsed (used for the live preview). */
+function toTex(value, strict = false) {
+  if (value instanceof Tex) return value.s;
+  if (value === null || value === undefined) return '';
+  if (typeof value === 'number') return String(value);
+  const s = String(value).trim();
+  if (!s) return '';
+  if (s.includes('\\')) return s;               // already TeX
+  try {
+    return splitTop(s, ',').map(part =>
+      splitTop(part, '=').map(piece => {
+        if (!piece.trim()) throw new Error('empty');
+        return parseTex(normalizeMath(piece));
+      }).join(' = ')
+    ).join(',\\quad ');
+  } catch (err) {
+    return strict ? null : '\\text{' + escText(s) + '}';
+  }
+}
+
+/* Plain-text fallback (used while KaTeX is loading / offline) */
+function readableMath(value) {
+  const sup = { '0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻','+':'⁺','(':'⁽',')':'⁾' };
+  const toSup = e => [...e].map(c => sup[c] ?? c).join('');
+  return String(value)
+    .replace(/\\frac\{d\}\{d([A-Za-z])\}/g, 'd/d$1')
+    .replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, '($1)/($2)')
+    .replace(/\\lim_\{([^{}]*)\}/g, (_, l) => 'lim ' + l.replace(/\\to/g, '→'))
+    .replace(/\\sqrt\{([^{}]+)\}/g, '√($1)')
+    .replace(/\\text\{([^{}]*)\}/g, '$1')
+    .replace(/\\(?:left|right)/g, '')
+    .replace(/\\(?:quad|,|;)/g, ' ')
+    .replace(/\\cdot/g, '×').replace(/\\infty/g, '∞').replace(/\\pi/g, 'π').replace(/\\to/g, '→')
+    .replace(/\^\{([^{}]*)\}/g, (_, e) => toSup(e))
+    .replace(/\*\*\s*\(([^()]*)\)/g, (_, e) => toSup(e))
+    .replace(/\*\*\s*([+-]?\d+)/g, (_, e) => toSup(e))
+    .replace(/\\/g, '')
+    .replace(/\*/g, ' × ')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/[−–]/g, '-');
+}
+
+function renderMath(el, tex, fallback, display = false) {
+  if (!el) return;
+  el.classList.remove('empty');
+  el.textContent = fallback ?? '';
+  if (!tex || !window.katex) return;
+  try {
+    el.innerHTML = window.katex.renderToString(tex, { throwOnError: true, displayMode: display, strict: 'ignore' });
+  } catch (err) {
+    el.textContent = fallback ?? '';
+  }
+}
+
+/* =====================================================================
+   Tab router  (also switches the colour theme:
+   neutral for graph + probability, green for calculus)
+   ===================================================================== */
+const VIEW_OF = { bfs:'graph', dfs:'graph', dijkstra:'graph', probability:'prob', calculus:'calc' };
+let currentAlgo = 'bfs';
+
+function showTab(name) {
+  document.querySelectorAll('#viz-tabs [role="tab"]').forEach(btn => {
+    const on = btn.dataset.tab === name;
+    btn.setAttribute('aria-selected', String(on));
+    btn.tabIndex = on ? 0 : -1;
+  });
+  const view = VIEW_OF[name];
+  ['graph', 'prob', 'calc'].forEach(v => { $('view-' + v).hidden = v !== view; });
+  document.body.dataset.theme = view === 'calc' ? 'calc' : 'neutral';
+
+  if (view === 'graph') {
+    currentAlgo = name;
+    $('algo-title').textContent = 'Run ' + (name === 'dijkstra' ? 'Dijkstra' : name.toUpperCase());
+    $('target-field').hidden = name === 'dfs';
+    $('target-optional').textContent = name === 'dijkstra' ? '(required)' : '(optional)';
+    if (name === 'dijkstra' && !$('weighted-toggle').checked) {
+      $('weighted-toggle').checked = true;
+      $('weighted-toggle').dispatchEvent(new Event('change'));
+    }
+  }
+  if (view !== 'prob') stopLesson();
+}
+document.querySelectorAll('#viz-tabs [role="tab"]').forEach(btn => {
+  btn.addEventListener('click', () => showTab(btn.dataset.tab));
 });
-  $('card-event').addEventListener('change', () => {
-    stopLesson(); resetDeck(); renderHand(); renderLesson();
-  });
-  $('card-count').addEventListener('change', () => {
-    $('card-count').value = String(drawCount());
-    stopLesson(); resetDeck(); renderHand(); renderLesson();
-  });
-  $('card-draw').addEventListener('click', () => {
-    if (hand.length >= drawCount() || !deck.length) return;
-    hand.push(deck.pop());
-    renderHand();
-  });
-  $('card-reset').addEventListener('click', () => { resetDeck(); renderHand(); });
-  $('card-simulate').addEventListener('click', runSimulation);
-  $('lesson-back').addEventListener('click', () => { stopLesson(); lessonStep = Math.max(0, lessonStep - 1); renderLesson(); });
-  $('lesson-next').addEventListener('click', () => { stopLesson(); lessonStep = Math.min(3, lessonStep + 1); renderLesson(); });
-  $('lesson-play').addEventListener('click', startLesson);
-  $('lesson-replay').addEventListener('click', () => { stopLesson(); lessonStep = 0; startLesson(); });
 
-  const subtitle = document.querySelector('header p');
-  if (subtitle) subtitle.textContent = 'Interactive math visualizations';
-  resetDeck();
-  renderHand();
-  renderLesson();
-})();
-</script>
+/* =====================================================================
+   Graph editor
+   ===================================================================== */
+const editor = (() => {
+  const NS = 'http://www.w3.org/2000/svg';
+  const R = 26;
+  const canvas = $('graph-canvas');
+  const edgesLayer = $('edges-layer');
+  const nodesLayer = $('nodes-layer');
+  const dragLayer = $('drag-layer');
+  let nodes = [], edges = [], nextId = 0, selected = null, drag = null, lastTap = null;
 
-<script>
-(() => {
-  const tabList = document.querySelector('[role="tablist"]');
+  const make = (name, attrs = {}, parent) => {
+    const n = document.createElementNS(NS, name);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (parent) parent.append(n);
+    return n;
+  };
+  const isDirected = () => $('directed-toggle').checked;
+  const isWeighted = () => $('weighted-toggle').checked;
+  const labelOf = id => (nodes.find(n => n.id === id) || {}).label ?? id;
 
-  if (!tabList || document.getElementById('tab-calculus')) return;
-
-  const algorithmSection = tabList.closest('section');
-  const algorithmInputs = algorithmSection.querySelector('.space-y-4');
-  const probabilityControls = document.getElementById('card-event')?.closest('.space-y-4');
-  const rightColumn = algorithmSection.parentElement;
-  const executionSection = document.getElementById('exec-display')?.closest('section');
-  const graphSection = document.querySelector('#graph-canvas')?.closest('section');
-  const videoSection = document.querySelector('#video-player')?.closest('section');
-  const jsonSection = document.querySelector('#json-output')?.closest('details');
-  const leftColumn = graphSection?.parentElement;
-  const main = document.querySelector('main');
-
-  if (!main || !graphSection || !leftColumn) {
-    console.error('Calculus: Could not find the main page layout.');
-    return;
+  function nextLabel() {
+    const used = new Set(nodes.map(n => n.label));
+    for (let i = 0; i < 26; i++) { const l = String.fromCharCode(65 + i); if (!used.has(l)) return l; }
+    for (let i = 1; i < 1000; i++) { const l = 'N' + i; if (!used.has(l)) return l; }
   }
-
-  const mainGrid = main.querySelector(':scope > .grid') || leftColumn.parentElement;
-
-  if (!mainGrid) {
-    console.error('Calculus: Could not find the page grid.');
-    return;
+  function edgeExists(a, b) {
+    const d = isDirected();
+    return edges.some(e => (e.source === a && e.target === b) || (!d && e.source === b && e.target === a));
   }
+  const clampX = x => Math.max(30, Math.min((canvas.clientWidth || 800) - 30, x));
+  const clampY = y => Math.max(30, Math.min((canvas.clientHeight || 440) - 30, y));
 
-  const probabilityLab = document.querySelector(
-    '[aria-label="Card probability lesson and experiment"]'
-  );
-
-  // Create the Calculus tab
-  const tab = document.createElement('button');
-  tab.id = 'tab-calculus';
-  tab.type = 'button';
-  tab.className = 'tab-pill btn-secondary flex-1 px-2 py-1.5 text-sm';
-  tab.textContent = 'Calculus';
-  tab.setAttribute('role', 'tab');
-  tab.setAttribute('aria-selected', 'false');
-  tabList.append(tab);
-
-  // Create the Calculus panel
-  const panel = document.createElement('section');
-  panel.id = 'calculus-panel';
-  panel.className = 'hidden card p-5 space-y-4';
-
-  panel.innerHTML = `
-    <h2 class="text-lg font-semibold">Calculus Visualizer</h2>
-
-    <p class="text-sm text-ink-dim">
-      Enter a calculus expression to solve it and generate an animation.
-    </p>
-
-    <div id="calc-mode-tabs" role="tablist" aria-label="Calculus problem type"
-      class="flex flex-wrap gap-2 border-b border-paper-dim pb-3">
-      <button id="calc-tab-derivative" type="button" role="tab"
-        aria-selected="true" aria-controls="calc-panel-derivative" tabindex="0"
-        class="btn-primary">Derivatives</button>
-      <button id="calc-tab-limit" type="button" role="tab"
-        aria-selected="false" aria-controls="calc-panel-limit" tabindex="-1"
-        class="btn-secondary">Limits</button>
-      <button id="calc-tab-continuity" type="button" role="tab"
-        aria-selected="false" aria-controls="calc-panel-continuity" tabindex="-1"
-        class="btn-secondary">Continuity</button>
-      <button id="calc-tab-chain-rule" type="button" role="tab"
-        aria-selected="false" aria-controls="calc-panel-chain-rule" tabindex="-1"
-        class="btn-secondary">Chain Rule</button>
-    </div>
-
-    <div id="calc-panel-derivative" role="tabpanel" aria-labelledby="calc-tab-derivative"
-      data-problem-type="derivative" class="space-y-4">
-      <div>
-        <p class="block text-sm mb-2">Derivative topic</p>
-        <div id="calc-derivative-topics" role="group" aria-label="Derivative topic"
-          class="flex flex-wrap gap-2">
-          <button type="button" data-problem-type="derivative" aria-pressed="true" class="btn-primary text-sm">General Derivative</button>
-          <button type="button" data-problem-type="power_rule" aria-pressed="false" class="btn-secondary text-sm">Power Rule</button>
-          <button type="button" data-problem-type="sum_rule" aria-pressed="false" class="btn-secondary text-sm">Sum Rule</button>
-          <button type="button" data-problem-type="product_rule" aria-pressed="false" class="btn-secondary text-sm">Product Rule</button>
-          <button type="button" data-problem-type="quotient_rule" aria-pressed="false" class="btn-secondary text-sm">Quotient Rule</button>
-          <button type="button" data-problem-type="tangent_line" aria-pressed="false" class="btn-secondary text-sm">Tangent Line</button>
-          <button type="button" data-problem-type="derivative_applications" aria-pressed="false" class="btn-secondary text-sm">Derivative Applications</button>
-        </div>
-      </div>
-      <div>
-        <label for="calc-derivative-expression" class="block text-sm mb-1">Function f(x)</label>
-        <input id="calc-derivative-expression" name="expression" class="input-field"
-          value="x**2 + 3*x + 2" placeholder="Example: x**2 + 3*x + 2">
-        <p class="text-xs text-ink-dim mt-1">Use ** for powers, e.g. x**2.</p>
-      </div>
-      <div>
-        <label for="calc-derivative-variable" class="block text-sm mb-1">Differentiate with respect to</label>
-        <input id="calc-derivative-variable" name="variable" class="input-field" value="x">
-      </div>
-      <div id="calc-derivative-point-field" class="hidden">
-        <label for="calc-derivative-point" class="block text-sm mb-1">Point for tangent line (x = a)</label>
-        <input id="calc-derivative-point" name="point" class="input-field" value="1">
-      </div>
-    </div>
-
-    <div id="calc-panel-limit" role="tabpanel" aria-labelledby="calc-tab-limit"
-      data-problem-type="limit" class="hidden space-y-4">
-      <div>
-        <p class="block text-sm mb-2">Limit topic</p>
-        <div id="calc-limit-topics" role="group" aria-label="Limit topic"
-          class="flex flex-wrap gap-2">
-          <button type="button" data-problem-type="limit" aria-pressed="true" class="btn-primary text-sm">Limit at a Point</button>
-          <button type="button" data-problem-type="one_sided_limit" aria-pressed="false" class="btn-secondary text-sm">One-Sided Limit</button>
-          <button type="button" data-problem-type="two_sided_limit" aria-pressed="false" class="btn-secondary text-sm">Two-Sided Limit</button>
-          <button type="button" data-problem-type="limit_at_infinity" aria-pressed="false" class="btn-secondary text-sm">Limit at Infinity</button>
-        </div>
-      </div>
-      <div>
-        <label for="calc-limit-expression" class="block text-sm mb-1">Function f(x)</label>
-        <input id="calc-limit-expression" name="expression" class="input-field"
-          value="(x**2 - 1)/(x - 1)" placeholder="Example: (x**2 - 1)/(x - 1)">
-        <p class="text-xs text-ink-dim mt-1">Use ** for powers, e.g. x**2.</p>
-      </div>
-      <div>
-        <label for="calc-limit-variable" class="block text-sm mb-1">Variable</label>
-        <input id="calc-limit-variable" name="variable" class="input-field" value="x">
-      </div>
-      <div id="calc-limit-point-field">
-        <label for="calc-limit-point" class="block text-sm mb-1">Approach value a (x → a)</label>
-        <input id="calc-limit-point" name="point" class="input-field" value="1">
-      </div>
-      <div id="calc-limit-direction-field" class="hidden">
-        <label id="calc-limit-direction-label" for="calc-limit-direction" class="block text-sm mb-1">Direction</label>
-        <select id="calc-limit-direction" name="direction" class="select-field">
-          <option value="+">From the right / positive infinity (+)</option>
-          <option value="-">From the left / negative infinity (-)</option>
-        </select>
-      </div>
-    </div>
-
-    <div id="calc-panel-continuity" role="tabpanel" aria-labelledby="calc-tab-continuity"
-      data-problem-type="continuity" class="hidden space-y-4">
-      <div>
-        <label for="calc-continuity-expression" class="block text-sm mb-1">Function f(x)</label>
-        <input id="calc-continuity-expression" name="expression" class="input-field"
-          value="x**2 + 3*x + 2" placeholder="Example: x**2 + 3*x + 2">
-        <p class="text-xs text-ink-dim mt-1">Use ** for powers, e.g. x**2.</p>
-      </div>
-      <div>
-        <label for="calc-continuity-variable" class="block text-sm mb-1">Variable</label>
-        <input id="calc-continuity-variable" name="variable" class="input-field" value="x">
-      </div>
-      <div>
-        <label for="calc-continuity-point" class="block text-sm mb-1">Check continuity at x = a</label>
-        <input id="calc-continuity-point" name="point" class="input-field" value="1">
-      </div>
-    </div>
-
-    <div id="calc-panel-chain-rule" role="tabpanel" aria-labelledby="calc-tab-chain-rule"
-      data-problem-type="chain_rule" class="hidden space-y-4">
-      <div>
-        <label for="calc-chain-rule-expression" class="block text-sm mb-1">Composite function f(g(x))</label>
-        <input id="calc-chain-rule-expression" name="expression" class="input-field"
-          value="(3*x + 1)**2" placeholder="Example: (3*x + 1)**2">
-        <p class="text-xs text-ink-dim mt-1">Enter a composite function using ** for powers.</p>
-      </div>
-      <div>
-        <label for="calc-chain-rule-variable" class="block text-sm mb-1">Differentiate with respect to</label>
-        <input id="calc-chain-rule-variable" name="variable" class="input-field" value="x">
-      </div>
-    </div>
-
-    <div class="flex flex-wrap gap-2">
-      <button id="calc-solve" class="btn-primary" type="button">Solve</button>
-      <button id="calc-render" class="btn-secondary" type="button">
-        Generate Video
-      </button>
-    </div>
-
-    <p id="calc-status" class="text-sm" role="status"></p>
-
-    <div id="calc-result" class="hidden rounded-lg p-3 bg-paper text-sm">
-      <section class="rounded-xl border border-cyan-200 bg-white p-4 shadow-sm"
-        aria-labelledby="calc-final-heading">
-        <p id="calc-final-heading" class="text-xs uppercase tracking-wide font-semibold text-cyan-dark">Final Answer</p>
-        <p id="calc-result-conclusion" class="mt-1 font-medium text-ink"></p>
-        <div id="calc-result-equation" class="mt-2 font-mono text-ink"></div>
-      </section>
-      <section class="mt-4" aria-labelledby="calc-steps-heading">
-        <h3 id="calc-steps-heading" class="font-semibold text-ink">Step-by-Step Solution</h3>
-        <ol id="calc-result-steps" class="mt-3 space-y-3"></ol>
-      </section>
-    </div>
-
-    <video id="calc-video" class="hidden" controls playsinline></video>
-  `;
-
-  // Add Calculus to the main page grid
-  panel.style.gridColumn = '1 / -1';
-panel.style.width = 'min(100%, 900px)';
-panel.style.maxWidth = '900px';
-panel.style.boxSizing = 'border-box';
-panel.style.margin = '28px auto';
-panel.style.padding = '28px';
-panel.style.borderRadius = '18px';
-panel.style.background = '#ffffff';
-panel.style.boxShadow = '0 8px 30px rgba(40, 45, 80, 0.08)';
-  mainGrid.append(panel);
-
-  // Layout styling
-  const calcStyle = document.createElement('style');
-  calcStyle.id = 'calculus-layout-style';
-  calcStyle.textContent = `
-    #calculus-panel {
-      min-width: 0;
-      overflow: hidden;
-    }
-
-    #calculus-panel input,
-    #calculus-panel select {
-      display: block;
-      width: 100%;
-      max-width: 100%;
-      min-width: 0;
-      box-sizing: border-box;
-      padding: 10px;
-      border: 1px solid #d7d9e2;
-      border-radius: 8px;
-      background: white;
-      color: #202333;
-    }
-
-    #calculus-panel [role="tabpanel"] {
-      min-width: 0;
-    }
-
-    #calc-mode-tabs [role="tab"] {
-      border-radius: 8px;
-      transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
-    }
-
-    #calc-mode-tabs [role="tab"][aria-selected="true"] {
-      background: #ecfeff;
-      box-shadow: inset 0 0 0 1px #a5f3fc;
-      color: #0e7490;
-      font-weight: 600;
-    }
-
-    #calc-mode-tabs [role="tab"][aria-selected="false"] {
-      background: #ffffff;
-      color: #3d494c;
-    }
-
-    #calc-mode-tabs [role="tab"][aria-selected="false"]:hover {
-      background: #faf8ff;
-      border-color: #94a3b8;
-    }
-
-    #calc-video {
-  display: block;
-  width: 100%;
-  max-height: 460px;
-  aspect-ratio: 16 / 9;
-  object-fit: contain;
-  background: #171b26;
-  border-radius: 12px;
-  margin-top: 16px;
-}
-
-#calc-video.hidden {
-  display: none;
-}
-
-    #calc-result {
-      width: 100%;
-      max-width: 100%;
-      overflow-x: auto;
-      box-sizing: border-box;
-    }
-
-    #calculus-panel button {
-      cursor: pointer;
-      padding: 9px 14px;
-      border-radius: 8px;
-    }
-
-    @media (max-width: 700px) {
-      #calculus-panel {
-        padding: 16px;
-      }
-    }
-  `;
-  document.head.append(calcStyle);
-
-  // Remember which original tab was selected
-  const originalTabs = [...tabList.querySelectorAll('[role="tab"]')]
-    .filter(button => button !== tab);
-
-  const originalGridColumns = mainGrid.style.gridTemplateColumns;
-
-  function showCalculus(active, clickedTab = null) {
-    panel.classList.toggle('hidden', !active);
-
-    if (active) {
-      leftColumn.classList.add('hidden');
-      rightColumn.classList.remove('hidden');
-      algorithmInputs.classList.add('hidden');
-      probabilityControls?.classList.add('hidden');
-      executionSection?.classList.add('hidden');
-      algorithmSection.querySelector('h2').textContent = 'Visualizers';
-      mainGrid.style.gridTemplateColumns = 'minmax(0, 1fr)';
-    } else {
-      leftColumn.classList.remove('hidden');
-      executionSection?.classList.remove('hidden');
-      mainGrid.style.gridTemplateColumns = originalGridColumns;
-    }
-
-    tabList.querySelectorAll('[role="tab"]').forEach(button => {
-      const selected = active
-        ? button === tab
-        : button === clickedTab;
-
-      button.setAttribute('aria-selected', String(selected));
-      button.classList.toggle('btn-primary', selected);
-      button.classList.toggle('btn-secondary', !selected);
+  function syncSelects() {
+    const labels = nodes.map(n => n.label);
+    [['start-node', 0], ['target-node', labels.length - 1]].forEach(([id, fallbackIdx]) => {
+      const sel = $(id);
+      const prev = sel.value;
+      sel.innerHTML = '';
+      labels.forEach(l => { const o = document.createElement('option'); o.value = o.textContent = l; sel.append(o); });
+      sel.value = labels.includes(prev) ? prev : (labels[fallbackIdx] ?? '');
     });
   }
 
-  tab.addEventListener('click', () => showCalculus(true));
+  function render() {
+    nodesLayer.replaceChildren();
+    edgesLayer.replaceChildren();
+    const directed = isDirected(), weighted = isWeighted();
 
-  originalTabs.forEach(button => {
-    button.addEventListener('click', () => showCalculus(false, button));
-  });
-
-  const calculusTabs = [...panel.querySelectorAll('[role="tab"]')];
-  const calculusPanels = [...panel.querySelectorAll('[role="tabpanel"]')];
-  const derivativePanel = document.getElementById('calc-panel-derivative');
-  const limitPanel = document.getElementById('calc-panel-limit');
-  const derivativeTopics = document.getElementById('calc-derivative-topics');
-  const limitTopics = document.getElementById('calc-limit-topics');
-  const derivativePointField = document.getElementById('calc-derivative-point-field');
-  const limitPointField = document.getElementById('calc-limit-point-field');
-  const limitDirectionField = document.getElementById('calc-limit-direction-field');
-  const limitDirectionLabel = document.getElementById('calc-limit-direction-label');
-  const equationInputs = [...panel.querySelectorAll('input[name="expression"]')];
-
-  function stripOuterParentheses(value) {
-    let source = value.trim();
-    while (source.startsWith('(') && source.endsWith(')')) {
-      let depth = 0;
-      let wrapsAll = true;
-      for (let index = 0; index < source.length; index++) {
-        if (source[index] === '(') depth++;
-        if (source[index] === ')') depth--;
-        if (depth === 0 && index < source.length - 1) {
-          wrapsAll = false;
-          break;
-        }
+    edges.forEach((edge, idx) => {
+      const s = nodes.find(n => n.id === edge.source), t = nodes.find(n => n.id === edge.target);
+      if (!s || !t) return;
+      const dx = t.x - s.x, dy = t.y - s.y, dist = Math.hypot(dx, dy);
+      if (dist < 1) return;
+      const ux = dx / dist, uy = dy / dist;
+      const pts = { x1: s.x + ux * (R + 2), y1: s.y + uy * (R + 2), x2: t.x - ux * (R + 2), y2: t.y - uy * (R + 2) };
+      const g = make('g', { class: 'edge' }, edgesLayer);
+      make('line', { ...pts, stroke: '#111', 'stroke-width': 2, class: 'edge-line', ...(directed ? { 'marker-end': 'url(#arrow)' } : {}) }, g);
+      const hit = make('line', { ...pts, stroke: 'transparent', 'stroke-width': 16, class: 'edge-hit', 'data-idx': idx }, g);
+      hit.style.cursor = 'pointer';
+      hit.style.pointerEvents = 'stroke';
+      if (weighted && edge.weight != null) {
+        const label = make('text', {
+          x: (s.x + t.x) / 2 - uy * 13, y: (s.y + t.y) / 2 + ux * 13,
+          'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': 12,
+          'font-family': 'JetBrains Mono, monospace', 'font-weight': 600, fill: '#111',
+          stroke: '#fff', 'stroke-width': 4, 'paint-order': 'stroke'
+        }, g);
+        label.textContent = edge.weight;
+        label.style.pointerEvents = 'none';
       }
-      if (!wrapsAll || depth !== 0) break;
-      source = source.slice(1, -1).trim();
-    }
-    return source;
-  }
+    });
 
-  function splitTopLevelFraction(source) {
-    let depth = 0;
-    for (let index = 0; index < source.length; index++) {
-      if (source[index] === '(') depth++;
-      if (source[index] === ')') depth--;
-      if (source[index] === '/' && depth === 0) {
-        return [source.slice(0, index), source.slice(index + 1)];
-      }
-    }
-    return null;
-  }
+    nodes.forEach(node => {
+      const g = make('g', { class: 'graph-node' + (node.id === selected ? ' selected' : '') }, nodesLayer);
+      g.style.cursor = 'grab';
+      make('circle', { cx: node.x, cy: node.y, r: R, fill: '#fff', stroke: '#111', 'stroke-width': 2.5 }, g);
+      const txt = make('text', {
+        x: node.x, y: node.y + 1, 'text-anchor': 'middle', 'dominant-baseline': 'central',
+        'font-size': 14, 'font-family': 'JetBrains Mono, monospace', 'font-weight': 700, fill: '#111'
+      }, g);
+      txt.textContent = node.label;
+      txt.style.pointerEvents = 'none';
+    });
 
-  function expressionToTex(value) {
-    let source = String(value ?? '').trim();
-    if (!source) return '';
-    if (/\\(?:frac|lim|int|sqrt|sum|prod|partial|infty|cdot)\b/.test(source)) return source;
-
-    let integralMatch = source.match(/^Integral\((.*),\s*\(([A-Za-z]\w*),\s*([^,]+),\s*([^,)]+)\)\)$/);
-    if (integralMatch) {
-      return `\\int_{${expressionToTex(integralMatch[3])}}^{${expressionToTex(integralMatch[4])}} ${expressionToTex(integralMatch[1])}\\,d${expressionToTex(integralMatch[2])}`;
-    }
-    integralMatch = source.match(/^Integral\((.*),\s*([A-Za-z]\w*)\)$/);
-    if (integralMatch) {
-      return `\\int ${expressionToTex(integralMatch[1])}\\,d${expressionToTex(integralMatch[2])}`;
-    }
-    const derivativeMatch = source.match(/^Derivative\((.*),\s*([A-Za-z]\w*)\)$/);
-    if (derivativeMatch) {
-      return `\\frac{d}{d${expressionToTex(derivativeMatch[2])}}\\left(${expressionToTex(derivativeMatch[1])}\\right)`;
-    }
-
-    source = stripOuterParentheses(source);
-    const fractionParts = splitTopLevelFraction(source);
-    if (fractionParts) {
-      const equalsIndex = fractionParts[0].lastIndexOf('=');
-      if (equalsIndex !== -1) {
-        const leftSide = fractionParts[0].slice(0, equalsIndex);
-        const numerator = fractionParts[0].slice(equalsIndex + 1);
-        return `${expressionToTex(leftSide)} = \\frac{${expressionToTex(stripOuterParentheses(numerator))}}{${expressionToTex(stripOuterParentheses(fractionParts[1]))}}`;
-      }
-      return `\\frac{${expressionToTex(stripOuterParentheses(fractionParts[0]))}}{${expressionToTex(stripOuterParentheses(fractionParts[1]))}}`;
-    }
-
-    source = source
-      .replace(/\*\*\s*\(([^()]*)\)/g, '^{$1}')
-      .replace(/\*\*\s*([A-Za-z0-9.]+)/g, '^{$1}')
-      .replace(/\bsqrt\(([^()]*)\)/g, '\\sqrt{$1}')
-      .replace(/\b(sin|cos|tan|asin|acos|atan|log|ln|exp)\(([^()]*)\)/g, '\\$1\\left($2\\right)')
-      .replace(/\bAbs\(([^()]*)\)/g, '\\left|$1\\right|')
-      .replace(/\boo\b/g, '\\infty')
-      .replace(/\bpi\b/g, '\\pi')
-      .replace(/²/g, '^{2}')
-      .replace(/³/g, '^{3}')
-      .replace(/([0-9])\s*\*\s*([A-Za-z])/g, '$1$2')
-      .replace(/\*/g, '\\cdot ');
-    return source;
-  }
-
-  function renderMath(target, tex, fallback, displayMode = false) {
-    target.replaceChildren();
-    if (!window.katex) {
-      target.textContent = fallback;
-      return;
-    }
-    try {
-      window.katex.render(tex, target, {
-        displayMode,
-        output: 'htmlAndMathml',
-        strict: 'error',
-        throwOnError: true,
-        trust: false
+    const sel = nodes.find(n => n.id === selected);
+    if (sel) {
+      const g = make('g', { class: 'delete-badge' }, nodesLayer);
+      g.style.cursor = 'pointer';
+      const bx = sel.x + 20, by = sel.y - 20;
+      make('rect', { x: bx - 11, y: by - 11, width: 22, height: 22, rx: 5, fill: '#b4412f' }, g);
+      const x = make('text', { x: bx, y: by + 1, 'text-anchor': 'middle', 'dominant-baseline': 'central', 'font-size': 15, 'font-weight': 700, fill: '#fff' }, g);
+      x.textContent = '×';
+      x.style.pointerEvents = 'none';
+      g.addEventListener('click', ev => {
+        ev.stopPropagation();
+        edges = edges.filter(e => e.source !== selected && e.target !== selected);
+        nodes = nodes.filter(n => n.id !== selected);
+        selected = null;
+        render();
       });
-    } catch (error) {
-      console.warn('KaTeX could not render this equation.', error);
-      target.textContent = fallback;
     }
+
+    $('editor-stat').textContent = nodes.length + ' nodes · ' + edges.length + ' edges';
+    syncSelects();
   }
 
-  equationInputs.forEach(input => {
-    const preview = document.createElement('div');
-    preview.className = 'calc-equation-preview mt-2 min-h-6 text-ink';
-    preview.setAttribute('aria-label', 'Formatted equation preview');
-    input.parentElement.append(preview);
-    const updatePreview = () => renderMath(preview, expressionToTex(input.value), input.value);
-    input.addEventListener('input', updatePreview);
-    updatePreview();
-  });
-  window.addEventListener('load', () => {
-    equationInputs.forEach(input => input.dispatchEvent(new Event('input')));
-  }, { once: true });
-
-  const methodLabels = {
-    symbolic_limit: 'Symbolic limit',
-    compare_one_sided_limits: 'Comparison of one-sided limits',
-    limit_and_function_value: 'Limit and function-value comparison',
-    symbolic_differentiation: 'Symbolic differentiation',
-    power_rule: 'Power Rule',
-    sum_rule: 'Sum Rule',
-    product_rule: 'Product Rule',
-    quotient_rule: 'Quotient Rule',
-    chain_rule: 'Chain Rule',
-    critical_points_and_second_derivative: 'Critical points and second derivative'
+  /* ---------- pointer interaction ---------- */
+  const coords = e => { const r = canvas.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+  const hitNode = (x, y) => {
+    for (let i = nodes.length - 1; i >= 0; i--) if (Math.hypot(nodes[i].x - x, nodes[i].y - y) <= R + 4) return nodes[i];
+    return null;
   };
 
-  function finalAnswer(payload, solution) {
-    const variable = expressionToTex(solution.variable ?? payload.variable);
-    const point = expressionToTex(solution.point ?? payload.point);
-    const result = solution.result ?? solution.derivative ?? solution.tangent_line ??
-      solution.first_derivative ?? '';
-
-    if (payload.problem_type === 'continuity') {
-      const state = solution.is_continuous === true
-        ? 'The function is continuous at this point.'
-        : solution.is_continuous === false
-          ? 'The function is not continuous at this point.'
-          : `Result: ${solution.result ?? 'No continuity result was returned.'}`;
-      return {
-        text: state,
-        tex: `f(${point}) = ${expressionToTex(solution.function_value ?? '')},\\quad \\lim_{${variable}\\to ${point}} f(${variable}) = ${expressionToTex(solution.limit_value ?? '')}`
-      };
+  function onMove(e) {
+    if (!drag) return;
+    const p = coords(e);
+    if (!drag.moved) {
+      if (Math.hypot(p.x - drag.sx, p.y - drag.sy) < 6) return;
+      drag.moved = true;
     }
-    if (payload.problem_type === 'tangent_line') {
-      return {text: 'Tangent line', tex: `y = ${expressionToTex(solution.tangent_line ?? result)}`};
-    }
-    if (['limit', 'one_sided_limit', 'two_sided_limit', 'limit_at_infinity'].includes(payload.problem_type)) {
-      const doesNotExist = result === 'does_not_exist';
-      let target = point;
-      if (payload.problem_type === 'limit_at_infinity') {
-        target = payload.direction === '-' ? '-\\infty' : '\\infty';
-      } else if (payload.problem_type === 'one_sided_limit') {
-        target += payload.direction === '-' ? '^{-}' : '^{+}';
-      }
-      return {
-        text: doesNotExist ? 'The two-sided limit does not exist.' : 'Limit',
-        tex: `\\lim_{${variable}\\to ${target}} f(${variable}) = ${doesNotExist ? '\\text{does not exist}' : expressionToTex(result)}`
-      };
-    }
-    if (payload.problem_type === 'derivative_applications') {
-      const classifications = solution.classifications?.map(item =>
-        `${item.classification} at x = ${item.point}`
-      ).join('; ');
-      return {
-        text: classifications || 'Derivative applications',
-        tex: `f'(${variable}) = ${expressionToTex(solution.first_derivative ?? result)}${solution.second_derivative !== undefined ? `,\\quad f''(${variable}) = ${expressionToTex(solution.second_derivative)}` : ''}`
-      };
-    }
-    if (payload.problem_type === 'derivative' || payload.problem_type.endsWith('_rule')) {
-      return {
-        text: 'Derivative',
-        tex: `\\frac{d}{d${variable}} f(${variable}) = ${expressionToTex(result)}`
-      };
-    }
-    return {text: 'Result', tex: expressionToTex(result)};
+    dragLayer.replaceChildren();
+    make('line', { x1: drag.node.x, y1: drag.node.y, x2: p.x, y2: p.y, stroke: '#111', 'stroke-width': 2, 'stroke-dasharray': '6 4' }, dragLayer);
   }
-
-  function appendEquation(container, value) {
-    const values = Array.isArray(value) ? value : [value];
-    values.filter(item => item !== null && item !== undefined && item !== '').forEach(item => {
-      const equation = document.createElement('div');
-      equation.className = 'calc-step-equation mt-2 rounded-lg bg-paper px-3 py-2 text-ink';
-      renderMath(equation, expressionToTex(item), String(item));
-      container.append(equation);
-    });
+  function endDrag() {
+    window.removeEventListener('pointermove', onMove);
+    window.removeEventListener('pointerup', onUp);
+    window.removeEventListener('pointercancel', onCancel);
   }
-
-  function stepEquations(step, solution) {
-    const equations = [];
-    if (step.expression !== undefined && !(step.type === 'differentiate_terms' && Array.isArray(step.expression))) {
-      equations.push(step.expression);
-    }
-    if (step.result !== undefined &&
-        !['exists', 'does_not_exist', 'continuous', 'not_continuous'].includes(step.result)) {
-      equations.push(step.result);
-    }
-
-    switch (step.type) {
-      case 'identify':
-        if (solution.u !== undefined && solution.v !== undefined) {
-          equations.push(`u = ${solution.u},\\quad v = ${solution.v}`);
-        }
-        if (solution.outer_function && solution.inner_function) {
-          equations.push(`\\text{outer} = ${solution.outer_function},\\quad \\text{inner} = ${solution.inner_function}`);
-        }
-        break;
-      case 'differentiate':
-        if (solution.u_prime !== undefined && solution.v_prime !== undefined) {
-          equations.push(`u' = ${solution.u_prime},\\quad v' = ${solution.v_prime}`);
-        }
-        if (solution.first_derivative !== undefined) {
-          equations.push(`f'(${solution.variable}) = ${solution.first_derivative}`);
-        }
-        break;
-      case 'differentiate_terms':
-        if (solution.terms && solution.term_derivatives &&
-            solution.terms.length === solution.term_derivatives.length) {
-          solution.terms.forEach((term, index) => {
-            equations.push(`\\frac{d}{d${expressionToTex(solution.variable)}}\\left(${expressionToTex(term)}\\right) = ${expressionToTex(solution.term_derivatives[index])}`);
-          });
-        } else {
-          if (solution.terms) equations.push(solution.terms);
-          if (solution.term_derivatives) equations.push(solution.term_derivatives);
-        }
-        break;
-      case 'apply_rule':
-        if (solution.method === 'product_rule' &&
-            solution.u !== undefined && solution.v !== undefined &&
-            solution.u_derivative !== undefined && solution.v_derivative !== undefined) {
-          equations.push(
-            `${expressionToTex(solution.u_derivative)}\\left(${expressionToTex(solution.v)}\\right) + ` +
-            `${expressionToTex(solution.u)}\\left(${expressionToTex(solution.v_derivative)}\\right)`
-          );
-        }
-        if (typeof step.message === 'string') {
-          const formula = step.message.includes(':')
-            ? step.message.slice(step.message.lastIndexOf(':') + 1).trim()
-            : step.message;
-          if (formula.includes('=')) equations.push(formula);
-        }
-        break;
-      case 'critical_points':
-        if (solution.critical_points) equations.push(solution.critical_points);
-        break;
-      case 'second_derivative':
-        if (solution.second_derivative !== undefined) equations.push(`f''(${solution.variable}) = ${solution.second_derivative}`);
-        break;
-      case 'classify':
-        if (solution.classifications?.length) {
-          solution.classifications.forEach(item => {
-            equations.push(`x = ${item.point},\\quad f''(x) = ${item.second_derivative_value},\\quad \\text{${item.classification}}`);
-          });
-        }
-        break;
-    }
-    return equations;
-  }
-
-  function splitAdditiveTerms(expression) {
-    const terms = [];
-    let depth = 0;
-    let start = 0;
-    for (let index = 0; index < expression.length; index++) {
-      const character = expression[index];
-      if (character === '(') depth++;
-      if (character === ')') depth--;
-      if (depth === 0 && index > start &&
-          (character === '+' || character === '-') &&
-          !['*', '/', '^'].includes(expression[index - 1])) {
-        terms.push(expression.slice(start, index).trim());
-        start = index;
-      }
-    }
-    terms.push(expression.slice(start).trim());
-    return terms
-      .map(term => term.startsWith('+') ? term.slice(1).trim() : term)
-      .filter(Boolean);
-  }
-
-  function parseNumericCoefficient(value) {
-    if (!value) return 1;
-    if (value === '-') return -1;
-    if (value === '+') return 1;
-    const parts = value.split('/');
-    const numerator = Number(parts[0]);
-    const denominator = parts.length === 2 ? Number(parts[1]) : 1;
-    if (!Number.isFinite(numerator) || !Number.isFinite(denominator) || denominator === 0) return null;
-    return numerator / denominator;
-  }
-
-  function parseMonomial(term, variable) {
-    const source = term.replace(/\s+/g, '');
-    const constant = source.match(/^([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:\/\d+(?:\.\d*)?)?)$/);
-    if (constant) {
-      const coefficient = parseNumericCoefficient(constant[1]);
-      return coefficient === null ? null : {coefficient, exponent: 0};
-    }
-
-    const variablePattern = variable.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const coefficientPattern = '[+-]?(?:(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:/\\d+(?:\\.\\d*)?)?)?';
-    const match = source.match(new RegExp(
-      `^(${coefficientPattern})\\*?${variablePattern}(?:\\*\\*([+-]?\\d+))?$`
-    ));
-    if (!match) return null;
-    const coefficient = parseNumericCoefficient(match[1]);
-    const exponent = match[2] === undefined ? 1 : Number(match[2]);
-    if (coefficient === null || !Number.isInteger(exponent)) return null;
-    return {coefficient, exponent};
-  }
-
-  function polynomialTerms(expression, variable) {
-    const terms = splitAdditiveTerms(String(expression));
-    const parsed = terms.map(term => ({term, monomial: parseMonomial(term, variable)}));
-    return parsed.every(item => item.monomial) ? parsed : null;
-  }
-
-  function polynomialCoefficients(terms) {
-    const coefficients = new Map();
-    terms.forEach(({monomial}) => {
-      coefficients.set(
-        monomial.exponent,
-        (coefficients.get(monomial.exponent) || 0) + monomial.coefficient
-      );
-    });
-    return coefficients;
-  }
-
-  function samePolynomial(left, right) {
-    const leftCoefficients = polynomialCoefficients(left);
-    const rightCoefficients = polynomialCoefficients(right);
-    const exponents = new Set([...leftCoefficients.keys(), ...rightCoefficients.keys()]);
-    return [...exponents].every(exponent =>
-      Math.abs((leftCoefficients.get(exponent) || 0) - (rightCoefficients.get(exponent) || 0)) < 1e-10
-    );
-  }
-
-  function numberTex(value) {
-    if (Number.isInteger(value)) return String(value);
-    return String(Number(value.toPrecision(10)));
-  }
-
-  function monomialTex(coefficient, exponent, variable) {
-    if (coefficient === 0) return '0';
-    const sign = coefficient < 0 ? '-' : '';
-    const magnitude = Math.abs(coefficient);
-    const coefficientTex = magnitude === 1 && exponent !== 0 ? '' : numberTex(magnitude);
-    const variableTex = exponent === 0
-      ? ''
-      : exponent === 1
-        ? expressionToTex(variable)
-        : `${expressionToTex(variable)}^{${exponent}}`;
-    return `${sign}${coefficientTex}${variableTex}` || '0';
-  }
-
-  function verifiedMonomialDerivativeSteps(payload, solution) {
-    if (!['derivative', 'power_rule'].includes(payload.problem_type)) return null;
-    const expression = solution.expression ?? payload.expression;
-    const derivative = solution.derivative ?? solution.result;
-    if (typeof derivative !== 'string') return null;
-
-    const terms = polynomialTerms(expression, payload.variable);
-    const returnedTerms = polynomialTerms(derivative, payload.variable);
-    if (!terms || !returnedTerms) return null;
-
-    const differentiatedTerms = terms.map(({term, monomial}) => ({
-      term,
-      coefficient: monomial.coefficient * monomial.exponent,
-      exponent: monomial.exponent - 1
-    }));
-    const calculated = differentiatedTerms.map(({coefficient, exponent}) => ({
-      monomial: {coefficient, exponent}
-    }));
-    if (!samePolynomial(calculated, returnedTerms)) return null;
-
-    const variable = expressionToTex(payload.variable);
-    return [
-      ...differentiatedTerms.map(({term, coefficient, exponent}) => {
-        const monomial = parseMonomial(term, payload.variable);
-        const isConstant = monomial.exponent === 0;
-        const derivativeTex = monomialTex(coefficient, exponent, payload.variable);
-        let rightSide = derivativeTex;
-        if (!isConstant && monomial.coefficient !== 1 && monomial.coefficient !== -1 &&
-            monomial.exponent !== 1) {
-          const innerDerivative = monomialTex(monomial.exponent, exponent, payload.variable);
-          rightSide = `${numberTex(monomial.coefficient)}\\left(${innerDerivative}\\right) = ${derivativeTex}`;
-        }
-        return {
-          title: isConstant
-            ? 'Constant rule'
-            : monomial.coefficient === 1
-              ? 'Power rule'
-              : 'Constant-multiple rule',
-          message: '',
-          equations: [`\\frac{d}{d${variable}}\\left(${expressionToTex(term)}\\right) = ${rightSide}`]
-        };
-      }),
-      {
-        title: 'Final result',
-        message: '',
-        equations: [`f'(${variable}) = ${expressionToTex(derivative)}`]
-      }
-    ];
-  }
-
-  function renderSolutionSteps(payload, solution) {
-    const list = document.getElementById('calc-result-steps');
-    list.replaceChildren();
-    let number = 0;
-
-    const addCard = (title, message, equations = []) => {
-      number += 1;
-      const item = document.createElement('li');
-      item.className = 'calc-step-card rounded-r-lg border border-paper-dim bg-white p-3';
-
-      const header = document.createElement('div');
-      header.className = 'flex items-start gap-3';
-      const badge = document.createElement('span');
-      badge.className = 'calc-step-number flex shrink-0 items-center justify-center rounded-full bg-cyan-50 text-xs font-semibold text-cyan-dark';
-      badge.textContent = String(number);
-      const body = document.createElement('div');
-      body.className = 'min-w-0 flex-1';
-      const heading = document.createElement('h4');
-      heading.className = 'font-medium text-ink';
-      heading.textContent = title;
-      body.append(heading);
-
-      if (message) {
-        const explanation = document.createElement('p');
-        explanation.className = 'mt-1 text-sm leading-relaxed text-ink-dim';
-        explanation.textContent = message;
-        body.append(explanation);
-      }
-      equations.filter(value => value !== undefined && value !== null && value !== '').forEach(value => {
-        appendEquation(body, value);
-      });
-      header.append(badge, body);
-      item.append(header);
-      list.append(item);
-    };
-
-    const expression = solution.expression ?? payload.expression;
-    if (expression) {
-      addCard('Given', 'Start with the function provided.', [
-        `f(${solution.variable ?? payload.variable}) = ${expressionToTex(expression)}`
-      ]);
-    }
-
-    const monomialSteps = verifiedMonomialDerivativeSteps(payload, solution);
-    if (monomialSteps) {
-      monomialSteps.forEach(step => addCard(step.title, step.message, step.equations));
-      return;
-    }
-
-    const methodLabel = methodLabels[solution.method];
-    if (methodLabel) {
-      addCard('Method', methodLabel);
-    }
-
-    if (Array.isArray(solution.steps)) {
-      solution.steps.forEach(step => {
-        if (!step || typeof step !== 'object') return;
-        const stepType = String(step.type ?? 'Step').replace(/_/g, ' ');
-        let title = stepType.charAt(0).toUpperCase() + stepType.slice(1);
-        if (['derivative', 'power_rule', 'sum_rule', 'product_rule', 'quotient_rule', 'chain_rule']
-          .includes(payload.problem_type) && step.type === 'result') {
-          title = 'Final result';
-        } else if (payload.problem_type === 'sum_rule' && step.type === 'combine') {
-          title = 'Final result';
-        } else if (payload.problem_type === 'tangent_line' && step.type === 'tangent') {
-          title = 'Final result';
-        }
-        let message = typeof step.message === 'string' ? step.message : '';
-        if (payload.problem_type === 'chain_rule' && step.type === 'identify' &&
-            (!solution.outer_function || !solution.inner_function)) {
-          message = 'The solver did not identify a specific inner or outer function.';
-        }
-        addCard(title, message, stepEquations(step, solution));
-      });
-    }
-
-    if (payload.problem_type === 'derivative_applications') {
-      if (solution.first_derivative !== undefined && !solution.steps?.some(step => step.type === 'differentiate')) {
-        addCard('First derivative', '', [`f'(${solution.variable}) = ${solution.first_derivative}`]);
-      }
-      if (solution.second_derivative !== undefined && !solution.steps?.some(step => step.type === 'second_derivative')) {
-        addCard('Second derivative', '', [`f''(${solution.variable}) = ${solution.second_derivative}`]);
-      }
-      if (solution.critical_points !== undefined && !solution.steps?.some(step => step.type === 'critical_points')) {
-        addCard('Critical points', '', [solution.critical_points]);
-      }
-    }
-
-    if (!number) addCard('Solution', 'The solver did not return any step-by-step details.');
-  }
-
-  function updateDerivativeTopic() {
-    const selectedTopic = derivativeTopics.querySelector('[aria-pressed="true"]');
-    derivativePanel.dataset.problemType = selectedTopic.dataset.problemType;
-    derivativePointField.classList.toggle('hidden', selectedTopic.dataset.problemType !== 'tangent_line');
-  }
-
-  function updateLimitTopic() {
-    const selectedTopic = limitTopics.querySelector('[aria-pressed="true"]');
-    const problemType = selectedTopic.dataset.problemType;
-    const needsPoint = problemType !== 'limit_at_infinity';
-    const needsDirection = ['one_sided_limit', 'limit_at_infinity'].includes(problemType);
-    limitPanel.dataset.problemType = problemType;
-    limitPointField.classList.toggle('hidden', !needsPoint);
-    limitDirectionField.classList.toggle('hidden', !needsDirection);
-    limitDirectionLabel.textContent = problemType === 'limit_at_infinity'
-      ? 'Direction at infinity'
-      : 'Approach from';
-    limitDirectionField.querySelector('option[value="+"]').textContent =
-      problemType === 'limit_at_infinity' ? 'Positive infinity (+)' : 'From the right (+)';
-    limitDirectionField.querySelector('option[value="-"]').textContent =
-      problemType === 'limit_at_infinity' ? 'Negative infinity (-)' : 'From the left (-)';
-  }
-
-  updateDerivativeTopic();
-  updateLimitTopic();
-
-  function clearCalculusOutput() {
-    const status = document.getElementById('calc-status');
-    const result = document.getElementById('calc-result');
-    const video = document.getElementById('calc-video');
-    status.textContent = '';
-    result.classList.add('hidden');
-    video.pause();
-    video.removeAttribute('src');
-    video.classList.add('hidden');
-  }
-
-  function bindSubtopicButtons(group, updateTopic) {
-    group.addEventListener('click', event => {
-      const selectedButton = event.target.closest('button[data-problem-type]');
-      if (!selectedButton) return;
-      group.querySelectorAll('button[data-problem-type]').forEach(button => {
-        const selected = button === selectedButton;
-        button.setAttribute('aria-pressed', String(selected));
-        button.classList.toggle('btn-primary', selected);
-        button.classList.toggle('btn-secondary', !selected);
-      });
-      updateTopic();
-      clearCalculusOutput();
-    });
-  }
-  bindSubtopicButtons(derivativeTopics, updateDerivativeTopic);
-  bindSubtopicButtons(limitTopics, updateLimitTopic);
-
-  function selectCalculusTab(selectedTab) {
-    const selectedPanelId = selectedTab.getAttribute('aria-controls');
-    calculusTabs.forEach(button => {
-      const selected = button === selectedTab;
-      button.setAttribute('aria-selected', String(selected));
-      button.tabIndex = selected ? 0 : -1;
-      button.classList.toggle('btn-primary', selected);
-      button.classList.toggle('btn-secondary', !selected);
-    });
-    calculusPanels.forEach(tabPanel => {
-      tabPanel.classList.toggle('hidden', tabPanel.id !== selectedPanelId);
-    });
-
-    clearCalculusOutput();
-  }
-
-  calculusTabs.forEach((button, index) => {
-    button.addEventListener('click', () => selectCalculusTab(button));
-    button.addEventListener('keydown', event => {
-      let nextIndex = null;
-      if (event.key === 'ArrowRight') nextIndex = (index + 1) % calculusTabs.length;
-      if (event.key === 'ArrowLeft') nextIndex = (index - 1 + calculusTabs.length) % calculusTabs.length;
-      if (event.key === 'Home') nextIndex = 0;
-      if (event.key === 'End') nextIndex = calculusTabs.length - 1;
-      if (nextIndex !== null) {
-        event.preventDefault();
-        calculusTabs[nextIndex].focus();
-        selectCalculusTab(calculusTabs[nextIndex]);
-      }
-    });
-  });
-
-  // Data sent to the FastAPI backend
-  function getPayload() {
-    const activePanel = calculusPanels.find(tabPanel => !tabPanel.classList.contains('hidden'));
-    const pointInput = activePanel.querySelector('[name="point"]');
-    const directionInput = activePanel.querySelector('[name="direction"]');
-    const payload = {
-      problem_type: activePanel.dataset.problemType,
-      expression: activePanel.querySelector('[name="expression"]').value.trim(),
-      variable: activePanel.querySelector('[name="variable"]').value.trim(),
-      point: pointInput && !pointInput.closest('.hidden') ? pointInput.value.trim() : ''
-    };
-    if (directionInput && !directionInput.closest('.hidden')) {
-      payload.direction = directionInput.value;
-    }
-    return payload;
-  }
-
-  // Solve the expression or render its animation
-  async function requestCalculus(endpoint) {
-    const status = document.getElementById('calc-status');
-    const result = document.getElementById('calc-result');
-    const video = document.getElementById('calc-video');
-    const payload = getPayload();
-
-    if (!payload.expression || !payload.variable) {
-      status.textContent = 'Please enter an expression and variable.';
-      return;
-    }
-    if ([
-      'limit',
-      'one_sided_limit',
-      'two_sided_limit',
-      'continuity',
-      'tangent_line'
-    ].includes(payload.problem_type) && !payload.point) {
-      status.textContent = 'Please enter the point required for this problem.';
-      return;
-    }
-
-    status.textContent = 'Working… please wait.';
-    result.classList.add('hidden');
-
-    if (endpoint.endsWith('/render')) {
-      video.pause();
-      video.removeAttribute('src');
-      video.classList.add('hidden');
-    }
-
-    try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(
-          typeof data.detail === 'string'
-            ? data.detail
-            : JSON.stringify(data.detail || 'Request failed.')
-        );
-      }
-
-      if (endpoint.endsWith('/solve')) {
-        const solution = data.solution || data;
-        const answer = finalAnswer(payload, solution);
-        document.getElementById('calc-result-conclusion').textContent = answer.text;
-        renderMath(
-          document.getElementById('calc-result-equation'),
-          answer.tex,
-          answer.text,
-          true
-        );
-        renderSolutionSteps(payload, solution);
-        result.classList.remove('hidden');
-        status.textContent = 'Solution ready!';
+  function onCancel() { endDrag(); drag = null; dragLayer.replaceChildren(); }
+  function onUp(e) {
+    endDrag();
+    if (!drag) return;
+    const d = drag; drag = null;
+    dragLayer.replaceChildren();
+    const p = coords(e);
+    if (d.moved) {
+      const target = hitNode(p.x, p.y);
+      if (target && target.id !== d.node.id) {
+        if (!edgeExists(d.node.id, target.id)) edges.push({ source: d.node.id, target: target.id, weight: isWeighted() ? 1 : undefined });
       } else {
-        if (!data.video_url) {
-          throw new Error('The server did not return a video URL.');
-        }
-
-        video.src = new URL(data.video_url, window.location.origin).href;
-        video.classList.remove('hidden');
-        video.load();
-        status.textContent = 'Video ready! Press play to watch.';
+        d.node.x = clampX(p.x); d.node.y = clampY(p.y);
       }
-    } catch (error) {
-      status.textContent = 'Error: ' + error.message;
+    } else {
+      const now = Date.now();
+      if (lastTap && lastTap.id === d.node.id && now - lastTap.t < 350) {
+        lastTap = null;
+        const name = prompt('Rename node:', d.node.label);
+        const clean = name && name.trim();
+        if (clean && !nodes.some(n => n.label === clean && n.id !== d.node.id)) d.node.label = clean;
+      } else {
+        lastTap = { id: d.node.id, t: now };
+        selected = selected === d.node.id ? null : d.node.id;
+      }
     }
+    render();
   }
 
-  document.getElementById('calc-solve').addEventListener('click', () => {
-    requestCalculus('/api/calculus/solve');
+  canvas.addEventListener('pointerdown', e => {
+    if (e.button !== undefined && e.button !== 0) return;
+    if (e.target.closest('#canvas-toolbar, .delete-badge, .edge-hit')) return;
+    e.preventDefault();
+    const p = coords(e);
+    const hit = hitNode(p.x, p.y);
+    if (hit) {
+      drag = { node: hit, sx: p.x, sy: p.y, moved: false };
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', onUp);
+      window.addEventListener('pointercancel', onCancel);
+      return;
+    }
+    selected = null;
+    nodes.push({ id: 'N' + nextId++, label: nextLabel(), x: clampX(p.x), y: clampY(p.y) });
+    render();
   });
 
-  document.getElementById('calc-render').addEventListener('click', () => {
-    requestCalculus('/api/calculus/render');
+  edgesLayer.addEventListener('click', e => {
+    const hit = e.target.closest('.edge-hit');
+    if (!hit) return;
+    const idx = parseInt(hit.dataset.idx, 10);
+    const edge = edges[idx];
+    if (!edge) return;
+    if (isWeighted()) {
+      const w = prompt('Weight for ' + labelOf(edge.source) + ' → ' + labelOf(edge.target) + '\n(leave empty to delete this edge)', edge.weight ?? 1);
+      if (w === null) return;
+      if (w.trim() === '') edges.splice(idx, 1);
+      else if (!isNaN(parseFloat(w))) edge.weight = parseFloat(w);
+    } else {
+      edges.splice(idx, 1);
+    }
+    render();
   });
+
+  function loadExample() {
+    const w = canvas.clientWidth || 760, h = canvas.clientHeight || 440;
+    const cx = w / 2, cy = h / 2;
+    nodes = [
+      { id: 'N0', label: 'A', x: cx, y: cy - 150 },
+      { id: 'N1', label: 'B', x: cx - 170, y: cy - 30 },
+      { id: 'N2', label: 'C', x: cx + 170, y: cy - 30 },
+      { id: 'N3', label: 'D', x: cx - 100, y: cy + 130 },
+      { id: 'N4', label: 'E', x: cx + 100, y: cy + 130 }
+    ];
+    edges = [
+      { source: 'N0', target: 'N1', weight: 4 }, { source: 'N0', target: 'N2', weight: 2 },
+      { source: 'N1', target: 'N3', weight: 5 }, { source: 'N2', target: 'N4', weight: 6 },
+      { source: 'N1', target: 'N2', weight: 1 }, { source: 'N3', target: 'N4', weight: 3 }
+    ];
+    nextId = 5; selected = null;
+    render();
+  }
+
+  $('btn-example-graph').addEventListener('click', loadExample);
+  $('btn-clear-graph').addEventListener('click', () => { nodes = []; edges = []; nextId = 0; selected = null; render(); });
+  $('directed-toggle').addEventListener('change', render);
+  $('weighted-toggle').addEventListener('change', e => {
+    if (e.target.checked) edges.forEach(ed => { if (ed.weight == null) ed.weight = 1; });
+    render();
+  });
+
+  /* Build the payload; keep the canvas layout (uniformly scaled into the Manim frame) */
+  function toPayload() {
+    const directed = isDirected(), weighted = isWeighted();
+    if (!nodes.length) return { directed, weighted, nodes: [], edges: [] };
+    const TARGET_W = 12.4, TARGET_H = 5.2;
+    const xs = nodes.map(n => n.x), ys = nodes.map(n => n.y);
+    const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
+    const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+    const scale = Math.min(TARGET_W / Math.max(maxX - minX, 1), TARGET_H / Math.max(maxY - minY, 1));
+    const round = v => Math.round(v * 100) / 100;
+    return {
+      directed, weighted,
+      nodes: nodes.map(n => ({ id: n.label, x: round((n.x - cx) * scale), y: round(-(n.y - cy) * scale) })),
+      edges: edges.map(e => {
+        const o = { source: labelOf(e.source), target: labelOf(e.target) };
+        if (e.weight != null) o.weight = e.weight;
+        return o;
+      })
+    };
+  }
+
+  loadExample();
+  return { toPayload };
+})();
+
+/* =====================================================================
+   Run graph algorithm + render video
+   ===================================================================== */
+let currentVideoUrl = null;
+let currentAnimJson = null;
+
+function renderVideo(url) {
+  currentVideoUrl = url;
+  const player = $('video-player');
+  player.src = API_BASE + url;
+  player.hidden = false;
+  $('video-placeholder').hidden = true;
+  $('btn-download').disabled = false;
+}
+function renderJson(json) {
+  currentAnimJson = json;
+  $('json-output').textContent = JSON.stringify(json, null, 2);
+}
+function updateExec(result) {
+  const anim = result.animation_input || {};
+  const states = anim.states || [];
+  const last = states[states.length - 1] || {};
+  $('exec-algo').textContent = (anim.algorithm || '—').toUpperCase();
+  $('exec-step').textContent = (last.step || 0) + ' / ' + states.length;
+  $('exec-visited').textContent = last.visited?.length || 0;
+  $('exec-frontier').textContent = last.frontier?.length || 0;
+  $('exec-message').textContent = last.message || '';
+}
+
+async function runAlgorithm() {
+  const btn = $('btn-run');
+  const graph = editor.toPayload();
+  const start = $('start-node').value;
+  const target = $('target-node').value || null;
+
+  if (!graph.nodes.length) return showToast('Draw at least one node first', 'error');
+  if (!start) return showToast('Pick a start node', 'error');
+  if (currentAlgo === 'dijkstra') {
+    if (!graph.weighted) return showToast('Enable Weighted for Dijkstra', 'error');
+    if (!target) return showToast('Dijkstra needs a target node', 'error');
+  }
+
+  setStatus('Running ' + currentAlgo.toUpperCase() + '…', 'running');
+  btn.disabled = true;
+  btn.textContent = 'Running…';
+
+  try {
+    const runRes = await fetch(API_BASE + '/api/algorithm/run', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ algorithm: currentAlgo, start, target: currentAlgo === 'dfs' ? null : target, graph })
+    });
+    if (!runRes.ok) { const err = await runRes.json().catch(() => ({})); throw new Error(err.detail || 'Algorithm failed'); }
+    const runResult = await runRes.json();
+
+    showToast('Algorithm done — rendering video…', 'info');
+    const renderRes = await fetch(API_BASE + '/api/manim/render', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ animation_input: runResult.animation_input, quality: $('quality').value })
+    });
+    if (!renderRes.ok) { const err = await renderRes.json().catch(() => ({})); throw new Error(err.detail || 'Render failed'); }
+    const renderResult = await renderRes.json();
+
+    renderVideo(renderResult.video_url);
+    renderJson(runResult.animation_input);
+    updateExec(runResult);
+    setStatus('Video ready', 'ready');
+    showToast('Video ready!', 'success');
+  } catch (e) {
+    setStatus('Error', 'error');
+    showToast(e.message || 'Something went wrong', 'error');
+    console.error(e);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '▶ Run & Render';
+  }
+}
+$('btn-run').addEventListener('click', runAlgorithm);
+$('btn-copy-json').addEventListener('click', () => {
+  if (!currentAnimJson) return showToast('No JSON to copy', 'error');
+  navigator.clipboard?.writeText(JSON.stringify(currentAnimJson, null, 2));
+  showToast('JSON copied', 'success');
+});
+$('btn-download').addEventListener('click', () => {
+  if (!currentVideoUrl) return;
+  const a = document.createElement('a');
+  a.href = API_BASE + currentVideoUrl;
+  a.download = currentVideoUrl.split('/').pop();
+  a.click();
+});
+
+/* =====================================================================
+   Probability lab
+   ===================================================================== */
+const SUITS = ['S', 'H', 'D', 'C'];
+const RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+const SUIT_MARK = { S: '♠', H: '♥', D: '♦', C: '♣' };
+const SUIT_NAME = { S: 'spades', H: 'hearts', D: 'diamonds', C: 'clubs' };
+const EVENT_NAME = { heart: 'a heart', red: 'a red card', ace: 'an ace', spade: 'a spade', king: 'a king' };
+let deck = [], hand = [], lessonStep = 0, lessonTimer = null, simulating = false;
+
+const makeDeck = () => SUITS.flatMap(suit => RANKS.map(rank => ({ suit, rank })));
+function drawCount() {
+  const v = parseInt($('card-count').value, 10);
+  return Math.max(1, Math.min(52, Number.isFinite(v) ? v : 1));
+}
+function isMatch(card, ev = $('card-event').value) {
+  if (ev === 'heart') return card.suit === 'H';
+  if (ev === 'red') return card.suit === 'H' || card.suit === 'D';
+  if (ev === 'ace') return card.rank === 'A';
+  if (ev === 'spade') return card.suit === 'S';
+  return card.rank === 'K';
+}
+const matchingCount = ev => makeDeck().filter(c => isMatch(c, ev)).length;
+function choose(n, k) {
+  if (k < 0 || k > n) return 0n;
+  k = Math.min(k, n - k);
+  let r = 1n;
+  for (let i = 1; i <= k; i++) r = r * BigInt(n - k + i) / BigInt(i);
+  return r;
+}
+function exactProbability(count = drawCount(), ev = $('card-event').value) {
+  const all = choose(52, count), none = choose(52 - matchingCount(ev), count);
+  return all === 0n ? 0 : Number(all - none) / Number(all);
+}
+const pct = v => (v * 100).toFixed(1) + '%';
+function shuffle(cards) {
+  for (let i = cards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cards[i], cards[j]] = [cards[j], cards[i]];
+  }
+  return cards;
+}
+function cardEl(card, cls, highlight) {
+  const el = document.createElement('span');
+  const red = card.suit === 'H' || card.suit === 'D';
+  el.className = cls + (red ? ' red-card' : ' black-card') + (highlight && isMatch(card) ? ' is-hit' : '');
+  el.setAttribute('aria-label', card.rank + ' of ' + SUIT_NAME[card.suit]);
+  const r = document.createElement('span'); r.textContent = card.rank;
+  const s = document.createElement('strong'); s.textContent = SUIT_MARK[card.suit];
+  el.append(r, s);
+  return el;
+}
+function resetDeck() { deck = shuffle(makeDeck()); hand = []; }
+
+function renderHand() {
+  const box = $('card-hand');
+  box.replaceChildren();
+  if (!hand.length) {
+    const empty = document.createElement('span');
+    empty.className = 'sub'; empty.textContent = 'No cards drawn yet.';
+    box.append(empty);
+  } else hand.forEach(c => box.append(cardEl(c, 'hand-card', true)));
+
+  const n = drawCount();
+  $('deck-status').textContent = deck.length + ' cards remain · ' + hand.length + ' of ' + n + ' drawn';
+  $('card-result').textContent = !hand.length ? 'Draw a card to try the event.'
+    : hand.some(c => isMatch(c)) ? 'Your hand contains ' + EVENT_NAME[$('card-event').value] + '.'
+    : (hand.length >= n ? 'No match this time.' : 'No match yet. The remaining cards stay in the deck.');
+  const total = choose(52, n);
+  const favorable = total - choose(52 - matchingCount($('card-event').value), n);
+  $('card-favorable').textContent = favorable.toLocaleString() + ' of ' + total.toLocaleString() + ' hands';
+  $('card-exact').textContent = pct(exactProbability());
+}
+
+function renderLesson() {
+  const ev = $('card-event').value, n = drawCount();
+  const m = matchingCount(ev);
+  const total = choose(52, n), none = choose(52 - m, n);
+  const exact = total ? Number(total - none) / Number(total) : 0;
+  const scenes = [
+    { title: 'Start with the whole deck', cap: 'A standard deck has 52 distinct cards. Each card is one equally likely outcome for a single draw.',
+      tex: '|S| = 52', text: 'sample space = 52 cards' },
+    { title: 'Count the cards that match', cap: 'For ' + EVENT_NAME[ev] + ', there are ' + m + ' favorable cards in the full deck.',
+      tex: 'P = \\dfrac{' + m + '}{52} = ' + (m / 52 * 100).toFixed(1) + '\\%', text: m + ' / 52 = ' + pct(m / 52) },
+    { title: 'For a hand, count combinations', cap: 'Draws are without replacement, so count distinct hands. Subtract the hands with no match from all possible hands.',
+      tex: 'P = 1 - \\dfrac{\\binom{' + (52 - m) + '}{' + n + '}}{\\binom{52}{' + n + '}}', text: 'P = 1 - C(' + (52 - m) + ', ' + n + ') / C(52, ' + n + ')' },
+    { title: 'Compare exact chance with trials', cap: 'The exact answer comes from counting. A simulation samples shuffled hands; its estimate wobbles, especially with few trials.',
+      tex: '\\text{exact} = ' + (exact * 100).toFixed(1) + '\\%', text: 'exact = ' + pct(exact) + ' — compare with the simulation below' }
+  ];
+  const sc = scenes[lessonStep];
+  $('lesson-title').textContent = sc.title;
+  $('lesson-caption').textContent = sc.cap;
+  renderMath($('lesson-eq'), sc.tex, sc.text, false);
+  $('lesson-progress').textContent = (lessonStep + 1) + ' / ' + scenes.length;
+
+  const visual = $('lesson-cards');
+  visual.replaceChildren();
+  const samples = lessonStep === 1
+    ? [{ rank: 'A', suit: 'H' }, { rank: '5', suit: 'D' }, { rank: 'K', suit: 'S' }, { rank: '10', suit: 'C' }]
+    : [{ rank: 'A', suit: 'S' }, { rank: '5', suit: 'H' }, { rank: 'Q', suit: 'D' }, { rank: '10', suit: 'C' }];
+  samples.forEach(c => visual.append(cardEl(c, 'lesson-card', lessonStep >= 1)));
+
+  $('lesson-back').disabled = lessonStep === 0;
+  $('lesson-next').disabled = lessonStep === scenes.length - 1;
+  $('lesson-play').textContent = lessonTimer ? 'Pause lesson' : 'Play lesson';
+}
+function stopLesson() {
+  if (lessonTimer !== null) clearInterval(lessonTimer);
+  lessonTimer = null;
+  renderLesson();
+}
+function startLesson() {
+  if (lessonTimer !== null) { stopLesson(); return; }
+  if (lessonStep === 3) lessonStep = 0;
+  lessonTimer = setInterval(() => {
+    if (lessonStep >= 3) { stopLesson(); return; }
+    lessonStep++;
+    renderLesson();
+  }, 4200);
+  renderLesson();
+}
+
+function renderChart(values, exact) {
+  const chart = $('card-chart');
+  chart.replaceChildren();
+  chart.setAttribute('aria-label', 'Observed probability ' + pct(values[values.length - 1] || 0) + '; exact probability ' + pct(exact));
+  values.forEach(v => {
+    const bar = document.createElement('span');
+    bar.className = 'bar';
+    bar.style.height = Math.max(3, Math.min(100, v * 100)) + '%';
+    bar.title = 'Observed ' + pct(v);
+    chart.append(bar);
+  });
+  const line = document.createElement('div');
+  line.className = 'exact-line';
+  line.style.bottom = Math.min(100, exact * 100) + '%';
+  line.title = 'Exact ' + pct(exact);
+  chart.append(line);
+}
+async function runSimulation() {
+  if (simulating) return;
+  simulating = true;
+  $('card-simulate').disabled = true;
+  $('card-simulation-result').textContent = 'Sampling shuffled hands…';
+  const trials = parseInt($('card-trials').value, 10);
+  const n = drawCount(), ev = $('card-event').value;
+  const exact = exactProbability(n, ev);
+  const sample = makeDeck();
+  const observed = [];
+  const every = Math.max(1, Math.floor(trials / 60));
+  let hits = 0;
+  for (let i = 1; i <= trials; i++) {
+    shuffle(sample);
+    if (sample.slice(0, n).some(c => isMatch(c, ev))) hits++;
+    if (i % every === 0 || i === trials) {
+      observed.push(hits / i);
+      renderChart(observed, exact);
+      $('card-simulation-result').textContent = i + ' trials · ' + hits + ' matches · observed ' + pct(hits / i) + ' · exact ' + pct(exact);
+      await new Promise(r => setTimeout(r, 12));
+    }
+  }
+  simulating = false;
+  $('card-simulate').disabled = false;
+}
+
+function probReset() { stopLesson(); resetDeck(); renderHand(); renderLesson(); }
+$('card-event').addEventListener('change', probReset);
+$('card-count').addEventListener('change', () => { $('card-count').value = String(drawCount()); probReset(); });
+$('card-draw').addEventListener('click', () => {
+  if (hand.length >= drawCount() || !deck.length) { showToast('Your hand is full — shuffle to start again', 'info'); return; }
+  hand.push(deck.pop());
+  renderHand();
+});
+$('card-reset').addEventListener('click', () => { resetDeck(); renderHand(); });
+$('card-simulate').addEventListener('click', runSimulation);
+$('lesson-back').addEventListener('click', () => { stopLesson(); lessonStep = Math.max(0, lessonStep - 1); renderLesson(); });
+$('lesson-next').addEventListener('click', () => { stopLesson(); lessonStep = Math.min(3, lessonStep + 1); renderLesson(); });
+$('lesson-play').addEventListener('click', startLesson);
+$('lesson-replay').addEventListener('click', () => { stopLesson(); lessonStep = 0; startLesson(); });
+resetDeck(); renderHand(); renderLesson();
+
+/* =====================================================================
+   Calculus
+   ===================================================================== */
+const calcTabs = [...document.querySelectorAll('#calc-modes [role="tab"]')];
+const calcPanels = [...document.querySelectorAll('.calc-mode-panel')];
+const exprInputs = [...document.querySelectorAll('.calc-mode-panel input[name="expression"]')];
+let activeExpr = exprInputs[0];
+
+/* --- live equation preview --- */
+function updatePreview(input) {
+  const pv = $(input.id.replace('-expression', '-preview'));
+  const v = input.value.trim();
+  if (!v) { pv.textContent = 'Preview appears here'; pv.classList.add('empty'); return; }
+  const tex = toTex(v, true);
+  renderMath(pv, tex, v);
+}
+exprInputs.forEach(input => {
+  input.addEventListener('focus', () => { activeExpr = input; });
+  input.addEventListener('input', () => updatePreview(input));
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); requestCalculus('/api/calculus/solve'); } });
+  updatePreview(input);
+});
+
+/* --- toolbar: insert at cursor --- */
+const toolbar = $('calc-toolbar');
+toolbar.addEventListener('pointerdown', e => { if (e.target.closest('button[data-insert]')) e.preventDefault(); });
+toolbar.addEventListener('click', e => {
+  const btn = e.target.closest('button[data-insert]');
+  if (!btn || !activeExpr) return;
+  const input = activeExpr;
+  const start = input.selectionStart ?? input.value.length;
+  const end = input.selectionEnd ?? start;
+  const ins = btn.dataset.insert;
+  input.value = input.value.slice(0, start) + ins + input.value.slice(end);
+  const caret = start + Number(btn.dataset.cursor ?? ins.length);
+  input.focus();
+  input.setSelectionRange(caret, caret);
+  input.dispatchEvent(new Event('input', { bubbles: true }));
+});
+
+/* --- mode tabs (Derivatives / Limits / Continuity / Chain Rule) --- */
+function clearCalcOutput() {
+  const status = $('calc-status');
+  status.textContent = ''; status.removeAttribute('data-state'); status.setAttribute('aria-busy', 'false');
+  $('calc-result').hidden = true;
+  const v = $('calc-video');
+  v.pause(); v.removeAttribute('src'); v.hidden = true;
+}
+function selectMode(tab) {
+  const panelId = tab.getAttribute('aria-controls');
+  calcTabs.forEach(b => { const on = b === tab; b.setAttribute('aria-selected', String(on)); b.tabIndex = on ? 0 : -1; });
+  calcPanels.forEach(p => { p.hidden = p.id !== panelId; });
+  const panel = $(panelId);
+  activeExpr = panel.querySelector('input[name="expression"]');
+  clearCalcOutput();
+}
+calcTabs.forEach((tab, i) => {
+  tab.addEventListener('click', () => selectMode(tab));
+  tab.addEventListener('keydown', e => {
+    let next = null;
+    if (e.key === 'ArrowRight') next = (i + 1) % calcTabs.length;
+    if (e.key === 'ArrowLeft') next = (i - 1 + calcTabs.length) % calcTabs.length;
+    if (e.key === 'Home') next = 0;
+    if (e.key === 'End') next = calcTabs.length - 1;
+    if (next !== null) { e.preventDefault(); calcTabs[next].focus(); selectMode(calcTabs[next]); }
+  });
+});
+
+/* --- sub-topic chips --- */
+function syncPanel(panel) {
+  const type = panel.dataset.problemType;
+  const pf = panel.querySelector('.f-point'), df = panel.querySelector('.f-direction');
+  if (panel.id === 'calc-panel-derivative') pf.hidden = type !== 'tangent_line';
+  if (panel.id === 'calc-panel-limit') {
+    pf.hidden = type === 'limit_at_infinity';
+    df.hidden = !['one_sided_limit', 'limit_at_infinity'].includes(type);
+    const inf = type === 'limit_at_infinity';
+    $('calc-limit-direction-label').textContent = inf ? 'Direction at infinity' : 'Approach from';
+    df.querySelector('option[value="+"]').textContent = inf ? 'Positive infinity (+)' : 'From the right (+)';
+    df.querySelector('option[value="-"]').textContent = inf ? 'Negative infinity (−)' : 'From the left (−)';
+  }
+}
+document.querySelectorAll('.calc-mode-panel .chips').forEach(group => {
+  group.addEventListener('click', e => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    group.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', String(c === chip)));
+    const panel = group.closest('.calc-mode-panel');
+    panel.dataset.problemType = chip.dataset.problemType;
+    syncPanel(panel);
+    clearCalcOutput();
+  });
+});
+calcPanels.forEach(syncPanel);
+
+/* --- payload --- */
+function getPayload() {
+  const panel = calcPanels.find(p => !p.hidden);
+  const pointInput = panel.querySelector('[name="point"]');
+  const dirInput = panel.querySelector('[name="direction"]');
+  const payload = {
+    problem_type: panel.dataset.problemType,
+    expression: normalizeMath(panel.querySelector('[name="expression"]').value.trim()),
+    variable: panel.querySelector('[name="variable"]').value.trim(),
+    point: pointInput && !pointInput.closest('[hidden]') ? normalizeMath(pointInput.value.trim()) : ''
+  };
+  if (dirInput && !dirInput.closest('[hidden]')) payload.direction = dirInput.value;
+  return payload;
+}
+
+/* --- final answer --- */
+function finalAnswer(payload, sol) {
+  const type = payload.problem_type;
+  const varName = sol.variable ?? payload.variable;
+  const v = toTex(varName);
+  const pointRaw = sol.point ?? payload.point;
+  const a = toTex(pointRaw);
+  const result = sol.result ?? sol.derivative ?? sol.tangent_line ?? sol.first_derivative;
+  const missing = what => { throw new Error('The solver did not return ' + what + '.'); };
+
+  if (type === 'continuity') {
+    if (sol.is_continuous !== true && sol.is_continuous !== false) missing('a continuity result');
+    if (!sol.function_value || !sol.limit_value) missing('the function value and limit needed to check continuity');
+    return {
+      text: sol.is_continuous ? 'The function is continuous at this point.' : 'The function is not continuous at this point.',
+      tex: 'f(' + a + ') = ' + toTex(sol.function_value) + ',\\quad \\lim_{' + v + '\\to ' + a + '} f(' + v + ') = ' + toTex(sol.limit_value),
+      fallback: 'f(' + readableMath(pointRaw) + ') = ' + readableMath(sol.function_value) + '; limit = ' + readableMath(sol.limit_value)
+    };
+  }
+  if (type === 'tangent_line') {
+    const tangent = sol.tangent_line ?? result;
+    if (tangent === undefined || tangent === null || tangent === '') missing('a tangent line');
+    return { text: 'Tangent line', tex: 'y = ' + toTex(tangent), fallback: 'y = ' + readableMath(tangent) };
+  }
+  if (['limit', 'one_sided_limit', 'two_sided_limit', 'limit_at_infinity'].includes(type)) {
+    if (result === undefined || result === null || result === '') missing('a limit value');
+    const none = result === 'does_not_exist';
+    let target = a, targetText = readableMath(pointRaw);
+    if (type === 'limit_at_infinity') { target = payload.direction === '-' ? '-\\infty' : '\\infty'; targetText = payload.direction === '-' ? '-∞' : '∞'; }
+    else if (type === 'one_sided_limit') { target += payload.direction === '-' ? '^{-}' : '^{+}'; targetText += payload.direction === '-' ? '⁻' : '⁺'; }
+    return {
+      text: none ? 'The two-sided limit does not exist.' : 'Limit',
+      tex: '\\lim_{' + v + '\\to ' + target + '} f(' + v + ') = ' + (none ? '\\text{does not exist}' : toTex(result)),
+      fallback: 'lim (' + varName + ' → ' + targetText + ') = ' + (none ? 'does not exist' : readableMath(result))
+    };
+  }
+  if (type === 'derivative_applications') {
+    if (sol.first_derivative === undefined) missing('the first derivative');
+    const cls = sol.classifications?.map(c => c.classification + ' at x = ' + c.point).join('; ');
+    const second = sol.second_derivative !== undefined;
+    return {
+      text: cls || 'Derivative applications',
+      tex: "f'(" + v + ') = ' + toTex(sol.first_derivative) + (second ? ",\\quad f''(" + v + ') = ' + toTex(sol.second_derivative) : ''),
+      fallback: "f'(" + varName + ') = ' + readableMath(sol.first_derivative) + (second ? "; f''(" + varName + ') = ' + readableMath(sol.second_derivative) : '')
+    };
+  }
+  if (type === 'derivative' || type.endsWith('_rule')) {
+    if (result === undefined || result === null || result === '') missing('a derivative');
+    return { text: 'Derivative', tex: "f'(" + v + ') = ' + toTex(result), fallback: "f'(" + varName + ') = ' + readableMath(result) };
+  }
+  if (result === undefined || result === null || result === '') missing('a final mathematical answer');
+  return { text: 'Result', tex: toTex(result), fallback: readableMath(result) };
+}
+
+/* --- step helpers --- */
+const METHOD_LABELS = {
+  symbolic_limit: 'Symbolic limit', compare_one_sided_limits: 'Comparison of one-sided limits',
+  limit_and_function_value: 'Limit and function-value comparison', symbolic_differentiation: 'Symbolic differentiation',
+  power_rule: 'Power Rule', sum_rule: 'Sum Rule', product_rule: 'Product Rule', quotient_rule: 'Quotient Rule',
+  chain_rule: 'Chain Rule', critical_points_and_second_derivative: 'Critical points and second derivative'
+};
+
+function stepEquations(step, sol, varName) {
+  const eqs = [];
+  const v = toTex(sol.variable ?? varName);
+  if (step.expression !== undefined && !(step.type === 'differentiate_terms' && Array.isArray(step.expression))) eqs.push(step.expression);
+  if (step.result !== undefined && !['exists', 'does_not_exist', 'continuous', 'not_continuous'].includes(step.result)) eqs.push(step.result);
+
+  switch (step.type) {
+    case 'identify':
+      if (sol.u !== undefined && sol.v !== undefined) eqs.push(T('u = ' + toTex(sol.u) + ',\\quad v = ' + toTex(sol.v)));
+      if (sol.outer_function && sol.inner_function) eqs.push(T('\\text{outer} = ' + toTex(sol.outer_function) + ',\\quad \\text{inner} = ' + toTex(sol.inner_function)));
+      break;
+    case 'differentiate':
+      if (sol.u_prime !== undefined && sol.v_prime !== undefined) eqs.push(T("u' = " + toTex(sol.u_prime) + ",\\quad v' = " + toTex(sol.v_prime)));
+      if (sol.first_derivative !== undefined) eqs.push(T("f'(" + v + ') = ' + toTex(sol.first_derivative)));
+      break;
+    case 'differentiate_terms':
+      if (sol.terms && sol.term_derivatives && sol.terms.length === sol.term_derivatives.length) {
+        sol.terms.forEach((term, i) => eqs.push(T('\\frac{d}{d' + v + '}\\left(' + toTex(term) + '\\right) = ' + toTex(sol.term_derivatives[i]))));
+      } else {
+        if (sol.terms) eqs.push(sol.terms);
+        if (sol.term_derivatives) eqs.push(sol.term_derivatives);
+      }
+      break;
+    case 'apply_rule':
+      if (sol.method === 'product_rule' && sol.u !== undefined && sol.v !== undefined && sol.u_derivative !== undefined && sol.v_derivative !== undefined) {
+        eqs.push(T('\\left(' + toTex(sol.u_derivative) + '\\right)\\left(' + toTex(sol.v) + '\\right) + \\left(' + toTex(sol.u) + '\\right)\\left(' + toTex(sol.v_derivative) + '\\right)'));
+      }
+      if (typeof step.message === 'string') {
+        const formula = step.message.includes(':') ? step.message.slice(step.message.lastIndexOf(':') + 1).trim() : step.message;
+        if (formula.includes('=')) eqs.push(formula);
+      }
+      break;
+    case 'critical_points':
+      if (sol.critical_points) eqs.push(sol.critical_points);
+      break;
+    case 'comparison':
+      if (sol.function_value !== undefined && sol.limit_value !== undefined) {
+        eqs.push(T('f(' + toTex(sol.point) + ') = ' + toTex(sol.function_value) + ',\\quad \\lim_{' + v + '\\to ' + toTex(sol.point) + '} f(' + v + ') = ' + toTex(sol.limit_value)));
+      }
+      break;
+    case 'simplify':
+      if (sol.method === 'chain_rule' && sol.result !== undefined) eqs.push(T("f'(" + v + ') = ' + toTex(sol.result)));
+      break;
+    case 'second_derivative':
+      if (sol.second_derivative !== undefined) eqs.push(T("f''(" + v + ') = ' + toTex(sol.second_derivative)));
+      break;
+    case 'classify':
+      sol.classifications?.forEach(c => eqs.push(T('x = ' + toTex(c.point) + ",\\quad f''(x) = " + toTex(c.second_derivative_value) + ',\\quad \\text{' + escText(String(c.classification)) + '}')));
+      break;
+  }
+  return eqs;
+}
+
+/* --- clean power-rule steps for plain polynomials --- */
+function splitAdditiveTerms(expression) {
+  const terms = []; let depth = 0, start = 0;
+  for (let i = 0; i < expression.length; i++) {
+    const c = expression[i];
+    if (c === '(') depth++;
+    if (c === ')') depth--;
+    if (depth === 0 && i > start && (c === '+' || c === '-') && !['*', '/', '^'].includes(expression[i - 1])) {
+      terms.push(expression.slice(start, i).trim());
+      start = i;
+    }
+  }
+  terms.push(expression.slice(start).trim());
+  return terms.map(t => (t.startsWith('+') ? t.slice(1).trim() : t)).filter(Boolean);
+}
+function parseNumericCoefficient(value) {
+  if (!value || value === '+') return 1;
+  if (value === '-') return -1;
+  const parts = value.split('/');
+  const num = Number(parts[0]), den = parts.length === 2 ? Number(parts[1]) : 1;
+  if (!Number.isFinite(num) || !Number.isFinite(den) || den === 0) return null;
+  return num / den;
+}
+function parseMonomial(term, variable) {
+  const src = term.replace(/\s+/g, '');
+  const constant = src.match(/^([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:\/\d+(?:\.\d*)?)?)$/);
+  if (constant) { const c = parseNumericCoefficient(constant[1]); return c === null ? null : { coefficient: c, exponent: 0 }; }
+  const vp = variable.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const m = src.match(new RegExp('^([+-]?(?:(?:\\d+(?:\\.\\d*)?|\\.\\d+)(?:/\\d+(?:\\.\\d*)?)?)?)\\*?' + vp + '(?:\\*\\*([+-]?\\d+))?$'));
+  if (!m) return null;
+  const coefficient = parseNumericCoefficient(m[1]);
+  const exponent = m[2] === undefined ? 1 : Number(m[2]);
+  if (coefficient === null || !Number.isInteger(exponent)) return null;
+  return { coefficient, exponent };
+}
+function polynomialTerms(expression, variable) {
+  const parsed = splitAdditiveTerms(String(expression)).map(term => ({ term, monomial: parseMonomial(term, variable) }));
+  return parsed.every(p => p.monomial) ? parsed : null;
+}
+function coefficientMap(terms) {
+  const map = new Map();
+  terms.forEach(({ monomial }) => map.set(monomial.exponent, (map.get(monomial.exponent) || 0) + monomial.coefficient));
+  return map;
+}
+function samePolynomial(a, b) {
+  const A = coefficientMap(a), B = coefficientMap(b);
+  return [...new Set([...A.keys(), ...B.keys()])].every(e => Math.abs((A.get(e) || 0) - (B.get(e) || 0)) < 1e-10);
+}
+const numTex = n => (Number.isInteger(n) ? String(n) : String(Number(n.toPrecision(10))));
+function monomialTex(coef, exp, variable) {
+  if (coef === 0) return '0';
+  const sign = coef < 0 ? '-' : '';
+  const mag = Math.abs(coef);
+  const c = mag === 1 && exp !== 0 ? '' : numTex(mag);
+  const v = toTex(variable);
+  const x = exp === 0 ? '' : exp === 1 ? v : v + '^{' + exp + '}';
+  return (sign + c + x) || '0';
+}
+function monomialDerivativeSteps(payload, sol) {
+  if (!['derivative', 'power_rule'].includes(payload.problem_type)) return null;
+  const expression = sol.expression ?? payload.expression;
+  const derivative = sol.derivative ?? sol.result;
+  if (typeof derivative !== 'string') return null;
+  const terms = polynomialTerms(expression, payload.variable);
+  const returned = polynomialTerms(derivative, payload.variable);
+  if (!terms || !returned) return null;
+
+  const diffs = terms.map(({ term, monomial }) => ({ term, monomial, coefficient: monomial.coefficient * monomial.exponent, exponent: monomial.exponent - 1 }));
+  if (!samePolynomial(diffs.map(d => ({ monomial: { coefficient: d.coefficient, exponent: d.exponent } })), returned)) return null;
+
+  const v = toTex(payload.variable);
+  const steps = diffs.map(({ term, monomial, coefficient, exponent }) => {
+    const isConst = monomial.exponent === 0;
+    const dTex = monomialTex(coefficient, exponent, payload.variable);
+    let right = dTex;
+    if (!isConst && Math.abs(monomial.coefficient) !== 1 && monomial.exponent !== 1) {
+      right = numTex(monomial.coefficient) + '\\left(' + monomialTex(monomial.exponent, exponent, payload.variable) + '\\right) = ' + dTex;
+    }
+    return {
+      title: isConst ? 'Constant rule' : monomial.coefficient === 1 ? 'Power rule' : 'Constant-multiple rule',
+      equations: [T('\\frac{d}{d' + v + '}\\left(' + toTex(term) + '\\right) = ' + right)]
+    };
+  });
+  steps.push({ title: 'Final result', equations: [T("f'(" + v + ') = ' + toTex(derivative))] });
+  return steps;
+}
+
+/* --- render the step cards --- */
+function renderSolutionSteps(payload, sol) {
+  const list = $('calc-result-steps');
+  list.replaceChildren();
+  let n = 0;
+
+  const addCard = (title, message, equations = []) => {
+    n++;
+    const li = document.createElement('li');
+    li.className = 'step';
+    const badge = document.createElement('span');
+    badge.className = 'step-n'; badge.textContent = String(n);
+    const body = document.createElement('div');
+    body.className = 'step-b';
+    const h = document.createElement('h4'); h.textContent = title;
+    body.append(h);
+    if (message) { const p = document.createElement('p'); p.textContent = readableMath(message); body.append(p); }
+    equations.flat().filter(x => x !== undefined && x !== null && x !== '').forEach(item => {
+      const eq = document.createElement('div');
+      eq.className = 'step-eq';
+      const tex = toTex(item);
+      renderMath(eq, tex, item instanceof Tex ? readableMath(item.s) : readableMath(item));
+      body.append(eq);
+    });
+    li.append(badge, body);
+    list.append(li);
+  };
+
+  const expression = sol.expression ?? payload.expression;
+  const varName = sol.variable ?? payload.variable;
+  if (expression) addCard('Given', 'Start with the function provided.', [T('f(' + toTex(varName) + ') = ' + toTex(expression))]);
+
+  const mono = monomialDerivativeSteps(payload, sol);
+  if (mono) { mono.forEach(s => addCard(s.title, '', s.equations)); return; }
+
+  if (METHOD_LABELS[sol.method]) addCard('Method', METHOD_LABELS[sol.method]);
+
+  if (Array.isArray(sol.steps)) {
+    sol.steps.forEach(step => {
+      if (!step || typeof step !== 'object') return;
+      const type = String(step.type ?? 'Step').replace(/_/g, ' ');
+      let title = type.charAt(0).toUpperCase() + type.slice(1);
+      if (['derivative', 'power_rule', 'sum_rule', 'product_rule', 'quotient_rule', 'chain_rule'].includes(payload.problem_type) && step.type === 'result') title = 'Final result';
+      else if (payload.problem_type === 'sum_rule' && step.type === 'combine') title = 'Final result';
+      else if (payload.problem_type === 'tangent_line' && step.type === 'tangent') title = 'Final result';
+      let message = typeof step.message === 'string' ? step.message : '';
+      if (payload.problem_type === 'chain_rule' && step.type === 'identify' && (!sol.outer_function || !sol.inner_function)) {
+        message = 'The solver did not identify a specific inner or outer function.';
+      }
+      addCard(title, message, stepEquations(step, sol, varName));
+    });
+  }
+
+  if (payload.problem_type === 'derivative_applications') {
+    const has = t => sol.steps?.some(s => s.type === t);
+    const v = toTex(sol.variable ?? payload.variable);
+    if (sol.first_derivative !== undefined && !has('differentiate')) addCard('First derivative', '', [T("f'(" + v + ') = ' + toTex(sol.first_derivative))]);
+    if (sol.second_derivative !== undefined && !has('second_derivative')) addCard('Second derivative', '', [T("f''(" + v + ') = ' + toTex(sol.second_derivative))]);
+    if (sol.critical_points !== undefined && !has('critical_points')) addCard('Critical points', '', [sol.critical_points]);
+  }
+
+  if (!n) addCard('Solution', 'The solver did not return any step-by-step details.');
+}
+
+/* --- request (solve / render video) --- */
+function setCalcStatus(state, message) {
+  const s = $('calc-status');
+  s.dataset.state = state;
+  s.setAttribute('aria-busy', String(state === 'loading'));
+  s.textContent = message;
+}
+let calcBusy = false;
+async function requestCalculus(endpoint) {
+  if (calcBusy) return;
+  const payload = getPayload();
+  const isSolve = endpoint.endsWith('/solve');
+
+  if (!payload.expression || !payload.variable) return setCalcStatus('error', 'Please enter an expression and variable.');
+  if (['limit', 'one_sided_limit', 'two_sided_limit', 'continuity', 'tangent_line'].includes(payload.problem_type) && !payload.point) {
+    return setCalcStatus('error', 'Please enter the point required for this problem.');
+  }
+
+  calcBusy = true;
+  $('calc-solve').disabled = true; $('calc-render').disabled = true;
+  setCalcStatus('loading', isSolve ? 'Solving… please wait.' : 'Rendering video — this can take a little while…');
+  const video = $('calc-video');
+  if (!isSolve) { video.pause(); video.removeAttribute('src'); video.hidden = true; }
+  else $('calc-result').hidden = true;
+
+  try {
+    const response = await fetch(API_BASE + endpoint, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+    });
+    let data = null;
+    try { data = await response.json(); } catch (_) { /* non-JSON error body */ }
+    if (!response.ok) {
+      throw new Error(typeof data?.detail === 'string' ? data.detail : JSON.stringify(data?.detail || 'Request failed.'));
+    }
+
+    if (isSolve) {
+      const sol = data && data.solution;
+      if (!sol || typeof sol !== 'object' || Array.isArray(sol)) throw new Error('The server returned an invalid calculus solution response.');
+      if (sol.steps !== undefined && !Array.isArray(sol.steps)) throw new Error('The server returned invalid step-by-step solution data.');
+      const answer = finalAnswer(payload, sol);
+      $('calc-result-conclusion').textContent = answer.text;
+      renderMath($('calc-result-equation'), answer.tex, answer.fallback, true);
+      renderSolutionSteps(payload, sol);
+      $('calc-result').hidden = false;
+      setCalcStatus('success', 'Solution ready!');
+      $('calc-result').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+      if (!data || !data.video_url) throw new Error('The server did not return a video URL.');
+      video.src = new URL(data.video_url, window.location.origin).href;
+      video.hidden = false;
+      video.load();
+      setCalcStatus('success', 'Video ready! Press play to watch.');
+    }
+  } catch (err) {
+    console.error(err);
+    setCalcStatus('error', 'Error: ' + err.message);
+  } finally {
+    calcBusy = false;
+    $('calc-solve').disabled = false; $('calc-render').disabled = false;
+  }
+}
+$('calc-solve').addEventListener('click', () => requestCalculus('/api/calculus/solve'));
+$('calc-render').addEventListener('click', () => requestCalculus('/api/calculus/render'));
+
+/* =====================================================================
+   Init
+   ===================================================================== */
+showTab('bfs');
+// KaTeX is loaded with `defer`, so re-render math once everything has loaded
+window.addEventListener('load', () => { exprInputs.forEach(updatePreview); renderLesson(); });
 })();
 </script>
-
-
 </body>
 </html>
