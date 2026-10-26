@@ -1,3 +1,10 @@
+import os
+import re
+import sys
+import subprocess
+from pathlib import Path
+from fastapi import HTTPException
+from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .graph import Graph
@@ -57,6 +64,18 @@ def clean_json(data):
 
 
 app = FastAPI(title="MathViz Graph API")
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
+VIDEO_DIR = PROJECT_ROOT / "media" / "videos" / "dynamic_integration"
+VIDEO_DIR.mkdir(parents=True, exist_ok=True)
+
+MANIM_FILE = PROJECT_ROOT / "manim" / "integration" / "dynamic_integration.py"
+
+app.mount(
+    "/generated-videos",
+    StaticFiles(directory=str(VIDEO_DIR)),
+    name="generated-videos",
+)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -168,3 +187,101 @@ def run_area_under_curve(data: AreaUnderCurveInput):
 def run_area_between_curves(data: AreaBetweenCurvesInput):
     result = area_between_curves(data)
     return result.model_dump()
+@app.post("/integration/generate-video")
+def generate_integration_video(data: BasicIntegrationInput):
+    expression = data.function.strip()
+
+    # Accept only basic mathematical expressions using x.
+    allowed_pattern = r"^[0-9a-zA-Z_+\-*/().,\s^]+$"
+
+    if not expression or not re.fullmatch(allowed_pattern, expression):
+        raise HTTPException(
+            status_code=400,
+            detail="Please enter a valid mathematical expression.",
+        )
+
+    # Generate a unique filename for each requested equation.
+    import hashlib
+
+    video_name = hashlib.sha256(
+        expression.encode("utf-8")
+    ).hexdigest()[:16] + ".mp4"
+
+    video_path = VIDEO_DIR / video_name
+
+    # Reuse a video only when the exact expression has already rendered.
+    marker_path = VIDEO_DIR / (video_name + ".txt")
+
+    if video_path.exists() and marker_path.exists():
+        if marker_path.read_text(encoding="utf-8") == expression:
+            return {
+                "function": expression,
+                "video_url": f"/generated-videos/{video_name}",
+            }
+
+    if not MANIM_FILE.exists():
+        raise HTTPException(
+            status_code=500,
+            detail=f"Manim file not found: {MANIM_FILE}",
+        )
+
+    env = os.environ.copy()
+    env["MATHVIZ_FUNCTION"] = expression
+
+    python_executable = PROJECT_ROOT / "manim_env" / "Scripts" / "python.exe"
+
+    try:
+        completed = subprocess.run(
+            [
+                str(python_executable),
+                "-m",
+                "manim",
+                "-ql",
+                str(MANIM_FILE),
+                "DynamicIntegration",
+                "--media_dir",
+                str(PROJECT_ROOT / "media"),
+            ],
+            cwd=str(PROJECT_ROOT),
+            env=env,
+            capture_output=True,
+            text=True,
+            timeout=180,
+        )
+
+    except subprocess.TimeoutExpired:
+        raise HTTPException(
+            status_code=504,
+            detail="Video generation took too long. Please try a simpler equation.",
+        )
+
+    if completed.returncode != 0:
+        raise HTTPException(
+            status_code=500,
+            detail="Manim video generation failed. Check the backend terminal for details.",
+        )
+
+    rendered_video = (
+        PROJECT_ROOT
+        / "media"
+        / "videos"
+        / "dynamic_integration"
+        / "480p15"
+        / "DynamicIntegration.mp4"
+    )
+
+    if not rendered_video.exists():
+        raise HTTPException(
+            status_code=500,
+            detail="Manim finished but the generated MP4 could not be found.",
+        )
+
+    import shutil
+
+    shutil.copy2(rendered_video, video_path)
+    marker_path.write_text(expression, encoding="utf-8")
+
+    return {
+        "function": expression,
+        "video_url": f"/generated-videos/{video_name}",
+    }

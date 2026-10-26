@@ -7,6 +7,17 @@
     <title>MathViz - Integration</title>
 
     <link rel="stylesheet" href="style.css">
+    <script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['\\(', '\\)'], ['$', '$']],
+      displayMath: [['\\[', '\\]'], ['$$', '$$']]
+    }
+  };
+</script>
+
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
 </head>
 
 <body>
@@ -131,7 +142,7 @@
     </footer>
 
 
-    <script src="script.js"></script>
+    <script src="script.js?v=2"></script>
 
 </body>
 </html>
