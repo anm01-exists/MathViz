@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mathviz"
+version = "1.0.0"
+description = "MathViz Unified - interactive graph algorithm animations rendered with Manim"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.104",
+    "uvicorn[standard]>=0.24",
+    "pydantic>=2.5",
+    "python-multipart>=0.0.6",
+    "jinja2>=3.1",
+    "manim>=0.19,<0.21",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "httpx>=0.24",
+]
+
+[tool.setuptools.packages.find]
+include = ["app*", "manim_engine*"]
+
+[tool.pytest.ini_options]
+testpaths = ["app/algorithms/tests", "manim_engine/tests"]
+pythonpath = ["."]

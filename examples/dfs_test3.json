@@ -1,0 +1,9 @@
+{
+  "algorithm": "DFS",
+  "start": "B",
+  "traversal": [
+    "B",
+    "A",
+    "C"
+  ]
+}

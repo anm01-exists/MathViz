@@ -1,0 +1,1011 @@
+{
+  "algorithm": "dfs",
+  "start": "root",
+
+  "graph": {
+    "directed": true,
+    "weighted": false,
+
+    "nodes": [
+      { "id": "root", "x": 0.0, "y": 3.5, "label": "root" },
+
+      { "id": "A", "x": -3.5, "y": 2.0, "label": "A" },
+      { "id": "B", "x": 0.0, "y": 2.0, "label": "B" },
+      { "id": "C", "x": 3.5, "y": 2.0, "label": "C" },
+
+      { "id": "D", "x": -5.0, "y": 0.5, "label": "D" },
+      { "id": "E", "x": -2.0, "y": 0.5, "label": "E" },
+      { "id": "F", "x": -0.5, "y": 0.5, "label": "F" },
+      { "id": "G", "x": 2.0, "y": 0.5, "label": "G" },
+      { "id": "H", "x": 5.0, "y": 0.5, "label": "H" },
+
+      { "id": "I", "x": -5.0, "y": -1.0, "label": "I" },
+      { "id": "J", "x": -2.0, "y": -1.0, "label": "J" },
+      { "id": "K", "x": 0.0, "y": -1.0, "label": "K" },
+      { "id": "L", "x": 3.0, "y": -1.0, "label": "L" },
+      { "id": "M", "x": 5.0, "y": -1.0, "label": "M" },
+
+      { "id": "N", "x": -3.5, "y": -2.5, "label": "N" },
+      { "id": "O", "x": 0.0, "y": -2.5, "label": "O" },
+      { "id": "P", "x": 3.5, "y": -2.5, "label": "P" },
+
+      { "id": "Q", "x": 7.0, "y": 2.0, "label": "Q" },
+      { "id": "R", "x": 7.0, "y": 0.5, "label": "R" }
+    ],
+
+    "edges": [
+      { "source": "root", "target": "A" },
+      { "source": "root", "target": "B" },
+      { "source": "root", "target": "C" },
+
+      { "source": "A", "target": "D" },
+      { "source": "A", "target": "E" },
+
+      { "source": "B", "target": "E" },
+      { "source": "B", "target": "F" },
+      { "source": "B", "target": "G" },
+
+      { "source": "C", "target": "G" },
+      { "source": "C", "target": "H" },
+      { "source": "C", "target": "Q" },
+
+      { "source": "D", "target": "I" },
+      { "source": "D", "target": "J" },
+
+      { "source": "E", "target": "J" },
+      { "source": "E", "target": "K" },
+
+      { "source": "F", "target": "K" },
+      { "source": "F", "target": "L" },
+
+      { "source": "G", "target": "L" },
+      { "source": "G", "target": "M" },
+
+      { "source": "H", "target": "M" },
+      { "source": "H", "target": "R" },
+
+      { "source": "I", "target": "N" },
+      { "source": "J", "target": "N" },
+
+      { "source": "K", "target": "O" },
+      { "source": "L", "target": "O" },
+      { "source": "L", "target": "P" },
+
+      { "source": "M", "target": "P" },
+
+      { "source": "N", "target": "A" },
+      { "source": "O", "target": "F" },
+      { "source": "P", "target": "G" },
+
+      { "source": "Q", "target": "R" },
+      { "source": "R", "target": "H" }
+    ]
+  },
+
+  "states": [
+    {
+      "step": 0,
+      "event": "init",
+      "current": null,
+      "visited": [],
+      "frontier": ["root"],
+      "parent": {},
+      "message": "Start DFS at root. Stack = [root]"
+    },
+
+    {
+      "step": 1,
+      "event": "visit",
+      "current": "root",
+      "visited": ["root"],
+      "frontier": ["C", "B", "A"],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root"
+      },
+      "selected_edges": [
+        ["root", "A"],
+        ["root", "B"],
+        ["root", "C"]
+      ],
+      "message": "Visit root. Push C, B, A so A is explored first."
+    },
+
+    {
+      "step": 2,
+      "event": "visit",
+      "current": "A",
+      "visited": ["root", "A"],
+      "frontier": ["C", "B", "E", "D"],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root",
+        "D": "A",
+        "E": "A"
+      },
+      "current_edge": {
+        "source": "root",
+        "target": "A"
+      },
+      "selected_edges": [
+        ["root", "A"],
+        ["root", "B"],
+        ["root", "C"],
+        ["A", "D"],
+        ["A", "E"]
+      ],
+      "message": "Pop A. Visit A. Push E, D."
+    },
+
+    {
+      "step": 3,
+      "event": "visit",
+      "current": "D",
+      "visited": ["root", "A", "D"],
+      "frontier": ["C", "B", "E", "J", "I"],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root",
+        "D": "A",
+        "E": "A",
+        "I": "D",
+        "J": "D"
+      },
+      "current_edge": {
+        "source": "A",
+        "target": "D"
+      },
+      "selected_edges": [
+        ["root", "A"],
+        ["A", "D"],
+        ["D", "I"],
+        ["D", "J"]
+      ],
+      "message": "Pop D. Visit D. Push J, I."
+    },
+
+    {
+      "step": 4,
+      "event": "visit",
+      "current": "I",
+      "visited": ["root", "A", "D", "I"],
+      "frontier": ["C", "B", "E", "J", "N"],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root",
+        "D": "A",
+        "E": "A",
+        "I": "D",
+        "J": "D",
+        "N": "I"
+      },
+      "current_edge": {
+        "source": "D",
+        "target": "I"
+      },
+      "selected_edges": [
+        ["root", "A"],
+        ["A", "D"],
+        ["D", "I"],
+        ["I", "N"]
+      ],
+      "message": "Pop I. Visit I. Push N."
+    },
+
+    {
+      "step": 5,
+      "event": "visit",
+      "current": "N",
+      "visited": ["root", "A", "D", "I", "N"],
+      "frontier": ["C", "B", "E", "J"],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root",
+        "D": "A",
+        "E": "A",
+        "I": "D",
+        "J": "D",
+        "N": "I"
+      },
+      "current_edge": {
+        "source": "I",
+        "target": "N"
+      },
+      "selected_edges": [
+        ["root", "A"],
+        ["A", "D"],
+        ["D", "I"],
+        ["I", "N"]
+      ],
+      "message": "Pop N. Visit N. N points back to A, but A is already visited. Ignore the cycle."
+    },
+
+    {
+      "step": 6,
+      "event": "backtrack",
+      "current": "I",
+      "visited": ["root", "A", "D", "I", "N"],
+      "frontier": ["C", "B", "E", "J"],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root",
+        "D": "A",
+        "E": "A",
+        "I": "D",
+        "J": "D",
+        "N": "I"
+      },
+      "selected_edges": [
+        ["root", "A"],
+        ["A", "D"],
+        ["D", "I"],
+        ["I", "N"]
+      ],
+      "message": "N has no unvisited neighbors. Backtrack to I."
+    },
+
+    {
+      "step": 7,
+      "event": "backtrack",
+      "current": "D",
+      "visited": ["root", "A", "D", "I", "N"],
+      "frontier": ["C", "B", "E", "J"],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root",
+        "D": "A",
+        "E": "A",
+        "I": "D",
+        "J": "D",
+        "N": "I"
+      },
+      "selected_edges": [
+        ["root", "A"],
+        ["A", "D"],
+        ["D", "I"],
+        ["I", "N"]
+      ],
+      "message": "Backtrack to D. Continue with J."
+    },
+
+    {
+      "step": 8,
+      "event": "visit",
+      "current": "J",
+      "visited": ["root", "A", "D", "I", "N", "J"],
+      "frontier": ["C", "B", "E"],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root",
+        "D": "A",
+        "E": "A",
+        "I": "D",
+        "J": "D",
+        "N": "I"
+      },
+      "current_edge": {
+        "source": "D",
+        "target": "J"
+      },
+      "selected_edges": [
+        ["root", "A"],
+        ["A", "D"],
+        ["D", "J"]
+      ],
+      "message": "Pop J. Visit J. J points to N, but N is already visited."
+    },
+
+    {
+      "step": 9,
+      "event": "backtrack",
+      "current": "A",
+      "visited": ["root", "A", "D", "I", "N", "J"],
+      "frontier": ["C", "B", "E"],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root",
+        "D": "A",
+        "E": "A",
+        "I": "D",
+        "J": "D",
+        "N": "I"
+      },
+      "selected_edges": [
+        ["root", "A"],
+        ["A", "D"]
+      ],
+      "message": "D and J are complete. Backtrack to A."
+    },
+
+    {
+      "step": 10,
+      "event": "visit",
+      "current": "E",
+      "visited": ["root", "A", "D", "I", "N", "J", "E"],
+      "frontier": ["C", "B", "K"],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root",
+        "D": "A",
+        "E": "A",
+        "I": "D",
+        "J": "D",
+        "N": "I",
+        "K": "E"
+      },
+      "current_edge": {
+        "source": "A",
+        "target": "E"
+      },
+      "selected_edges": [
+        ["root", "A"],
+        ["A", "E"],
+        ["E", "K"]
+      ],
+      "message": "Pop E. Visit E. J is already visited, so only K is pushed."
+    },
+
+    {
+      "step": 11,
+      "event": "visit",
+      "current": "K",
+      "visited": ["root", "A", "D", "I", "N", "J", "E", "K"],
+      "frontier": ["C", "B", "F"],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root",
+        "D": "A",
+        "E": "A",
+        "I": "D",
+        "J": "D",
+        "N": "I",
+        "K": "E",
+        "F": "K"
+      },
+      "current_edge": {
+        "source": "E",
+        "target": "K"
+      },
+      "selected_edges": [
+        ["root", "A"],
+        ["A", "E"],
+        ["E", "K"],
+        ["K", "F"]
+      ],
+      "message": "Pop K. Visit K. K points to O, and O will be discovered later; F is also reachable."
+    },
+
+    {
+      "step": 12,
+      "event": "visit",
+      "current": "F",
+      "visited": ["root", "A", "D", "I", "N", "J", "E", "K", "F"],
+      "frontier": ["C", "B", "L"],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root",
+        "D": "A",
+        "E": "A",
+        "I": "D",
+        "J": "D",
+        "N": "I",
+        "K": "E",
+        "F": "K",
+        "L": "F"
+      },
+      "current_edge": {
+        "source": "K",
+        "target": "F"
+      },
+      "selected_edges": [
+        ["root", "A"],
+        ["A", "E"],
+        ["E", "K"],
+        ["K", "F"],
+        ["F", "L"]
+      ],
+      "message": "Pop F. Visit F. Push L."
+    },
+
+    {
+      "step": 13,
+      "event": "visit",
+      "current": "L",
+      "visited": ["root", "A", "D", "I", "N", "J", "E", "K", "F", "L"],
+      "frontier": ["C", "B", "P", "O"],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root",
+        "D": "A",
+        "E": "A",
+        "I": "D",
+        "J": "D",
+        "N": "I",
+        "K": "E",
+        "F": "K",
+        "L": "F",
+        "O": "L",
+        "P": "L"
+      },
+      "current_edge": {
+        "source": "F",
+        "target": "L"
+      },
+      "selected_edges": [
+        ["root", "A"],
+        ["A", "E"],
+        ["E", "K"],
+        ["K", "F"],
+        ["F", "L"],
+        ["L", "O"],
+        ["L", "P"]
+      ],
+      "message": "Pop L. Visit L. Push P, O."
+    },
+
+    {
+      "step": 14,
+      "event": "visit",
+      "current": "O",
+      "visited": ["root", "A", "D", "I", "N", "J", "E", "K", "F", "L", "O"],
+      "frontier": ["C", "B", "P"],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root",
+        "D": "A",
+        "E": "A",
+        "I": "D",
+        "J": "D",
+        "N": "I",
+        "K": "E",
+        "F": "K",
+        "L": "F",
+        "O": "L",
+        "P": "L"
+      },
+      "current_edge": {
+        "source": "L",
+        "target": "O"
+      },
+      "selected_edges": [
+        ["root", "A"],
+        ["A", "E"],
+        ["E", "K"],
+        ["K", "F"],
+        ["F", "L"],
+        ["L", "O"]
+      ],
+      "message": "Pop O. Visit O. O points back to F, which is already visited. Cycle detected and ignored."
+    },
+
+    {
+      "step": 15,
+      "event": "visit",
+      "current": "P",
+      "visited": ["root", "A", "D", "I", "N", "J", "E", "K", "F", "L", "O", "P"],
+      "frontier": ["C", "B"],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root",
+        "D": "A",
+        "E": "A",
+        "I": "D",
+        "J": "D",
+        "N": "I",
+        "K": "E",
+        "F": "K",
+        "L": "F",
+        "O": "L",
+        "P": "L"
+      },
+      "current_edge": {
+        "source": "L",
+        "target": "P"
+      },
+      "selected_edges": [
+        ["root", "A"],
+        ["A", "E"],
+        ["E", "K"],
+        ["K", "F"],
+        ["F", "L"],
+        ["L", "P"]
+      ],
+      "message": "Pop P. Visit P. P points to G, which is not visited yet, so G becomes a future discovery."
+    },
+
+    {
+      "step": 16,
+      "event": "backtrack",
+      "current": "L",
+      "visited": ["root", "A", "D", "I", "N", "J", "E", "K", "F", "L", "O", "P"],
+      "frontier": ["C", "B"],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root",
+        "D": "A",
+        "E": "A",
+        "I": "D",
+        "J": "D",
+        "N": "I",
+        "K": "E",
+        "F": "K",
+        "L": "F",
+        "O": "L",
+        "P": "L"
+      },
+      "selected_edges": [
+        ["root", "A"],
+        ["A", "E"],
+        ["E", "K"],
+        ["K", "F"],
+        ["F", "L"],
+        ["L", "P"]
+      ],
+      "message": "L is complete. Backtrack through F, K, E, A."
+    },
+
+    {
+      "step": 17,
+      "event": "visit",
+      "current": "B",
+      "visited": [
+        "root",
+        "A",
+        "D",
+        "I",
+        "N",
+        "J",
+        "E",
+        "K",
+        "F",
+        "L",
+        "O",
+        "P",
+        "B"
+      ],
+      "frontier": ["C", "G"],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root",
+        "D": "A",
+        "E": "A",
+        "I": "D",
+        "J": "D",
+        "N": "I",
+        "K": "E",
+        "F": "K",
+        "L": "F",
+        "O": "L",
+        "P": "L",
+        "G": "B"
+      },
+      "current_edge": {
+        "source": "root",
+        "target": "B"
+      },
+      "selected_edges": [
+        ["root", "A"],
+        ["root", "B"],
+        ["root", "C"],
+        ["B", "G"]
+      ],
+      "message": "Pop B. E is already visited. F is already visited. G is discovered through B."
+    },
+
+    {
+      "step": 18,
+      "event": "visit",
+      "current": "G",
+      "visited": [
+        "root",
+        "A",
+        "D",
+        "I",
+        "N",
+        "J",
+        "E",
+        "K",
+        "F",
+        "L",
+        "O",
+        "P",
+        "B",
+        "G"
+      ],
+      "frontier": ["C", "M"],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root",
+        "D": "A",
+        "E": "A",
+        "I": "D",
+        "J": "D",
+        "N": "I",
+        "K": "E",
+        "F": "K",
+        "L": "F",
+        "O": "L",
+        "P": "L",
+        "G": "B",
+        "M": "G"
+      },
+      "current_edge": {
+        "source": "B",
+        "target": "G"
+      },
+      "selected_edges": [
+        ["root", "A"],
+        ["root", "B"],
+        ["B", "G"],
+        ["G", "M"]
+      ],
+      "message": "Pop G. Visit G. L is already visited; push M."
+    },
+
+    {
+      "step": 19,
+      "event": "visit",
+      "current": "M",
+      "visited": [
+        "root",
+        "A",
+        "D",
+        "I",
+        "N",
+        "J",
+        "E",
+        "K",
+        "F",
+        "L",
+        "O",
+        "P",
+        "B",
+        "G",
+        "M"
+      ],
+      "frontier": ["C"],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root",
+        "D": "A",
+        "E": "A",
+        "I": "D",
+        "J": "D",
+        "N": "I",
+        "K": "E",
+        "F": "K",
+        "L": "F",
+        "O": "L",
+        "P": "L",
+        "G": "B",
+        "M": "G"
+      },
+      "current_edge": {
+        "source": "G",
+        "target": "M"
+      },
+      "selected_edges": [
+        ["root", "A"],
+        ["root", "B"],
+        ["B", "G"],
+        ["G", "M"]
+      ],
+      "message": "Pop M. Visit M. M points to P, but P is already visited."
+    },
+
+    {
+      "step": 20,
+      "event": "visit",
+      "current": "C",
+      "visited": [
+        "root",
+        "A",
+        "D",
+        "I",
+        "N",
+        "J",
+        "E",
+        "K",
+        "F",
+        "L",
+        "O",
+        "P",
+        "B",
+        "G",
+        "M",
+        "C"
+      ],
+      "frontier": ["H", "Q"],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root",
+        "D": "A",
+        "E": "A",
+        "I": "D",
+        "J": "D",
+        "N": "I",
+        "K": "E",
+        "F": "K",
+        "L": "F",
+        "O": "L",
+        "P": "L",
+        "G": "B",
+        "M": "G",
+        "H": "C",
+        "Q": "C"
+      },
+      "current_edge": {
+        "source": "root",
+        "target": "C"
+      },
+      "selected_edges": [
+        ["root", "A"],
+        ["root", "B"],
+        ["root", "C"],
+        ["C", "G"],
+        ["C", "H"],
+        ["C", "Q"]
+      ],
+      "message": "Pop C. Visit C. G is already visited. Push Q, H."
+    },
+
+    {
+      "step": 21,
+      "event": "visit",
+      "current": "H",
+      "visited": [
+        "root",
+        "A",
+        "D",
+        "I",
+        "N",
+        "J",
+        "E",
+        "K",
+        "F",
+        "L",
+        "O",
+        "P",
+        "B",
+        "G",
+        "M",
+        "C",
+        "H"
+      ],
+      "frontier": ["Q", "R"],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root",
+        "D": "A",
+        "E": "A",
+        "I": "D",
+        "J": "D",
+        "N": "I",
+        "K": "E",
+        "F": "K",
+        "L": "F",
+        "O": "L",
+        "P": "L",
+        "G": "B",
+        "M": "G",
+        "H": "C",
+        "Q": "C",
+        "R": "H"
+      },
+      "current_edge": {
+        "source": "C",
+        "target": "H"
+      },
+      "selected_edges": [
+        ["root", "C"],
+        ["C", "H"],
+        ["H", "R"]
+      ],
+      "message": "Pop H. Visit H. Push R."
+    },
+
+    {
+      "step": 22,
+      "event": "visit",
+      "current": "R",
+      "visited": [
+        "root",
+        "A",
+        "D",
+        "I",
+        "N",
+        "J",
+        "E",
+        "K",
+        "F",
+        "L",
+        "O",
+        "P",
+        "B",
+        "G",
+        "M",
+        "C",
+        "H",
+        "R"
+      ],
+      "frontier": ["Q"],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root",
+        "D": "A",
+        "E": "A",
+        "I": "D",
+        "J": "D",
+        "N": "I",
+        "K": "E",
+        "F": "K",
+        "L": "F",
+        "O": "L",
+        "P": "L",
+        "G": "B",
+        "M": "G",
+        "H": "C",
+        "Q": "C",
+        "R": "H"
+      },
+      "current_edge": {
+        "source": "H",
+        "target": "R"
+      },
+      "selected_edges": [
+        ["root", "C"],
+        ["C", "H"],
+        ["H", "R"]
+      ],
+      "message": "Pop R. H is already visited, so the back edge is ignored."
+    },
+
+    {
+      "step": 23,
+      "event": "visit",
+      "current": "Q",
+      "visited": [
+        "root",
+        "A",
+        "D",
+        "I",
+        "N",
+        "J",
+        "E",
+        "K",
+        "F",
+        "L",
+        "O",
+        "P",
+        "B",
+        "G",
+        "M",
+        "C",
+        "H",
+        "R",
+        "Q"
+      ],
+      "frontier": [],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root",
+        "D": "A",
+        "E": "A",
+        "I": "D",
+        "J": "D",
+        "N": "I",
+        "K": "E",
+        "F": "K",
+        "L": "F",
+        "O": "L",
+        "P": "L",
+        "G": "B",
+        "M": "G",
+        "H": "C",
+        "Q": "C",
+        "R": "H"
+      },
+      "current_edge": {
+        "source": "C",
+        "target": "Q"
+      },
+      "selected_edges": [
+        ["root", "C"],
+        ["C", "Q"]
+      ],
+      "message": "Pop Q. Q points to R, but R is already visited."
+    },
+
+    {
+      "step": 24,
+      "event": "done",
+      "current": null,
+      "visited": [
+        "root",
+        "A",
+        "D",
+        "I",
+        "N",
+        "J",
+        "E",
+        "K",
+        "F",
+        "L",
+        "O",
+        "P",
+        "B",
+        "G",
+        "M",
+        "C",
+        "H",
+        "R",
+        "Q"
+      ],
+      "frontier": [],
+      "parent": {
+        "A": "root",
+        "B": "root",
+        "C": "root",
+        "D": "A",
+        "E": "A",
+        "I": "D",
+        "J": "D",
+        "N": "I",
+        "K": "E",
+        "F": "K",
+        "L": "F",
+        "O": "L",
+        "P": "L",
+        "G": "B",
+        "M": "G",
+        "H": "C",
+        "Q": "C",
+        "R": "H"
+      },
+      "selected_edges": [
+        ["root", "A"],
+        ["root", "B"],
+        ["root", "C"],
+        ["A", "D"],
+        ["D", "I"],
+        ["I", "N"],
+        ["D", "J"],
+        ["A", "E"],
+        ["E", "K"],
+        ["K", "F"],
+        ["F", "L"],
+        ["L", "O"],
+        ["L", "P"],
+        ["B", "G"],
+        ["G", "M"],
+        ["C", "H"],
+        ["H", "R"],
+        ["C", "Q"]
+      ],
+      "message": "DFS complete. Preorder: root, A, D, I, N, J, E, K, F, L, O, P, B, G, M, C, H, R, Q"
+    }
+  ]
+}

@@ -1,0 +1,1 @@
+"""Portable graph algorithm implementations (Role 2). No FastAPI dependencies."""

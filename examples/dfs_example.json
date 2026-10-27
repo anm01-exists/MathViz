@@ -1,0 +1,26 @@
+{
+  "algorithm": "dfs",
+  "start": "A",
+  "graph": {
+    "directed": false,
+    "weighted": false,
+    "nodes": [{ "id": "A" }, { "id": "B" }, { "id": "C" }, { "id": "D" }, { "id": "E" }],
+    "edges": [
+      { "source": "A", "target": "B" },
+      { "source": "A", "target": "C" },
+      { "source": "B", "target": "D" },
+      { "source": "C", "target": "D" },
+      { "source": "D", "target": "E" }
+    ]
+  },
+  "states": [
+    { "step": 0, "event": "init", "current": null, "visited": [], "frontier": ["A"], "parent": {}, "message": "Start DFS at A. Stack = [A]" },
+    { "step": 1, "event": "visit", "current": "A", "visited": ["A"], "frontier": ["C", "B"], "parent": { "B": "A", "C": "A" }, "selected_edges": [["A", "B"]], "message": "Visit A. Push neighbors C, B (B on top)" },
+    { "step": 2, "event": "visit", "current": "B", "visited": ["A", "B"], "frontier": ["C", "D"], "parent": { "B": "A", "C": "A", "D": "B" }, "current_edge": { "source": "A", "target": "B" }, "selected_edges": [["A", "B"], ["B", "D"]], "message": "Pop B. Visit B. Push D" },
+    { "step": 3, "event": "visit", "current": "D", "visited": ["A", "B", "D"], "frontier": ["C", "E", "C"], "parent": { "B": "A", "C": "A", "D": "B", "E": "D" }, "current_edge": { "source": "B", "target": "D" }, "selected_edges": [["A", "B"], ["B", "D"], ["D", "E"]], "message": "Pop D. Visit D. Push E, C" },
+    { "step": 4, "event": "visit", "current": "E", "visited": ["A", "B", "D", "E"], "frontier": ["C", "C"], "parent": { "B": "A", "C": "A", "D": "B", "E": "D" }, "current_edge": { "source": "D", "target": "E" }, "selected_edges": [["A", "B"], ["B", "D"], ["D", "E"]], "message": "Pop E. Visit E (dead end). Backtrack" },
+    { "step": 5, "event": "backtrack", "current": "D", "visited": ["A", "B", "D", "E"], "frontier": ["C", "C"], "parent": { "B": "A", "C": "A", "D": "B", "E": "D" }, "current_edge": { "source": "D", "target": "E" }, "selected_edges": [["A", "B"], ["B", "D"], ["D", "E"]], "message": "Backtrack to D. Pop C" },
+    { "step": 6, "event": "visit", "current": "C", "visited": ["A", "B", "D", "E", "C"], "frontier": ["C"], "parent": { "B": "A", "C": "A", "D": "B", "E": "D" }, "current_edge": { "source": "A", "target": "C" }, "selected_edges": [["A", "B"], ["B", "D"], ["D", "E"], ["A", "C"]], "message": "Pop C. Visit C. Neighbors already visited" },
+    { "step": 7, "event": "done", "current": null, "visited": ["A", "B", "D", "E", "C"], "frontier": [], "parent": { "B": "A", "C": "A", "D": "B", "E": "D" }, "selected_edges": [["A", "B"], ["B", "D"], ["D", "E"], ["A", "C"]], "message": "DFS complete. Order: A, B, D, E, C" }
+  ]
+}

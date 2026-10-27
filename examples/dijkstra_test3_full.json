@@ -1,0 +1,113 @@
+{
+  "algorithm": "dijkstra",
+  "start": "A",
+  "target": "C",
+  "graph": {
+    "directed": false,
+    "weighted": true,
+    "nodes": [
+      {
+        "id": "A"
+      },
+      {
+        "id": "B"
+      },
+      {
+        "id": "C"
+      }
+    ],
+    "edges": [
+      {
+        "source": "A",
+        "target": "B",
+        "weight": 5
+      },
+      {
+        "source": "B",
+        "target": "C",
+        "weight": 2
+      }
+    ]
+  },
+  "states": [
+    {
+      "step": 0,
+      "event": "init",
+      "current": null,
+      "visited": [],
+      "finalized": [],
+      "frontier": [
+        "A",
+        "B",
+        "C"
+      ],
+      "distances": {
+        "A": 0,
+        "B": null,
+        "C": null
+      },
+      "parent": {},
+      "selected_edges": [],
+      "final_path": [],
+      "message": "Init: dist(A)=0, rest=inf"
+    },
+    {
+      "step": 1,
+      "event": "finalize",
+      "current": "A",
+      "visited": [
+        "A"
+      ],
+      "finalized": [
+        "A"
+      ],
+      "frontier": [
+        "B",
+        "C"
+      ],
+      "distances": {
+        "A": 0,
+        "B": 5,
+        "C": null
+      },
+      "parent": {
+        "B": "A"
+      },
+      "current_edge": {
+        "source": "A",
+        "target": "B"
+      },
+      "selected_edges": [
+        [
+          "A",
+          "B"
+        ]
+      ],
+      "final_path": [],
+      "message": "Settle A (dist=0)"
+    },
+    {
+      "step": 2,
+      "event": "path_found",
+      "current": null,
+      "visited": [
+        "A"
+      ],
+      "finalized": [
+        "A"
+      ],
+      "frontier": [],
+      "distances": {
+        "A": 0,
+        "B": 5,
+        "C": null
+      },
+      "parent": {
+        "B": "A"
+      },
+      "selected_edges": [],
+      "final_path": [],
+      "message": "Shortest path , cost inf"
+    }
+  ]
+}

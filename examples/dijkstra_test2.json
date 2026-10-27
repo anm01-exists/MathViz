@@ -1,0 +1,15 @@
+{
+  "algorithm": "Dijkstra",
+  "start": "A",
+  "destination": "C",
+  "distances": {
+    "A": 0,
+    "B": 2,
+    "C": 5
+  },
+  "path": [
+    "A",
+    "B",
+    "C"
+  ]
+}

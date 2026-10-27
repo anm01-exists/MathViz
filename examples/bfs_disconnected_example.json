@@ -1,0 +1,29 @@
+{
+  "algorithm": "bfs",
+  "start": "A",
+  "graph": {
+    "directed": false,
+    "weighted": false,
+    "nodes": [
+      { "id": "A", "x": -3.0, "y": 0.5 },
+      { "id": "B", "x": -2.0, "y": 1.5 },
+      { "id": "C", "x": -1.0, "y": 0.5 },
+      { "id": "D", "x": 1.5, "y": 0.5 },
+      { "id": "E", "id": "E", "x": 2.5, "y": 1.5 },
+      { "id": "F", "x": 3.5, "y": 0.5 }
+    ],
+    "edges": [
+      { "source": "A", "target": "B" },
+      { "source": "B", "target": "C" },
+      { "source": "D", "target": "E" },
+      { "source": "E", "target": "F" }
+    ]
+  },
+  "states": [
+    { "step": 0, "event": "init", "current": null, "visited": [], "frontier": ["A"], "parent": {}, "message": "Start BFS at A. Queue = [A]" },
+    { "step": 1, "event": "visit", "current": "A", "visited": ["A"], "frontier": ["B"], "parent": { "B": "A" }, "current_edge": { "source": "A", "target": "B" }, "selected_edges": [["A", "B"]], "message": "Visit A. Enqueue B" },
+    { "step": 2, "event": "visit", "current": "B", "visited": ["A", "B"], "frontier": ["C"], "parent": { "B": "A", "C": "B" }, "current_edge": { "source": "B", "target": "C" }, "selected_edges": [["A", "B"], ["B", "C"]], "message": "Dequeue B. Visit B. Enqueue C" },
+    { "step": 3, "event": "visit", "current": "C", "visited": ["A", "B", "C"], "frontier": [], "parent": { "B": "A", "C": "B" }, "current_edge": { "source": "B", "target": "C" }, "selected_edges": [["A", "B"], ["B", "C"]], "message": "Dequeue C. Visit C. No more neighbors" },
+    { "step": 4, "event": "done", "current": null, "visited": ["A", "B", "C"], "frontier": [], "parent": { "B": "A", "C": "B" }, "selected_edges": [["A", "B"], ["B", "C"]], "final_path": [], "message": "BFS complete. Component {A,B,C} visited. D,E,F unreachable from A" }
+  ]
+}

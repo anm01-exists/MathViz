@@ -1,0 +1,1 @@
+"""MathViz application package (FastAPI backend + orchestration)."""

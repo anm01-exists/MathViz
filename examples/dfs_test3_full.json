@@ -1,0 +1,145 @@
+{
+  "algorithm": "dfs",
+  "start": "B",
+  "graph": {
+    "directed": false,
+    "weighted": false,
+    "nodes": [
+      {
+        "id": "A"
+      },
+      {
+        "id": "B"
+      },
+      {
+        "id": "C"
+      }
+    ],
+    "edges": [
+      {
+        "source": "A",
+        "target": "B"
+      },
+      {
+        "source": "B",
+        "target": "C"
+      }
+    ]
+  },
+  "states": [
+    {
+      "step": 0,
+      "event": "init",
+      "current": null,
+      "visited": [],
+      "frontier": [
+        "B"
+      ],
+      "parent": {},
+      "selected_edges": [],
+      "final_path": [],
+      "message": "Start DFS at B. Stack = [B]"
+    },
+    {
+      "step": 1,
+      "event": "visit",
+      "current": "B",
+      "visited": [
+        "B"
+      ],
+      "frontier": [
+        "C",
+        "A"
+      ],
+      "parent": {
+        "C": "B",
+        "A": "B"
+      },
+      "selected_edges": [],
+      "final_path": [],
+      "message": "Visit B. Stack = ['C', 'A']"
+    },
+    {
+      "step": 2,
+      "event": "visit",
+      "current": "A",
+      "visited": [
+        "B",
+        "A"
+      ],
+      "frontier": [
+        "C"
+      ],
+      "parent": {
+        "C": "B",
+        "A": "B"
+      },
+      "selected_edges": [
+        [
+          "B",
+          "A"
+        ]
+      ],
+      "final_path": [],
+      "message": "Visit A. Stack = ['C']"
+    },
+    {
+      "step": 3,
+      "event": "visit",
+      "current": "C",
+      "visited": [
+        "B",
+        "A",
+        "C"
+      ],
+      "frontier": [],
+      "parent": {
+        "C": "B",
+        "A": "B"
+      },
+      "selected_edges": [
+        [
+          "B",
+          "A"
+        ],
+        [
+          "B",
+          "C"
+        ]
+      ],
+      "final_path": [],
+      "message": "Visit C."
+    },
+    {
+      "step": 4,
+      "event": "done",
+      "current": null,
+      "visited": [
+        "B",
+        "A",
+        "C"
+      ],
+      "frontier": [],
+      "parent": {
+        "C": "B",
+        "A": "B"
+      },
+      "selected_edges": [
+        [
+          "B",
+          "A"
+        ],
+        [
+          "B",
+          "C"
+        ]
+      ],
+      "final_path": [
+        "B",
+        "A",
+        "C"
+      ],
+      "message": "DFS complete. Order: B -> A -> C"
+    }
+  ]
+}
