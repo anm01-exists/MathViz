@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>MathViz: Interactive Probability Studio</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#00288e",
+            "primary-container": "#1e40af",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#a8b8ff",
+            "secondary": "#0051d5",
+            "secondary-container": "#316bf3",
+            "on-secondary": "#ffffff",
+            "secondary-fixed": "#dbe1ff",
+            "on-secondary-fixed": "#00174b",
+            "tertiary": "#003a46",
+            "tertiary-fixed-dim": "#4cd7f6",
+            "background": "#f8f9ff",
+            "surface": "#f8f9ff",
+            "surface-dim": "#cbdbf5",
+            "surface-container-lowest": "#ffffff",
+            "surface-container-low": "#eff4ff",
+            "surface-container": "#e5eeff",
+            "surface-container-high": "#dce9ff",
+            "surface-container-highest": "#d3e4fe",
+            "on-surface": "#0b1c30",
+            "on-surface-variant": "#444653",
+            "outline": "#757684",
+            "outline-variant": "#c4c5d5",
+            "error": "#ba1a1a",
+            "error-container": "#ffdad6",
+            "on-error-container": "#93000a"
+          },
+          borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+          spacing: { "gutter-lg": "2rem", "gutter-sm": "1rem", "space-xs": "0.25rem", "space-sm": "0.5rem", "space-md": "1rem", "space-lg": "1.5rem", "space-xl": "2.5rem" },
+          fontFamily: {
+            "headline-lg": ["Plus Jakarta Sans", "sans-serif"],
+            "headline-md": ["Plus Jakarta Sans", "sans-serif"],
+            "display-lg": ["Plus Jakarta Sans", "sans-serif"],
+            "body-lg": ["Inter", "sans-serif"],
+            "body-md": ["Inter", "sans-serif"],
+            "body-sm": ["Inter", "sans-serif"],
+            "label-md": ["Inter", "sans-serif"],
+            "label-sm": ["Inter", "sans-serif"],
+            "code-math": ["Inter", "monospace"]
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body { overscroll-behavior: none; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      opacity: 1;
+    }
+  </style>
+</head>
+<body class="bg-background font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col">
+
+  <!-- Sleek Unified Top Header (Decluttered Single Bar) -->
+  <header class="fixed top-0 left-0 right-0 z-50 bg-surface/95 backdrop-blur-xl border-b border-surface-container shadow-[0_1px_6px_rgba(0,0,0,0.03)]">
+    <div class="h-16 w-full px-gutter-lg flex items-center justify-between gap-space-md">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-2.5 shrink-0 cursor-pointer" onclick="switchView('overview-and-guide')">
+        <div class="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-on-primary shadow-sm">
+          <span class="material-symbols-outlined text-[20px]">functions</span>
+        </div>
+        <div class="flex items-baseline gap-1.5">
+          <span class="font-headline-md text-lg tracking-tight text-primary font-bold">MathViz</span>
+          <span class="hidden sm:inline-block text-[11px] font-semibold text-secondary bg-surface-container px-2 py-0.5 rounded-full">Probability Studio</span>
+        </div>
+      </div>
+
+      <!-- Center Navigation Bar (Consolidated & Compact) -->
+      <nav class="hidden lg:flex items-center gap-1 bg-surface-container-low p-1 rounded-xl border border-surface-container overflow-x-auto">
+        <a class="px-3 py-1.5 rounded-lg text-xs font-bold bg-primary text-on-primary shadow-sm whitespace-nowrap transition-all" data-path="overview-and-guide" href="#" onclick="switchView('overview-and-guide'); return false;">Overview</a>
+        <a class="px-3 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container whitespace-nowrap transition-all" data-path="discrete-distributions" href="#" onclick="switchView('discrete-distributions'); return false;">Discrete Lab</a>
+        <a class="px-3 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container whitespace-nowrap transition-all" data-path="continuous-distributions" href="#" onclick="switchView('continuous-distributions'); return false;">Continuous Lab</a>
+        <a class="px-3 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container whitespace-nowrap transition-all" data-path="distribution-sandbox-and-compare" href="#" onclick="switchView('distribution-sandbox-and-compare'); return false;">Compare</a>
+        <a class="px-3 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container whitespace-nowrap transition-all" data-path="monte-carlo-simulator" href="#" onclick="switchView('monte-carlo-simulator'); return false;">Monte Carlo</a>
+        <a class="px-3 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container whitespace-nowrap transition-all" data-path="custom-data-lab" href="#" onclick="switchView('custom-data-lab'); return false;">Data Fitting</a>
+        <a class="px-3 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container whitespace-nowrap transition-all" data-path="cheatsheet-and-proofs" href="#" onclick="switchView('cheatsheet-and-proofs'); return false;">Proofs</a>
+      </nav>
+
+      <!-- Right Utility Actions -->
+      <div class="flex items-center gap-2 shrink-0">
+        <!-- Compact Search -->
+        <div class="relative hidden md:flex items-center">
+          <span class="material-symbols-outlined absolute left-2.5 text-outline text-[18px] pointer-events-none">search</span>
+          <input id="mainSearchInput" class="w-48 xl:w-60 pl-8 pr-3 py-1.5 bg-surface-container-low text-on-surface placeholder:text-outline text-xs rounded-lg border border-outline-variant/60 focus:outline-none focus:ring-1 focus:ring-primary" placeholder="Search (normal, poisson)..." type="search">
+        </div>
+
+        <!-- Compact Presets Selector -->
+        <div class="flex items-center gap-1 bg-surface-container-low px-2 py-1 rounded-lg border border-outline-variant/50 text-on-surface-variant">
+          <span class="material-symbols-outlined text-[16px] text-primary">tune</span>
+          <select id="presetDropdown" onchange="loadPreset(this.value)" class="bg-transparent text-xs font-semibold text-on-surface focus:outline-none cursor-pointer pr-1">
+            <option value="normal">Normal N(0, 1)</option>
+            <option value="coin">Coin Toss B(30, 0.5)</option>
+            <option value="rare">Poisson Pois(3.5)</option>
+            <option value="waiting">Exponential Exp(1.5)</option>
+          </select>
+        </div>
+
+        <!-- Live Server Status Indicator -->
+        <div class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-surface-container-lowest text-on-surface-variant border border-surface-container shadow-sm" title="FastAPI Kernel Connected">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-[11px] font-bold text-on-surface">Kernel v2.0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Subnav Strip for smaller screens (< 1024px) -->
+    <div class="lg:hidden h-10 w-full px-4 bg-surface-container-low flex items-center overflow-x-auto border-t border-surface-container">
+      <nav class="flex items-center gap-1 text-xs whitespace-nowrap">
+        <a class="px-2.5 py-1 rounded-md text-xs font-bold bg-primary text-on-primary" data-path="overview-and-guide" href="#" onclick="switchView('overview-and-guide'); return false;">Overview</a>
+        <a class="px-2.5 py-1 rounded-md text-xs font-semibold text-on-surface-variant" data-path="discrete-distributions" href="#" onclick="switchView('discrete-distributions'); return false;">Discrete</a>
+        <a class="px-2.5 py-1 rounded-md text-xs font-semibold text-on-surface-variant" data-path="continuous-distributions" href="#" onclick="switchView('continuous-distributions'); return false;">Continuous</a>
+        <a class="px-2.5 py-1 rounded-md text-xs font-semibold text-on-surface-variant" data-path="distribution-sandbox-and-compare" href="#" onclick="switchView('distribution-sandbox-and-compare'); return false;">Compare</a>
+        <a class="px-2.5 py-1 rounded-md text-xs font-semibold text-on-surface-variant" data-path="monte-carlo-simulator" href="#" onclick="switchView('monte-carlo-simulator'); return false;">Monte Carlo</a>
+        <a class="px-2.5 py-1 rounded-md text-xs font-semibold text-on-surface-variant" data-path="custom-data-lab" href="#" onclick="switchView('custom-data-lab'); return false;">Fitting</a>
+        <a class="px-2.5 py-1 rounded-md text-xs font-semibold text-on-surface-variant" data-path="cheatsheet-and-proofs" href="#" onclick="switchView('cheatsheet-and-proofs'); return false;">Proofs</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content View Container -->
+  <main class="w-full pt-20 lg:pt-20 bg-background flex-1">
+
+    <!-- ======================================================== -->
+    <!-- VIEW 1: OVERVIEW & INTERACTIVE WORKBENCH -->
+    <!-- ======================================================== -->
+    <div id="viewOverview" class="flex flex-col w-full">
+      
+      <!-- Sleek, Uncluttered Studio Header Strip -->
+      <div class="w-full px-gutter-lg pt-4 pb-3">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 p-3 bg-surface-container-lowest rounded-xl border border-surface-container shadow-sm">
+          <div>
+            <h1 class="text-lg md:text-xl font-bold text-primary tracking-tight flex items-center gap-2">
+              <span>Probability &amp; Distribution Studio</span>
+              <span class="text-[11px] font-semibold text-secondary-container bg-surface-container-high px-2 py-0.5 rounded-full">Interactive Workbench</span>
+            </h1>
+            <p class="text-xs text-on-surface-variant">Adjust parameters via sliders or exact values to explore real-time curves, intervals, and theoretical moments.</p>
+          </div>
+
+          <!-- Streamlined Distribution Selector Pills -->
+          <div class="flex items-center gap-1.5 p-1 bg-surface-container-low rounded-xl border border-surface-container overflow-x-auto" id="distroTabs">
+            <button class="tab-btn px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap bg-primary text-on-primary shadow-sm" data-tab="normal" onclick="switchTab('normal')">
+              <span class="material-symbols-outlined text-[16px]">show_chart</span>
+              Normal
+            </button>
+            <button class="tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 hover:bg-surface-container-high whitespace-nowrap bg-transparent text-on-surface" data-tab="binomial" onclick="switchTab('binomial')">
+              <span class="material-symbols-outlined text-[16px]">bar_chart</span>
+              Binomial
+            </button>
+            <button class="tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 hover:bg-surface-container-high whitespace-nowrap bg-transparent text-on-surface" data-tab="poisson" onclick="switchTab('poisson')">
+              <span class="material-symbols-outlined text-[16px]">grain</span>
+              Poisson
+            </button>
+            <button class="tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 hover:bg-surface-container-high whitespace-nowrap bg-transparent text-on-surface" data-tab="exponential" onclick="switchTab('exponential')">
+              <span class="material-symbols-outlined text-[16px]">timeline</span>
+              Exponential
+            </button>
+            <button class="tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 hover:bg-surface-container-high whitespace-nowrap bg-transparent text-on-surface" data-tab="uniform" onclick="switchTab('uniform')">
+              <span class="material-symbols-outlined text-[16px]">horizontal_rule</span>
+              Uniform
+            </button>
+            <button class="tab-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 hover:bg-surface-container-high whitespace-nowrap bg-transparent text-on-surface" data-tab="matrix" onclick="switchTab('matrix')">
+              <span class="material-symbols-outlined text-[16px]">grid_view</span>
+              Matrix
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Primary Interactive Studio Grid -->
+      <div class="w-full px-gutter-lg pb-space-xl">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg" id="interactiveWorkbench">
+          
+          <!-- Left Column: Parameter Inputs & Calculators (5 cols) -->
+          <div class="lg:col-span-5 flex flex-col gap-space-md">
+            
+            <!-- Parameter Tuning Card (Choice for user to enter exact values or slide) -->
+            <div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm border border-surface-container flex flex-col gap-space-md">
+              <div class="flex items-center justify-between border-b border-surface-container pb-2">
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary text-[22px]">tune</span>
+                  <h2 class="font-headline-md text-headline-md font-bold text-primary" id="panelDistroTitle">Normal Distribution N(μ, σ²)</h2>
+                </div>
+                <span class="text-xs px-2.5 py-0.5 rounded-full bg-surface-container-highest text-primary font-label-sm" id="distroClassBadge">Continuous PDF</span>
+              </div>
+
+              <div class="text-xs text-on-surface-variant flex items-center gap-1.5 bg-surface-container-low p-2 rounded-lg">
+                <span class="material-symbols-outlined text-[16px] text-primary">edit</span>
+                <span>Enter exact values in the number boxes or adjust the interactive sliders.</span>
+              </div>
+
+              <!-- Dynamic Parameter Sliders & Number Input Boxes -->
+              <div class="space-y-space-md pt-space-xs" id="dynamicSliders">
+                <!-- Dynamically rendered by app.js -->
+              </div>
+
+              <!-- Interval Query Calculator -->
+              <div class="bg-surface-container-low p-space-md rounded-lg space-y-space-sm border border-surface-container">
+                <div class="flex items-center justify-between">
+                  <label class="font-label-md text-xs font-bold text-on-surface flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-secondary text-[18px]">calculate</span>
+                    Area Under Curve / Probability Query
+                  </label>
+                  <div class="flex items-center gap-1 text-xs">
+                    <button class="px-2 py-1 rounded bg-primary text-on-primary font-label-sm text-xs transition-colors" id="modeIntervalBtn" onclick="setCalcMode('interval')">Interval [a, b]</button>
+                    <button class="px-2 py-1 rounded bg-surface-container text-on-surface font-label-sm text-xs transition-colors" id="modeLessBtn" onclick="setCalcMode('less')">P(X ≤ x)</button>
+                    <button class="px-2 py-1 rounded bg-surface-container text-on-surface font-label-sm text-xs transition-colors" id="modeGreaterBtn" onclick="setCalcMode('greater')">P(X ≥ x)</button>
+                  </div>
+                </div>
+
+                <!-- Inputs row -->
+                <div class="grid grid-cols-2 gap-space-sm" id="intervalInputs">
+                  <div>
+                    <span class="font-label-sm text-xs text-on-surface-variant block mb-1">Lower limit (a)</span>
+                    <input class="w-full bg-surface-container-lowest px-3 py-1.5 rounded-lg text-on-surface font-code-math text-sm border border-outline-variant focus:outline-none focus:ring-2 focus:ring-secondary/30 shadow-sm" id="inputA" oninput="updateWorkbenchCalculations()" step="0.1" type="number" value="-1.0">
+                  </div>
+                  <div>
+                    <span class="font-label-sm text-xs text-on-surface-variant block mb-1">Upper limit (b)</span>
+                    <input class="w-full bg-surface-container-lowest px-3 py-1.5 rounded-lg text-on-surface font-code-math text-sm border border-outline-variant focus:outline-none focus:ring-2 focus:ring-secondary/30 shadow-sm" id="inputB" oninput="updateWorkbenchCalculations()" step="0.1" type="number" value="1.0">
+                  </div>
+                </div>
+
+                <!-- Real-time Result Pill -->
+                <div class="pt-space-xs">
+                  <div class="bg-surface-container-highest p-3 rounded-lg flex items-center justify-between border border-surface-container-high">
+                    <span class="font-code-math text-sm font-bold text-primary" id="calcExpressionDisplay">P(-1.00 ≤ X ≤ 1.00)</span>
+                    <div class="flex items-center gap-2">
+                      <span class="font-headline-md text-xl font-bold text-secondary" id="calcResultDisplay">68.27%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Moments & Theoretical Statistics Card -->
+            <div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm border border-surface-container space-y-space-md">
+              <div class="flex items-center justify-between border-b border-surface-container pb-2">
+                <span class="font-headline-md text-base font-bold text-on-surface flex items-center gap-2">
+                  <span class="material-symbols-outlined text-secondary text-[20px]">analytics</span>
+                  Moments &amp; Closed-Form Statistics
+                </span>
+                <span class="font-label-sm text-xs text-on-surface-variant">Exact values</span>
+              </div>
+              <div class="grid grid-cols-2 gap-space-sm" id="momentsGrid">
+                <div class="bg-surface-container p-3 rounded-lg">
+                  <span class="font-label-sm text-xs text-on-surface-variant block">Expectation E[X]</span>
+                  <div class="flex items-baseline justify-between mt-1">
+                    <span class="font-headline-md text-lg font-bold text-primary" id="metricMean">0.00</span>
+                    <span class="font-code-math text-xs text-on-surface-variant">μ</span>
+                  </div>
+                </div>
+                <div class="bg-surface-container p-3 rounded-lg">
+                  <span class="font-label-sm text-xs text-on-surface-variant block">Variance Var(X)</span>
+                  <div class="flex items-baseline justify-between mt-1">
+                    <span class="font-headline-md text-lg font-bold text-primary" id="metricVariance">1.00</span>
+                    <span class="font-code-math text-xs text-on-surface-variant">σ²</span>
+                  </div>
+                </div>
+                <div class="bg-surface-container p-3 rounded-lg">
+                  <span class="font-label-sm text-xs text-on-surface-variant block">Standard Dev σ</span>
+                  <div class="flex items-baseline justify-between mt-1">
+                    <span class="font-headline-md text-lg font-bold text-secondary" id="metricStdDev">1.00</span>
+                    <span class="font-code-math text-xs text-on-surface-variant">√Var</span>
+                  </div>
+                </div>
+                <div class="bg-surface-container p-3 rounded-lg">
+                  <span class="font-label-sm text-xs text-on-surface-variant block">Skewness γ₁</span>
+                  <div class="flex items-baseline justify-between mt-1">
+                    <span class="font-headline-md text-lg font-bold text-secondary" id="metricSkewness">0.00</span>
+                    <span class="font-code-math text-[11px] text-on-surface-variant" id="metricSkewFormula">Symmetric (0.00)</span>
+                  </div>
+                </div>
+              </div>
+              <!-- Formula Banner -->
+              <div class="p-3 bg-surface-container-low rounded-lg flex items-start gap-3 border border-surface-container">
+                <span class="material-symbols-outlined text-primary text-[20px] mt-0.5">functions</span>
+                <div class="text-xs space-y-1">
+                  <span class="font-bold text-on-surface block" id="pdfFormulaTitle">Probability Density Function f(x):</span>
+                  <span class="font-code-math text-primary block break-all font-semibold" id="pdfFormulaCode">f(x) = (1 / (σ √(2π))) · exp(-0.5 · ((x - μ) / σ)²)</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right Column: Interactive Real-Time SVG Plot (7 cols) -->
+          <div class="lg:col-span-7 flex flex-col gap-space-md">
+            <div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm border border-surface-container flex flex-col justify-between h-full min-h-[500px]">
+              
+              <!-- Graph Toolbar -->
+              <div class="flex flex-wrap items-center justify-between gap-space-sm pb-space-sm border-b border-surface-container-high">
+                <div class="flex items-center gap-3">
+                  <span class="font-headline-md text-base font-bold text-primary" id="canvasPlotTitle">Real-Time Distribution Canvas</span>
+                  <div class="flex items-center gap-2">
+                    <span class="inline-flex items-center gap-1 font-label-sm text-xs text-on-surface-variant">
+                      <span class="w-3 h-1 bg-primary rounded"></span> PDF / PMF
+                    </span>
+                    <span class="inline-flex items-center gap-1 font-label-sm text-xs text-on-surface-variant">
+                      <span class="w-3 h-0.5 bg-secondary-container rounded border-b border-dashed border-secondary"></span> CDF F(x)
+                    </span>
+                  </div>
+                </div>
+                <!-- Toggles -->
+                <div class="flex items-center gap-2">
+                  <label class="flex items-center gap-1.5 cursor-pointer font-label-sm text-xs text-on-surface">
+                    <input class="accent-primary rounded cursor-pointer" id="toggleCDF" type="checkbox">
+                    <span>Show CDF F(x)</span>
+                  </label>
+                  <label class="flex items-center gap-1.5 cursor-pointer font-label-sm text-xs text-on-surface ml-2">
+                    <input checked="" class="accent-primary rounded cursor-pointer" id="toggleSigmaGrid" type="checkbox">
+                    <span>σ Markers</span>
+                  </label>
+                  <button class="p-1 rounded hover:bg-surface-container text-on-surface-variant" onclick="resetPlotView()" title="Reset to standard defaults">
+                    <span class="material-symbols-outlined text-[20px]">refresh</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Dynamic SVG Vector Area -->
+              <div class="relative w-full flex-1 py-4 flex items-center justify-center overflow-hidden">
+                <svg class="w-full h-80 overflow-visible select-none" id="distroSvg" viewBox="0 0 700 320"></svg>
+              </div>
+
+              <!-- Footnote Demarcation Indicators -->
+              <div class="pt-space-sm flex flex-wrap items-center justify-between gap-space-sm bg-surface-container-low p-3 rounded-lg text-xs font-label-sm text-on-surface-variant border border-surface-container">
+                <div class="flex items-center gap-4">
+                  <span class="flex items-center gap-1.5">
+                    <span class="w-3 h-3 rounded bg-primary-container/40 border border-primary"></span>
+                    Shaded Area = Probability P(a ≤ X ≤ b)
+                  </span>
+                  <span class="flex items-center gap-1.5">
+                    <span class="w-2.5 h-0.5 bg-error"></span>
+                    μ (Mean Center)
+                  </span>
+                </div>
+                <div class="flex items-center gap-2 text-primary font-bold">
+                  <span>Domain:</span>
+                  <span id="domainRangeLabel">(-∞, +∞)</span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Comparison Matrix Section (Toggled via tab) -->
+        <div class="hidden bg-surface-container-lowest p-space-lg rounded-xl shadow-sm border border-surface-container mt-space-lg" id="matrixSection">
+          <div class="flex items-center justify-between mb-space-md">
+            <div>
+              <h2 class="font-headline-lg text-xl font-bold text-primary">Distribution Comparison Matrix</h2>
+              <p class="font-body-md text-xs text-on-surface-variant">Side-by-side analytical cross-reference of parametric families</p>
+            </div>
+            <button class="px-3 py-1.5 bg-surface-container hover:bg-surface-container-high rounded-lg text-xs font-label-md" onclick="switchTab('normal')">Return to Workbench</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left font-body-sm text-xs">
+              <thead class="bg-surface-container text-on-surface font-label-md font-bold">
+                <tr>
+                  <th class="p-3">Family / Name</th>
+                  <th class="p-3">Type</th>
+                  <th class="p-3">Parameters</th>
+                  <th class="p-3">PMF / PDF f(x)</th>
+                  <th class="p-3">Mean E[X]</th>
+                  <th class="p-3">Variance Var(X)</th>
+                  <th class="p-3">Primary Application</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-surface-container-high">
+                <tr class="hover:bg-surface-container-low transition-colors">
+                  <td class="p-3 font-bold text-primary">Normal (Gaussian)</td>
+                  <td class="p-3"><span class="px-2 py-0.5 rounded bg-surface-container-highest text-primary text-xs">Continuous</span></td>
+                  <td class="p-3 font-code-math">μ ∈ ℝ, σ > 0</td>
+                  <td class="p-3 font-code-math">(1/(σ√(2π))) · e^(-(x-μ)²/2σ²)</td>
+                  <td class="p-3 font-code-math">μ</td>
+                  <td class="p-3 font-code-math">σ²</td>
+                  <td class="p-3 text-on-surface-variant">Central Limit Theorem, physical metrics, noise</td>
+                </tr>
+                <tr class="hover:bg-surface-container-low transition-colors">
+                  <td class="p-3 font-bold text-primary">Binomial</td>
+                  <td class="p-3"><span class="px-2 py-0.5 rounded bg-secondary-fixed text-on-secondary-fixed text-xs">Discrete</span></td>
+                  <td class="p-3 font-code-math">n ∈ ℕ, p ∈ [0, 1]</td>
+                  <td class="p-3 font-code-math">(n choose k) p^k (1-p)^(n-k)</td>
+                  <td class="p-3 font-code-math">n·p</td>
+                  <td class="p-3 font-code-math">n·p·(1-p)</td>
+                  <td class="p-3 text-on-surface-variant">Repeated independent Bernoulli trials, A/B testing</td>
+                </tr>
+                <tr class="hover:bg-surface-container-low transition-colors">
+                  <td class="p-3 font-bold text-primary">Poisson</td>
+                  <td class="p-3"><span class="px-2 py-0.5 rounded bg-secondary-fixed text-on-secondary-fixed text-xs">Discrete</span></td>
+                  <td class="p-3 font-code-math">λ > 0</td>
+                  <td class="p-3 font-code-math">(λ^k · e^(-λ)) / k!</td>
+                  <td class="p-3 font-code-math">λ</td>
+                  <td class="p-3 font-code-math">λ</td>
+                  <td class="p-3 text-on-surface-variant">Continuous time arrival counts, network packets, defect densities</td>
+                </tr>
+                <tr class="hover:bg-surface-container-low transition-colors">
+                  <td class="p-3 font-bold text-primary">Exponential</td>
+                  <td class="p-3"><span class="px-2 py-0.5 rounded bg-surface-container-highest text-primary text-xs">Continuous</span></td>
+                  <td class="p-3 font-code-math">λ > 0</td>
+                  <td class="p-3 font-code-math">λ · e^(-λ x) (x ≥ 0)</td>
+                  <td class="p-3 font-code-math">1/λ</td>
+                  <td class="p-3 font-code-math">1/λ²</td>
+                  <td class="p-3 text-on-surface-variant">Waiting times between Poisson arrivals, radioactive decay</td>
+                </tr>
+                <tr class="hover:bg-surface-container-low transition-colors">
+                  <td class="p-3 font-bold text-primary">Uniform</td>
+                  <td class="p-3"><span class="px-2 py-0.5 rounded bg-surface-container-highest text-primary text-xs">Continuous</span></td>
+                  <td class="p-3 font-code-math">a &lt; b</td>
+                  <td class="p-3 font-code-math">1 / (b - a)</td>
+                  <td class="p-3 font-code-math">(a + b) / 2</td>
+                  <td class="p-3 font-code-math">(b - a)² / 12</td>
+                  <td class="p-3 text-on-surface-variant">Random number generation, non-informative prior</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Real-World Interactive Scenario Solver (User enters values to recalculate real-world problems) -->
+      <div class="w-full px-gutter-lg pb-space-xl">
+        <div class="bg-surface-container-low rounded-xl p-space-lg shadow-sm border border-surface-container">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm mb-space-lg">
+            <div>
+              <span class="text-xs font-label-sm uppercase tracking-wider text-secondary font-bold">Practical Applications</span>
+              <h2 class="font-headline-lg text-2xl font-bold text-primary tracking-tight">Interactive Scenario Problem Solver</h2>
+              <p class="font-body-md text-xs md:text-sm text-on-surface-variant">Input custom values to dynamically resolve engineering and business probability scenarios.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary">psychology</span>
+              <span class="font-label-md text-xs font-bold text-on-surface">3 Dynamic Presets</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-space-md">
+            <!-- Scenario 1: Poisson Cloud Server Outage -->
+            <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm border border-surface-container flex flex-col justify-between">
+              <div class="space-y-space-sm">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs px-2 py-0.5 rounded bg-error-container text-on-error-container font-label-sm font-semibold">Reliability Engineering</span>
+                  <span class="material-symbols-outlined text-error text-[18px]">dns</span>
+                </div>
+                <h3 class="font-headline-md text-base font-bold text-primary">Cloud Server Outage Risk</h3>
+                <p class="text-xs text-on-surface-variant">
+                  Evaluate outage risk under Poisson arrival mechanics. Enter the monthly outage rate and failure threshold:
+                </p>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <label class="block text-on-surface-variant font-semibold mb-0.5">Rate λ (outages/mo):</label>
+                    <input type="number" step="0.1" value="3.2" id="scenLamInput" class="w-full p-1.5 bg-surface-container border border-outline-variant rounded font-code-math" />
+                  </div>
+                  <div>
+                    <label class="block text-on-surface-variant font-semibold mb-0.5">Threshold k (failures):</label>
+                    <input type="number" step="1" value="5" id="scenThreshInput" class="w-full p-1.5 bg-surface-container border border-outline-variant rounded font-code-math" />
+                  </div>
+                </div>
+                <button onclick="solveScenarioDynamic('server_outage')" class="w-full mt-2 py-1.5 rounded-lg bg-primary text-on-primary text-xs font-bold hover:bg-primary-container transition-colors">
+                  Recalculate Outage Risk
+                </button>
+                <div class="p-2.5 bg-surface-container rounded-lg space-y-1 mt-2" id="scenSteps_server_outage">
+                  <p class="text-xs text-on-surface-variant font-code-math">P(X ≥ 5) = 1 - ∑_{k=0}^4 (3.2^k e^-3.2)/k!</p>
+                </div>
+              </div>
+              <div class="mt-space-md pt-space-sm border-t border-surface-container flex items-center justify-between">
+                <span class="text-xs font-label-sm text-on-surface-variant font-semibold">Critical Outage Prob:</span>
+                <span class="font-headline-md text-xl font-bold text-error" id="scenResult_server_outage">21.94%</span>
+              </div>
+            </div>
+
+            <!-- Scenario 2: Binomial CRO Funnel -->
+            <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm border border-surface-container flex flex-col justify-between">
+              <div class="space-y-space-sm">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs px-2 py-0.5 rounded bg-surface-container-highest text-primary font-label-sm font-semibold">Growth Analytics</span>
+                  <span class="material-symbols-outlined text-secondary text-[18px]">shopping_cart</span>
+                </div>
+                <h3 class="font-headline-md text-base font-bold text-primary">E-Commerce Checkout Funnel</h3>
+                <p class="text-xs text-on-surface-variant">
+                  Binomial conversion cohort. Enter sample size (n), baseline rate (p), and target conversions:
+                </p>
+                <div class="grid grid-cols-3 gap-1.5 text-xs">
+                  <div>
+                    <label class="block text-on-surface-variant font-semibold mb-0.5">Sample n:</label>
+                    <input type="number" step="5" value="50" id="scenNInput" class="w-full p-1.5 bg-surface-container border border-outline-variant rounded font-code-math" />
+                  </div>
+                  <div>
+                    <label class="block text-on-surface-variant font-semibold mb-0.5">Rate p:</label>
+                    <input type="number" step="0.01" value="0.08" id="scenPInput" class="w-full p-1.5 bg-surface-container border border-outline-variant rounded font-code-math" />
+                  </div>
+                  <div>
+                    <label class="block text-on-surface-variant font-semibold mb-0.5">Target k:</label>
+                    <input type="number" step="1" value="6" id="scenKMinInput" class="w-full p-1.5 bg-surface-container border border-outline-variant rounded font-code-math" />
+                  </div>
+                </div>
+                <button onclick="solveScenarioDynamic('checkout_funnel')" class="w-full mt-2 py-1.5 rounded-lg bg-primary text-on-primary text-xs font-bold hover:bg-primary-container transition-colors">
+                  Recalculate Funnel Yield
+                </button>
+                <div class="p-2.5 bg-surface-container rounded-lg space-y-1 mt-2" id="scenSteps_checkout_funnel">
+                  <p class="text-xs text-on-surface-variant font-code-math">E[X] = 50 · 0.08 = 4.0 conversions</p>
+                </div>
+              </div>
+              <div class="mt-space-md pt-space-sm border-t border-surface-container flex items-center justify-between">
+                <span class="text-xs font-label-sm text-on-surface-variant font-semibold">Target Success Prob:</span>
+                <span class="font-headline-md text-xl font-bold text-secondary" id="scenResult_checkout_funnel">20.92%</span>
+              </div>
+            </div>
+
+            <!-- Scenario 3: Normal Manufacturing Tolerance -->
+            <div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm border border-surface-container flex flex-col justify-between">
+              <div class="space-y-space-sm">
+                <div class="flex items-center justify-between">
+                  <span class="text-xs px-2 py-0.5 rounded bg-secondary-fixed text-on-secondary-fixed font-label-sm font-semibold">CNC Machining</span>
+                  <span class="material-symbols-outlined text-tertiary-container text-[18px]">precision_manufacturing</span>
+                </div>
+                <h3 class="font-headline-md text-base font-bold text-primary">Shaft Tolerance Defect Rate</h3>
+                <p class="text-xs text-on-surface-variant">
+                  Industrial tolerance inspection. Enter mean (μ), process noise (σ), and specification boundaries:
+                </p>
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                  <div>
+                    <label class="block text-on-surface-variant font-semibold mb-0.5">Mean μ (mm):</label>
+                    <input type="number" step="0.1" value="50.0" id="scenMuInput" class="w-full p-1.5 bg-surface-container border border-outline-variant rounded font-code-math" />
+                  </div>
+                  <div>
+                    <label class="block text-on-surface-variant font-semibold mb-0.5">Noise σ (mm):</label>
+                    <input type="number" step="0.01" value="0.05" id="scenSigmaInput" class="w-full p-1.5 bg-surface-container border border-outline-variant rounded font-code-math" />
+                  </div>
+                  <div>
+                    <label class="block text-on-surface-variant font-semibold mb-0.5">Lower LSL (mm):</label>
+                    <input type="number" step="0.01" value="49.90" id="scenLslInput" class="w-full p-1.5 bg-surface-container border border-outline-variant rounded font-code-math" />
+                  </div>
+                  <div>
+                    <label class="block text-on-surface-variant font-semibold mb-0.5">Upper USL (mm):</label>
+                    <input type="number" step="0.01" value="50.10" id="scenUslInput" class="w-full p-1.5 bg-surface-container border border-outline-variant rounded font-code-math" />
+                  </div>
+                </div>
+                <button onclick="solveScenarioDynamic('shaft_tolerance')" class="w-full mt-2 py-1.5 rounded-lg bg-primary text-on-primary text-xs font-bold hover:bg-primary-container transition-colors">
+                  Recalculate Defect Rate
+                </button>
+                <div class="p-2.5 bg-surface-container rounded-lg space-y-1 mt-2" id="scenSteps_shaft_tolerance">
+                  <p class="text-xs text-on-surface-variant font-code-math">Z = ±2.0 | Out of Spec P(|Z| > 2)</p>
+                </div>
+              </div>
+              <div class="mt-space-md pt-space-sm border-t border-surface-container flex items-center justify-between">
+                <span class="text-xs font-label-sm text-on-surface-variant font-semibold">Defect Scrap Rate:</span>
+                <span class="font-headline-md text-xl font-bold text-primary" id="scenResult_shaft_tolerance">4.55%</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 2: DISCRETE DISTRIBUTIONS DEEP-DIVE -->
+    <!-- ======================================================== -->
+    <div id="viewDiscrete" class="hidden w-full px-gutter-lg pb-space-xl">
+      <div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm border border-surface-container space-y-space-md">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm border-b border-surface-container pb-4">
+          <div>
+            <h2 class="font-headline-lg text-2xl font-bold text-primary">Discrete Distributions Laboratory</h2>
+            <p class="text-xs md:text-sm text-on-surface-variant">Detailed study of countably discrete random variables with stem mass PMFs and cumulative step CDFs.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-on-surface">Select Model:</span>
+            <select id="discSelect" onchange="updateDiscreteView()" class="p-2 bg-surface-container-low border border-outline-variant rounded-lg text-xs font-bold text-primary">
+              <option value="binomial">Binomial Distribution B(n, p)</option>
+              <option value="poisson">Poisson Distribution Pois(λ)</option>
+              <option value="geometric">Geometric Distribution Geom(p)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Controls Row -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-space-sm p-3 bg-surface-container-low rounded-xl">
+          <div>
+            <label class="block text-xs font-semibold text-on-surface mb-1">Trials (n) / Rate (λ):</label>
+            <input type="number" id="discN" value="20" min="1" max="100" oninput="updateDiscreteView()" class="w-full p-2 bg-surface-container-lowest border border-outline-variant rounded-lg font-code-math text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-on-surface mb-1">Probability (p):</label>
+            <input type="number" id="discP" value="0.5" step="0.05" min="0.01" max="0.99" oninput="updateDiscreteView()" class="w-full p-2 bg-surface-container-lowest border border-outline-variant rounded-lg font-code-math text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-on-surface mb-1">Query Range Low (k₁):</label>
+            <input type="number" id="discKLow" value="8" step="1" oninput="updateDiscreteView()" class="w-full p-2 bg-surface-container-lowest border border-outline-variant rounded-lg font-code-math text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-on-surface mb-1">Query Range High (k₂):</label>
+            <input type="number" id="discKHigh" value="12" step="1" oninput="updateDiscreteView()" class="w-full p-2 bg-surface-container-lowest border border-outline-variant rounded-lg font-code-math text-sm" />
+          </div>
+        </div>
+
+        <!-- Metrics Strip -->
+        <div class="grid grid-cols-3 gap-space-sm text-center">
+          <div class="p-3 bg-surface-container rounded-lg">
+            <span class="text-xs text-on-surface-variant block">Cumulative P(k₁ ≤ X ≤ k₂)</span>
+            <span class="text-xl font-bold text-secondary" id="discProbDisplay">--</span>
+          </div>
+          <div class="p-3 bg-surface-container rounded-lg">
+            <span class="text-xs text-on-surface-variant block">Expectation E[X]</span>
+            <span class="text-xl font-bold text-primary" id="discMeanDisplay">--</span>
+          </div>
+          <div class="p-3 bg-surface-container rounded-lg">
+            <span class="text-xs text-on-surface-variant block">Variance Var(X)</span>
+            <span class="text-xl font-bold text-primary" id="discVarDisplay">--</span>
+          </div>
+        </div>
+
+        <!-- Discrete SVG Canvas -->
+        <div class="p-4 bg-surface-container-lowest rounded-xl border border-surface-container">
+          <svg class="w-full h-80 overflow-visible" id="discreteSvg" viewBox="0 0 700 320"></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 3: CONTINUOUS DISTRIBUTIONS DEEP-DIVE -->
+    <!-- ======================================================== -->
+    <div id="viewContinuous" class="hidden w-full px-gutter-lg pb-space-xl">
+      <div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm border border-surface-container space-y-space-md">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm border-b border-surface-container pb-4">
+          <div>
+            <h2 class="font-headline-lg text-2xl font-bold text-primary">Continuous Probability Densities</h2>
+            <p class="text-xs md:text-sm text-on-surface-variant">Smooth probability density functions, tail integration, and confidence bounds.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-on-surface">Select Family:</span>
+            <select id="contSelect" onchange="updateContinuousView()" class="p-2 bg-surface-container-low border border-outline-variant rounded-lg text-xs font-bold text-primary">
+              <option value="normal">Normal (Gaussian)</option>
+              <option value="exponential">Exponential Exp(λ)</option>
+              <option value="student_t">Student's t-Distribution</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Controls Row -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-space-sm p-3 bg-surface-container-low rounded-xl">
+          <div>
+            <label class="block text-xs font-semibold text-on-surface mb-1">Mean (μ) / Df (ν):</label>
+            <input type="number" id="contMu" value="0.0" step="0.1" oninput="updateContinuousView()" class="w-full p-2 bg-surface-container-lowest border border-outline-variant rounded-lg font-code-math text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-on-surface mb-1">Standard Dev (σ):</label>
+            <input type="number" id="contSigma" value="1.0" step="0.1" min="0.1" oninput="updateContinuousView()" class="w-full p-2 bg-surface-container-lowest border border-outline-variant rounded-lg font-code-math text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-on-surface mb-1">Integral Bound a:</label>
+            <input type="number" id="contXLow" value="-1.96" step="0.05" oninput="updateContinuousView()" class="w-full p-2 bg-surface-container-lowest border border-outline-variant rounded-lg font-code-math text-sm" />
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-on-surface mb-1">Integral Bound b:</label>
+            <input type="number" id="contXHigh" value="1.96" step="0.05" oninput="updateContinuousView()" class="w-full p-2 bg-surface-container-lowest border border-outline-variant rounded-lg font-code-math text-sm" />
+          </div>
+        </div>
+
+        <!-- Metrics Strip -->
+        <div class="grid grid-cols-3 gap-space-sm text-center">
+          <div class="p-3 bg-surface-container rounded-lg">
+            <span class="text-xs text-on-surface-variant block">Shaded Area P(a ≤ X ≤ b)</span>
+            <span class="text-xl font-bold text-secondary" id="contProbDisplay">--</span>
+          </div>
+          <div class="p-3 bg-surface-container rounded-lg">
+            <span class="text-xs text-on-surface-variant block">Expectation E[X]</span>
+            <span class="text-xl font-bold text-primary" id="contMeanDisplay">--</span>
+          </div>
+          <div class="p-3 bg-surface-container rounded-lg">
+            <span class="text-xs text-on-surface-variant block">Variance Var(X)</span>
+            <span class="text-xl font-bold text-primary" id="contVarDisplay">--</span>
+          </div>
+        </div>
+
+        <!-- Continuous SVG Canvas -->
+        <div class="p-4 bg-surface-container-lowest rounded-xl border border-surface-container">
+          <svg class="w-full h-80 overflow-visible" id="continuousSvg" viewBox="0 0 700 320"></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 4: DISTRIBUTION SANDBOX & MULTI-COMPARE -->
+    <!-- ======================================================== -->
+    <div id="viewCompare" class="hidden w-full px-gutter-lg pb-space-xl">
+      <div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm border border-surface-container space-y-space-md">
+        <div class="border-b border-surface-container pb-4">
+          <h2 class="font-headline-lg text-2xl font-bold text-primary">Distribution Sandbox &amp; Overlay Comparator</h2>
+          <p class="text-xs md:text-sm text-on-surface-variant">Superimpose two distinct distributions on the same coordinate domain to examine tail behavior and convergence.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md p-4 bg-surface-container-low rounded-xl">
+          <!-- Distro A Controls -->
+          <div class="p-3 bg-surface-container-lowest rounded-lg border border-primary/30">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="w-3 h-3 rounded-full bg-primary"></span>
+              <span class="font-bold text-primary text-sm">Distribution A (Navy Line)</span>
+            </div>
+            <select id="compDistroA" onchange="updateComparisonView()" class="w-full p-2 bg-surface-container border border-outline-variant rounded text-xs font-bold text-primary mb-2">
+              <option value="normal">Standard Normal N(0, 1)</option>
+              <option value="binomial">Binomial B(20, 0.5)</option>
+              <option value="uniform">Uniform U(-2, 2)</option>
+            </select>
+            <div class="flex justify-between text-xs text-on-surface-variant">
+              <span>Mean: <strong id="compMeanA">--</strong></span>
+              <span>Var: <strong id="compVarA">--</strong></span>
+            </div>
+          </div>
+
+          <!-- Distro B Controls -->
+          <div class="p-3 bg-surface-container-lowest rounded-lg border border-secondary-container/50">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="w-3 h-3 rounded-full bg-secondary-container"></span>
+              <span class="font-bold text-secondary text-sm">Distribution B (Cyan Dashed Line)</span>
+            </div>
+            <select id="compDistroB" onchange="updateComparisonView()" class="w-full p-2 bg-surface-container border border-outline-variant rounded text-xs font-bold text-secondary mb-2">
+              <option value="student_t">Student's t (Heavy Tails, df=3)</option>
+              <option value="poisson">Poisson Pois(λ=10)</option>
+              <option value="normal">Normal N(0, 2.25)</option>
+            </select>
+            <div class="flex justify-between text-xs text-on-surface-variant">
+              <span>Mean: <strong id="compMeanB">--</strong></span>
+              <span>Var: <strong id="compVarB">--</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comparison SVG Canvas -->
+        <div class="p-4 bg-surface-container-lowest rounded-xl border border-surface-container">
+          <svg class="w-full h-80 overflow-visible" id="compareSvg" viewBox="0 0 700 320"></svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 5: MONTE CARLO SIMULATOR -->
+    <!-- ======================================================== -->
+    <div id="viewMonteCarlo" class="hidden w-full px-gutter-lg pb-space-xl">
+      <div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm border border-surface-container space-y-space-md">
+        
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm border-b border-surface-container pb-4">
+          <div>
+            <h2 class="font-headline-lg text-2xl font-bold text-primary">Monte Carlo Empirical Simulator</h2>
+            <p class="text-xs md:text-sm text-on-surface-variant">Interactive Law of Large Numbers (LLN) and Central Limit Theorem (CLT) stochastic mechanics.</p>
+          </div>
+          <span id="mcStatusBadge" class="px-3 py-1 rounded-full bg-surface-container-highest text-primary text-xs font-bold">Ready</span>
+        </div>
+
+        <!-- Simulator Configuration Toolbar -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-space-md p-4 bg-surface-container-low rounded-xl">
+          <div>
+            <label class="block text-xs font-bold text-on-surface mb-1">Stochastic Experiment:</label>
+            <select id="mcExperimentSelect" class="w-full p-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-xs font-semibold">
+              <option value="dice_sum">Dice Sum Scores (Central Limit Theorem)</option>
+              <option value="coin_toss">Coin Tossing (Heads in 20 Tosses)</option>
+              <option value="normal">Normal Sampling N(0, 1)</option>
+              <option value="exponential">Exponential Waiting Times (λ=1.0)</option>
+              <option value="poisson">Poisson Counting Process (λ=4.0)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-on-surface mb-1">Number of Trials (N):</label>
+            <select id="mcSampleSizeSelect" class="w-full p-2 bg-surface-container-lowest border border-outline-variant rounded-lg text-xs font-semibold">
+              <option value="500">500 Trials (Fast)</option>
+              <option value="2000" selected>2,000 Trials (Standard)</option>
+              <option value="10000">10,000 Trials (High Accuracy)</option>
+              <option value="50000">50,000 Trials (Asymptotic Precision)</option>
+            </select>
+          </div>
+
+          <div class="flex items-end">
+            <button onclick="runMonteCarloSimulation()" class="w-full py-2 px-4 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-bold text-xs shadow-sm transition-colors flex items-center justify-center gap-1.5">
+              <span class="material-symbols-outlined text-[18px]">play_arrow</span>
+              Run Simulation
+            </button>
+          </div>
+        </div>
+
+        <!-- Empirical vs Theoretical Metrics Table -->
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-space-sm text-center">
+          <div class="p-3 bg-surface-container rounded-lg">
+            <span class="text-[11px] text-on-surface-variant block">Empirical Mean X̄</span>
+            <span class="text-lg font-bold text-primary" id="mcEmpMean">--</span>
+          </div>
+          <div class="p-3 bg-surface-container rounded-lg">
+            <span class="text-[11px] text-on-surface-variant block">Theoretical Mean μ</span>
+            <span class="text-lg font-bold text-primary" id="mcTheoMean">--</span>
+          </div>
+          <div class="p-3 bg-surface-container rounded-lg">
+            <span class="text-[11px] text-on-surface-variant block">Empirical Var S²</span>
+            <span class="text-lg font-bold text-secondary" id="mcEmpVar">--</span>
+          </div>
+          <div class="p-3 bg-surface-container rounded-lg">
+            <span class="text-[11px] text-on-surface-variant block">Theoretical Var σ²</span>
+            <span class="text-lg font-bold text-secondary" id="mcTheoVar">--</span>
+          </div>
+          <div class="p-3 bg-surface-container rounded-lg col-span-2 md:col-span-1">
+            <span class="text-[11px] text-on-surface-variant block">Mean Error %</span>
+            <span class="text-lg font-bold text-emerald-600" id="mcErrorPct">--</span>
+          </div>
+        </div>
+
+        <!-- Monte Carlo Visualizations -->
+        <div class="space-y-space-md">
+          <div class="p-4 bg-surface-container-lowest rounded-xl border border-surface-container">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-bold text-xs text-primary" id="mcTitle">Empirical Frequency Histogram vs Theoretical Distribution</span>
+              <div class="flex items-center gap-3 text-[11px] text-on-surface-variant">
+                <span class="flex items-center gap-1"><span class="w-3 h-2 bg-primary-container opacity-60 rounded"></span> Empirical Bins</span>
+                <span class="flex items-center gap-1"><span class="w-3 h-0.5 bg-error"></span> Theoretical Density</span>
+              </div>
+            </div>
+            <svg class="w-full h-72 overflow-visible" id="mcHistogramSvg" viewBox="0 0 700 300"></svg>
+          </div>
+
+          <div class="p-4 bg-surface-container-lowest rounded-xl border border-surface-container">
+            <div class="flex items-center justify-between mb-2">
+              <span class="font-bold text-xs text-primary">Law of Large Numbers: Running Sample Mean Convergence X̄ₙ → μ</span>
+              <span class="text-[11px] text-on-surface-variant">Trial n (1 to N)</span>
+            </div>
+            <svg class="w-full h-44 overflow-visible" id="mcConvergenceSvg" viewBox="0 0 700 180"></svg>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 6: CUSTOM DATA LAB & EMPIRICAL FITTING -->
+    <!-- ======================================================== -->
+    <div id="viewCustomData" class="hidden w-full px-gutter-lg pb-space-xl">
+      <div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm border border-surface-container space-y-space-md">
+        
+        <div class="border-b border-surface-container pb-4">
+          <h2 class="font-headline-lg text-2xl font-bold text-primary">Custom Data Lab &amp; Distribution Fitting</h2>
+          <p class="text-xs md:text-sm text-on-surface-variant">Paste or enter your own custom raw dataset to calculate sample moments and estimate best-fit theoretical distributions via Maximum Likelihood Estimation.</p>
+        </div>
+
+        <!-- Input Area & Presets -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-space-md">
+          <div class="lg:col-span-8 space-y-2">
+            <label class="block text-xs font-bold text-on-surface">Enter Raw Numbers (Comma, space, or newline separated):</label>
+            <textarea id="customDataInput" rows="4" class="w-full p-3 font-code-math text-xs bg-surface-container-low border border-outline-variant rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20" placeholder="e.g. 112.5, 120.4, 98.2, 135.0, 119.8, 122.1, 105.4, 128.7..."></textarea>
+            
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-1.5">
+                <span class="text-xs text-on-surface-variant font-semibold">Generate sample:</span>
+                <button onclick="generateSampleData('normal')" class="px-2 py-1 bg-surface-container hover:bg-surface-container-high rounded text-xs font-semibold text-primary">Latency ~ N(120, 15)</button>
+                <button onclick="generateSampleData('exponential')" class="px-2 py-1 bg-surface-container hover:bg-surface-container-high rounded text-xs font-semibold text-primary">Service ~ Exp(0.05)</button>
+                <button onclick="generateSampleData('uniform')" class="px-2 py-1 bg-surface-container hover:bg-surface-container-high rounded text-xs font-semibold text-primary">Sensor ~ U(10, 50)</button>
+              </div>
+              <button onclick="analyzeCustomData()" class="px-4 py-2 bg-primary hover:bg-primary-container text-on-primary rounded-lg text-xs font-bold shadow-sm flex items-center gap-1.5 transition-colors">
+                <span class="material-symbols-outlined text-[16px]">analytics</span>
+                Fit Distributions
+              </button>
+            </div>
+          </div>
+
+          <!-- Dataset Moments Summary -->
+          <div class="lg:col-span-4 bg-surface-container-low p-3 rounded-xl border border-surface-container space-y-1.5 text-xs">
+            <span class="font-bold text-primary block border-b border-surface-container pb-1">Descriptive Statistics</span>
+            <div class="flex justify-between"><span>Sample Size (n):</span><strong id="customSampleSize">--</strong></div>
+            <div class="flex justify-between"><span>Mean (X̄):</span><strong id="customMean">--</strong></div>
+            <div class="flex justify-between"><span>Median:</span><strong id="customMedian">--</strong></div>
+            <div class="flex justify-between"><span>Std Dev (s):</span><strong id="customStdDev">--</strong></div>
+            <div class="flex justify-between"><span>Variance (s²):</span><strong id="customVariance">--</strong></div>
+            <div class="flex justify-between"><span>Skewness:</span><strong id="customSkewness">--</strong></div>
+            <div class="flex justify-between"><span>Kurtosis:</span><strong id="customKurtosis">--</strong></div>
+          </div>
+        </div>
+
+        <!-- Fitted Models Goodness-of-Fit Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs font-body-sm">
+            <thead class="bg-surface-container text-on-surface font-bold">
+              <tr>
+                <th class="p-2.5">Fitted Distribution</th>
+                <th class="p-2.5">Estimated Parameters (MLE)</th>
+                <th class="p-2.5">KS Statistic (D)</th>
+                <th class="p-2.5">Kolmogorov p-value</th>
+                <th class="p-2.5">Log-Likelihood</th>
+              </tr>
+            </thead>
+            <tbody id="fittedModelsTbody" class="divide-y divide-surface-container-high">
+              <!-- Dynamically populated by app.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empirical Histogram & Fitted Curves SVG -->
+        <div class="p-4 bg-surface-container-lowest rounded-xl border border-surface-container">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-bold text-xs text-primary">Empirical Density Histogram with Overlaid MLE Curves</span>
+            <div class="flex items-center gap-3 text-[11px]">
+              <span class="flex items-center gap-1"><span class="w-3 h-2 bg-secondary opacity-50 rounded"></span> Data Bins</span>
+              <span class="flex items-center gap-1"><span class="w-3 h-0.5 bg-primary"></span> Normal Fit</span>
+              <span class="flex items-center gap-1"><span class="w-3 h-0.5 bg-error"></span> Exponential Fit</span>
+              <span class="flex items-center gap-1"><span class="w-3 h-0.5 bg-emerald-600"></span> Uniform Fit</span>
+            </div>
+          </div>
+          <svg class="w-full h-72 overflow-visible" id="customDataSvg" viewBox="0 0 700 300"></svg>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- VIEW 7: CHEATSHEET & PROOFS -->
+    <!-- ======================================================== -->
+    <div id="viewCheatsheet" class="hidden w-full px-gutter-lg pb-space-xl">
+      <div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm border border-surface-container space-y-space-lg">
+        <div class="border-b border-surface-container pb-4">
+          <h2 class="font-headline-lg text-2xl font-bold text-primary">Probability Axioms, Formulas &amp; Proofs</h2>
+          <p class="text-xs md:text-sm text-on-surface-variant">Formal analytical derivations, moment generating functions, and operational identities.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+          <div class="p-4 bg-surface-container-low rounded-xl border border-surface-container space-y-2">
+            <h3 class="font-bold text-primary text-base">Kolmogorov Probability Axioms</h3>
+            <ul class="text-xs space-y-2 text-on-surface-variant font-code-math">
+              <li class="p-2 bg-surface-container-lowest rounded">1. Non-negativity: P(E) ≥ 0 for any event E ⊆ Ω</li>
+              <li class="p-2 bg-surface-container-lowest rounded">2. Unitarity: P(Ω) = 1.0 (certainty of sample space)</li>
+              <li class="p-2 bg-surface-container-lowest rounded">3. Countable Additivity: If E₁, E₂, ... are mutually disjoint, then P(∪ Eᵢ) = ∑ P(Eᵢ)</li>
+            </ul>
+          </div>
+
+          <div class="p-4 bg-surface-container-low rounded-xl border border-surface-container space-y-2">
+            <h3 class="font-bold text-primary text-base">Central Limit Theorem (CLT)</h3>
+            <p class="text-xs text-on-surface-variant">
+              Let X₁, X₂, ..., Xₙ be independent identically distributed (i.i.d.) random variables with finite expectation μ and variance σ². Then the normalized sample mean converges in distribution to standard normal:
+            </p>
+            <div class="p-3 bg-surface-container-lowest rounded font-code-math text-xs font-bold text-primary text-center">
+              Zₙ = (X̄ₙ - μ) / (σ / √n) ⎯⎯⎯→ N(0, 1)   as n → ∞
+            </div>
+          </div>
+
+          <div class="p-4 bg-surface-container-low rounded-xl border border-surface-container space-y-2">
+            <h3 class="font-bold text-primary text-base">Exponential Memoryless Property Proof</h3>
+            <p class="text-xs text-on-surface-variant">
+              Theorem: For X ~ Exp(λ), P(X > s + t | X > s) = P(X > t).
+            </p>
+            <div class="p-2.5 bg-surface-container-lowest rounded font-code-math text-xs text-on-surface-variant space-y-1">
+              <p>P(X > s + t | X > s) = P(X > s + t ∩ X > s) / P(X > s)</p>
+              <p>= P(X > s + t) / P(X > s) = e^(-λ(s+t)) / e^(-λs) = e^(-λt) = P(X > t) ∎</p>
+            </div>
+          </div>
+
+          <div class="p-4 bg-surface-container-low rounded-xl border border-surface-container space-y-2">
+            <h3 class="font-bold text-primary text-base">Poisson Limit of Binomial</h3>
+            <p class="text-xs text-on-surface-variant">
+              When n → ∞ and p → 0 such that λ = np remains constant:
+            </p>
+            <div class="p-2.5 bg-surface-container-lowest rounded font-code-math text-xs text-on-surface-variant space-y-1">
+              <p>lim (n choose k) p^k (1 - p)^(n - k)</p>
+              <p>= lim (n(n-1)...(n-k+1)/k!) · (λ/n)^k · (1 - λ/n)^(n - k)</p>
+              <p>= (λ^k / k!) · lim (1 - λ/n)^n · 1 = (λ^k · e^(-λ)) / k! ∎</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full bg-surface-container-low py-space-md mt-auto border-t border-surface-container">
+    <div class="w-full px-gutter-lg flex flex-col md:flex-row items-center justify-between gap-space-sm font-body-sm text-xs text-on-surface-variant">
+      <div class="flex items-center gap-space-sm">
+        <span class="font-bold text-primary">MathViz</span>
+        <span>— Interactive Academic Computing Laboratory for Probability &amp; Statistics</span>
+      </div>
+      <div class="flex items-center gap-space-md">
+        <span>FastAPI + NumPy Kernel v2.0</span>
+        <span>Dual Slider &amp; Numeric Field Inputs</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Application Scripts -->
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/charts.js"></script>
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

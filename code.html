@@ -1,0 +1,1137 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_standard" name="shell-type"><title>MathViz: Interactive Probability Studio</title><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "outline-variant": "#c4c5d5", "on-secondary-fixed-variant": "#003ea8", "surface-container-low": "#eff4ff", "error": "#ba1a1a", "surface-container-highest": "#d3e4fe", "on-primary": "#ffffff", "tertiary-fixed-dim": "#4cd7f6", "surface-bright": "#f8f9ff", "on-surface-variant": "#444653", "secondary-fixed-dim": "#b4c5ff", "surface-variant": "#d3e4fe", "on-secondary": "#ffffff", "on-primary-fixed-variant": "#173bab", "on-primary-fixed": "#001453", "on-surface": "#0b1c30", "on-tertiary-fixed": "#001f26", "inverse-primary": "#b8c4ff", "on-background": "#0b1c30", "surface-dim": "#cbdbf5", "primary-container": "#1e40af", "secondary-fixed": "#dbe1ff", "background": "#f8f9ff", "primary": "#00288e", "on-tertiary": "#ffffff", "inverse-surface": "#213145", "surface-tint": "#3755c3", "tertiary-container": "#005362", "on-error": "#ffffff", "on-primary-container": "#a8b8ff", "on-error-container": "#93000a", "primary-fixed": "#dde1ff", "primary-fixed-dim": "#b8c4ff", "on-tertiary-container": "#3cccea", "tertiary-fixed": "#acedff", "surface-container": "#e5eeff", "secondary": "#0051d5", "outline": "#757684", "on-secondary-container": "#fefcff", "surface-container-high": "#dce9ff", "surface-container-lowest": "#ffffff", "inverse-on-surface": "#eaf1ff", "secondary-container": "#316bf3", "tertiary": "#003a46", "on-tertiary-fixed-variant": "#004e5c", "on-secondary-fixed": "#00174b", "error-container": "#ffdad6", "surface": "#f8f9ff" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-xl": "2.5rem", "space-xs": "0.25rem", "gutter-lg": "2rem", "gutter-sm": "1rem", "space-sm": "0.5rem", "margin": "1rem", "margin-lg": "3rem", "space-md": "1rem", "margin-md": "2rem", "gutter": "1.5rem", "space-lg": "1.5rem" }, "fontFamily": { "label-md": [ "Inter" ], "code-math": [ "Inter" ], "headline-lg": [ "Plus Jakarta Sans" ], "body-md": [ "Inter" ], "display-lg": [ "Plus Jakarta Sans" ], "headline-lg-mobile": [ "Plus Jakarta Sans" ], "display-lg-mobile": [ "Plus Jakarta Sans" ], "headline-md": [ "Plus Jakarta Sans" ], "label-sm": [ "Inter" ], "body-sm": [ "Inter" ], "body-lg": [ "Inter" ] }, "fontSize": { "label-md": [ "0.875rem", { "lineHeight": "1.25rem", "letterSpacing": "0.01em", "fontWeight": "600" } ], "code-math": [ "0.9375rem", { "lineHeight": "1.5rem", "fontWeight": "400" } ], "headline-lg": [ "2rem", { "lineHeight": "2.5rem", "letterSpacing": "-0.02em", "fontWeight": "600" } ], "body-md": [ "1rem", { "lineHeight": "1.5rem", "fontWeight": "400" } ], "display-lg": [ "3rem", { "lineHeight": "3.5rem", "letterSpacing": "-0.03em", "fontWeight": "700" } ], "headline-lg-mobile": [ "1.5rem", { "lineHeight": "2rem", "letterSpacing": "-0.01em", "fontWeight": "600" } ], "display-lg-mobile": [ "2.25rem", { "lineHeight": "2.75rem", "letterSpacing": "-0.02em", "fontWeight": "700" } ], "headline-md": [ "1.25rem", { "lineHeight": "1.75rem", "letterSpacing": "-0.01em", "fontWeight": "600" } ], "label-sm": [ "0.75rem", { "lineHeight": "1rem", "letterSpacing": "0.02em", "fontWeight": "500" } ], "body-sm": [ "0.875rem", { "lineHeight": "1.25rem", "fontWeight": "400" } ], "body-lg": [ "1.125rem", { "lineHeight": "1.75rem", "fontWeight": "400" } ] } } } };</script></head><body class="bg-background font-body-md text-body-md text-on-surface antialiased min-h-screen flex flex-col"><header class="fixed top-0 left-0 right-0 z-50 bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 w-full px-gutter-lg flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md shrink-0"><img alt="MathViz Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VZ3DEawnjKba1uZVmQO5xcG1l_UjB6p96SAsrQKeP46XZNEiOHw8Lj3w1vCSOpl8JbSKS2YI9lmnH_ZQiqzdL2qN0Nj3youSIytSZnndx8u6kZTmKD2rJFxCzroc6txe4spFMC04XtSavaLQoLCPb0Veglz_FqmMwSCg2-SDT7z6RrGJ3XtEWBzP3fsppW0rUYwvwDreFXO7IwN1a7-HUn5odWf6_vzCdkv5HtHkZp7vr5GvgA-_kg2g"><div class="flex flex-col"><span class="font-headline-md text-headline-md tracking-tight text-primary leading-tight">MathViz</span><span class="font-label-sm text-label-sm text-on-surface-variant">Interactive Probability Studio</span></div></div><div class="flex-1 max-w-xl mx-space-md hidden md:block"><div class="relative flex items-center"><span class="material-symbols-outlined absolute left-3 text-outline text-[20px] pointer-events-none">search</span><input class="w-full pl-10 pr-4 py-2 bg-surface-container-lowest text-on-surface placeholder:text-outline font-body-sm text-body-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-secondary/20 shadow-[0_1px_3px_rgba(15,23,42,0.04)]" placeholder="Search distributions, formulas like normal, poisson..." type="search"></div></div><div class="flex items-center gap-space-sm shrink-0"><div class="hidden lg:flex items-center gap-space-xs bg-surface-container-low px-2 py-1 rounded-lg text-on-surface-variant"><span class="material-symbols-outlined text-[18px]">tune</span><select class="bg-transparent font-label-sm text-label-sm text-on-surface focus:outline-none cursor-pointer pr-1"><option>Preset: Standard Normal</option><option>Preset: Coin Tossing (Binomial)</option><option>Preset: Rare Events (Poisson)</option><option>Preset: Waiting Time (Exponential)</option></select></div><a class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md transition-colors" data-path="cheatsheet-and-proofs" href="#"><span class="material-symbols-outlined text-[18px]">menu_book</span>Cheatsheet</a><div class="flex items-center gap-1 px-2 py-1 rounded-lg bg-surface-container-lowest text-on-surface-variant shadow-[0_1px_2px_rgba(0,0,0,0.04)]"><span class="material-symbols-outlined text-[18px] text-primary">light_mode</span><span class="font-label-sm text-label-sm hidden xl:inline">Light</span></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div><div class="h-12 w-full px-gutter-lg bg-surface-container-low flex items-center overflow-x-auto"><nav class="flex items-center gap-space-sm py-1" data-active-classes="bg-primary-container text-on-primary font-bold rounded-lg shadow-[0_1px_3px_rgba(15,23,42,0.04)]"><a class="px-3 py-1.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container whitespace-nowrap transition-colors" data-path="overview-and-guide" href="#">Overview &amp; Guide</a><a class="px-3 py-1.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container whitespace-nowrap transition-colors" data-path="discrete-distributions" href="#">Discrete Distributions</a><a class="px-3 py-1.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container whitespace-nowrap transition-colors" data-path="continuous-distributions" href="#">Continuous Distributions</a><a class="px-3 py-1.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container whitespace-nowrap transition-colors" data-path="distribution-sandbox-and-compare" href="#">Distribution Sandbox / Compare</a><a class="px-3 py-1.5 rounded-lg font-label-md text-label-md text-on-surface-variant hover:text-on-surface hover:bg-surface-container whitespace-nowrap transition-colors" data-path="monte-carlo-simulator" href="#">Monte Carlo Simulator</a></nav></div></header><main class="w-full pt-28 bg-background flex-1"><div class="flex flex-col w-full">
+<!-- Top Academic Context Ribbon -->
+<div class="w-full px-gutter-lg pt-space-md pb-space-lg">
+<div class="relative overflow-hidden rounded-xl bg-gradient-to-r from-primary-fixed via-surface-container to-surface-container-high p-space-lg shadow-sm">
+<div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-lg">
+<div class="max-w-3xl space-y-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1 font-label-sm text-label-sm text-on-primary">
+<span class="material-symbols-outlined text-[14px]">auto_graph</span>
+              Interactive Math Workbench
+            </span>
+<span class="inline-flex items-center gap-1 rounded-full bg-surface-container-lowest px-3 py-1 font-label-sm text-label-sm text-primary shadow-sm">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+              Closed-Form Analytics
+            </span>
+</div>
+<h1 class="font-display-lg text-display-lg text-primary tracking-tight">
+            Probability &amp; Distribution Explorer
+          </h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">
+            Bridging theoretical statistics with dynamic computational mechanics. Explore the dichotomy between countably isolated discrete variables and smooth continuous probability densities.
+          </p>
+</div>
+<!-- Quick Metatags / Fast Indicators -->
+<div class="flex flex-wrap lg:flex-col gap-space-xs shrink-0 font-label-sm text-label-sm">
+<div class="flex items-center gap-2 bg-surface-container-lowest/90 backdrop-blur px-3 py-2 rounded-lg text-on-surface shadow-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-secondary"></span>
+<span class="font-bold">Discrete:</span>
+<span class="text-on-surface-variant">Binomial, Poisson, Geometric</span>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-lowest/90 backdrop-blur px-3 py-2 rounded-lg text-on-surface shadow-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-tertiary-fixed-dim"></span>
+<span class="font-bold">Continuous:</span>
+<span class="text-on-surface-variant">Normal ($\mu, \sigma$), Exponential ($\lambda$), Uniform</span>
+</div>
+<div class="flex items-center gap-2 bg-surface-container-lowest/90 backdrop-blur px-3 py-2 rounded-lg text-on-surface shadow-sm">
+<span class="w-2.5 h-2.5 rounded-full bg-primary-container"></span>
+<span class="font-bold">Operators:</span>
+<span class="text-on-surface-variant">$\mathbb{E}[X], \mathrm{Var}(X), f(x), F(x)$</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Tabs Switcher -->
+<div class="w-full px-gutter-lg pb-space-md">
+<div class="flex items-center gap-2 p-1.5 bg-surface-container rounded-xl overflow-x-auto shadow-sm" id="distroTabs">
+<button class="tab-btn px-4 py-2.5 rounded-lg font-label-md text-label-md transition-all flex items-center gap-2 whitespace-nowrap bg-transparent text-on-surface" data-tab="normal" onclick="switchTab('normal')">
+<span class="material-symbols-outlined text-[18px]">show_chart</span>
+        Normal / Gaussian (Continuous)
+      </button>
+<button class="tab-btn px-4 py-2.5 rounded-lg font-label-md text-label-md transition-all flex items-center gap-2 hover:bg-surface-container-high whitespace-nowrap bg-transparent text-on-surface" data-tab="binomial" onclick="switchTab('binomial')">
+<span class="material-symbols-outlined text-[18px]">bar_chart</span>
+        Binomial Distribution (Discrete)
+      </button>
+<button class="tab-btn px-4 py-2.5 rounded-lg font-label-md text-label-md transition-all flex items-center gap-2 hover:bg-surface-container-high whitespace-nowrap bg-transparent text-on-surface" data-tab="poisson" onclick="switchTab('poisson')">
+<span class="material-symbols-outlined text-[18px]">grain</span>
+        Poisson Distribution (Discrete)
+      </button>
+<button class="tab-btn px-4 py-2.5 rounded-lg font-label-md text-label-md transition-all flex items-center gap-2 hover:bg-surface-container-high whitespace-nowrap bg-primary text-on-primary shadow-sm" data-tab="exponential" onclick="switchTab('exponential')">
+<span class="material-symbols-outlined text-[18px]">timeline</span>
+        Exponential Distribution (Continuous)
+      </button>
+<button class="tab-btn px-4 py-2.5 rounded-lg font-label-md text-label-md transition-all flex items-center gap-2 bg-transparent text-on-surface hover:bg-surface-container-high whitespace-nowrap" data-tab="matrix" onclick="switchTab('matrix')">
+<span class="material-symbols-outlined text-[18px]">grid_view</span>
+        Comparison Matrix
+      </button>
+</div>
+</div>
+<!-- Primary Interactive Studio Grid -->
+<div class="w-full px-gutter-lg pb-space-xl">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-space-lg" id="interactiveWorkbench">
+<!-- Left Column: Controls & Calculators (4 cols) -->
+<div class="lg:col-span-5 flex flex-col gap-space-md">
+<!-- Parameter Tuning Card -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[22px]">tune</span>
+<h2 class="font-headline-md text-headline-md text-primary" id="panelDistroTitle">Exponential Distribution Exp(λ)</h2>
+</div>
+<span class="text-xs px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-sm" id="distroClassBadge">Continuous PDF</span>
+</div>
+<!-- Dynamic Sliders Container -->
+<div class="space-y-space-md pt-space-xs" id="dynamicSliders">
+        <div class="space-y-1">
+          <div class="flex items-center justify-between text-xs font-label-md">
+            <span class="">Rate Parameter (λ)</span>
+            <span class="bg-surface-container px-2 py-0.5 rounded text-primary font-bold" id="badgeExpLambda">1.0</span>
+          </div>
+          <input type="range" min="0.2" max="3" step="0.1" value="1" oninput="state.params.exponential.lambda = parseFloat(this.value); document.getElementById('badgeExpLambda').innerText = this.value; updateCalculations(); redrawCanvas();" class="w-full accent-primary cursor-pointer h-1.5 bg-surface-container rounded-lg">
+        </div>
+      </div>
+<!-- Interval Query Calculator -->
+<div class="bg-surface-container-low p-space-md rounded-lg space-y-space-sm mt-space-xs">
+<div class="flex items-center justify-between">
+<label class="font-label-md text-label-md text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary text-[18px]">calculate</span>
+                Area Under Curve / Probability Mass
+              </label>
+<div class="flex items-center gap-1 text-xs">
+<button class="px-2 py-1 rounded bg-primary text-on-primary font-label-sm" id="modeIntervalBtn" onclick="setCalcMode('interval')">Interval $[a, b]$</button>
+<button class="px-2 py-1 rounded bg-surface-container text-on-surface font-label-sm" id="modeLessBtn" onclick="setCalcMode('less')">$P(X \le x)$</button>
+</div>
+</div>
+<!-- Inputs row -->
+<div class="grid grid-cols-2 gap-space-sm" id="intervalInputs">
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Lower limit $(a)$</span>
+<input class="w-full bg-surface-container-lowest px-3 py-1.5 rounded-lg text-on-surface font-code-math text-code-math focus:outline-none focus:ring-2 focus:ring-secondary/30 shadow-sm" id="inputA" oninput="updateCalculations()" step="0.1" type="number" value="-1.0">
+</div>
+<div>
+<span class="font-label-sm text-label-sm text-on-surface-variant block mb-1">Upper limit $(b)$</span>
+<input class="w-full bg-surface-container-lowest px-3 py-1.5 rounded-lg text-on-surface font-code-math text-code-math focus:outline-none focus:ring-2 focus:ring-secondary/30 shadow-sm" id="inputB" oninput="updateCalculations()" step="0.1" type="number" value="1.0">
+</div>
+</div>
+<!-- Real-time Result Pill -->
+<div class="pt-space-xs">
+<div class="bg-surface-container-highest p-3 rounded-lg flex items-center justify-between">
+<span class="font-code-math text-code-math text-primary" id="calcExpressionDisplay">P(0.5 ≤ X ≤ 2.0)</span>
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-headline-md font-bold text-secondary" id="calcResultDisplay">47.12%</span>
+</div>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1.5" id="calcInsightNote">
+                Within $1\sigma$: encapsulates standard empirical rule spread.
+              </p>
+</div>
+</div>
+</div>
+<!-- Moment & Summary Metrics Card -->
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm space-y-space-md">
+<div class="flex items-center justify-between">
+<span class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">analytics</span>
+              Moments &amp; Theoretical Statistics
+            </span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Closed-form values</span>
+</div>
+<div class="grid grid-cols-2 gap-space-sm" id="momentsGrid">
+<div class="bg-surface-container p-3 rounded-lg">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Expectation $\mathbb{E}[X]$</span>
+<div class="flex items-baseline justify-between mt-1">
+<span class="font-headline-md text-headline-md font-bold text-primary" id="metricMean">1.00</span>
+<span class="font-code-math text-xs text-on-surface-variant" id="metricMeanFormula">$\mu$</span>
+</div>
+</div>
+<div class="bg-surface-container p-3 rounded-lg">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Variance $\mathrm{Var}(X)$</span>
+<div class="flex items-baseline justify-between mt-1">
+<span class="font-headline-md text-headline-md font-bold text-primary" id="metricVariance">1.00</span>
+<span class="font-code-math text-xs text-on-surface-variant" id="metricVarFormula">$\sigma^2$</span>
+</div>
+</div>
+<div class="bg-surface-container p-3 rounded-lg">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Standard Dev $\sigma$</span>
+<div class="flex items-baseline justify-between mt-1">
+<span class="font-headline-md text-headline-md font-bold text-secondary" id="metricStdDev">1.00</span>
+<span class="font-code-math text-xs text-on-surface-variant" id="metricStdFormula">$\sqrt{\mathrm{Var}}$</span>
+</div>
+</div>
+<div class="bg-surface-container p-3 rounded-lg">
+<span class="font-label-sm text-label-sm text-on-surface-variant block">Skewness $\gamma_1$</span>
+<div class="flex items-baseline justify-between mt-1">
+<span class="font-headline-md text-headline-md font-bold text-secondary" id="metricSkewness">2.00</span>
+<span class="font-code-math text-xs text-on-surface-variant" id="metricSkewFormula">Invariant: 2.0</span>
+</div>
+</div>
+</div>
+<div class="p-3 bg-surface-container-low rounded-lg flex items-start gap-3">
+<span class="material-symbols-outlined text-primary text-[20px] mt-0.5">functions</span>
+<div class="text-xs space-y-1">
+<span class="font-bold text-on-surface block" id="pdfFormulaTitle">Probability Density Function f(x):</span>
+<span class="font-code-math text-primary block break-all" id="pdfFormulaCode">f(x) = λ · e^(-λ x)   for x ≥ 0</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Interactive Real-Time SVG Plot (7 cols) -->
+<div class="lg:col-span-7 flex flex-col gap-space-md">
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col justify-between h-full min-h-[500px]">
+<!-- Graph Toolbar -->
+<div class="flex flex-wrap items-center justify-between gap-space-sm pb-space-sm border-b border-surface-container-high">
+<div class="flex items-center gap-3">
+<span class="font-headline-md text-headline-md text-primary" id="canvasPlotTitle">Density Curve $f(x)$</span>
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-on-surface-variant">
+<span class="w-3 h-0.5 bg-primary rounded"></span> PDF / PMF
+                </span>
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-on-surface-variant" id="cdfLegendTag">
+<span class="w-3 h-0.5 bg-secondary-container rounded stroke-dashed"></span> CDF $F(x)$
+                </span>
+</div>
+</div>
+<!-- Toggles -->
+<div class="flex items-center gap-2">
+<label class="flex items-center gap-1.5 cursor-pointer font-label-sm text-label-sm text-on-surface">
+<input class="accent-primary rounded cursor-pointer" id="toggleCDF" onchange="redrawCanvas()" type="checkbox">
+<span class="">Show CDF $F(x)$</span>
+</label>
+<label class="flex items-center gap-1.5 cursor-pointer font-label-sm text-label-sm text-on-surface ml-2">
+<input checked="" class="accent-primary rounded cursor-pointer" id="toggleSigmaGrid" onchange="redrawCanvas()" type="checkbox">
+<span class="">$\sigma$ Markers</span>
+</label>
+<button class="p-1 rounded hover:bg-surface-container text-on-surface-variant" onclick="resetPlotView()" title="Reset view">
+<span class="material-symbols-outlined text-[20px]">refresh</span>
+</button>
+</div>
+</div>
+<!-- Dynamic SVG Vector Area -->
+<div class="relative w-full flex-1 py-4 flex items-center justify-center overflow-hidden">
+<svg class="w-full h-80 overflow-visible select-none" id="distroSvg" viewBox="0 0 700 320">
+      <defs>
+        <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#1e40af" stop-opacity="0.35"></stop>
+          <stop offset="100%" stop-color="#1e40af" stop-opacity="0.05"></stop>
+        </linearGradient>
+      </defs>
+    <line x1="50" y1="25" x2="665" y2="25" stroke="#e2e8f0" stroke-dasharray="3,3"></line><line x1="50" y1="88.75" x2="665" y2="88.75" stroke="#e2e8f0" stroke-dasharray="3,3"></line><line x1="50" y1="152.5" x2="665" y2="152.5" stroke="#e2e8f0" stroke-dasharray="3,3"></line><line x1="50" y1="216.25" x2="665" y2="216.25" stroke="#e2e8f0" stroke-dasharray="3,3"></line><line x1="50" y1="280" x2="665" y2="280" stroke="#e2e8f0" stroke-dasharray="3,3"></line><path d="M 101.25 280 L 101.25 139.39516524843498 L 104.325 143.55066612001767 L 107.4 147.58335338050202 L 110.47500000000001 151.49685672063703 L 113.55000000000001 155.2946985575982 L 116.62500000000001 158.98029720540086 L 119.70000000000002 162.55696995161333 L 122.77500000000002 166.02793604313993 L 125.85000000000002 169.39631958376026 L 128.925 172.66515234603355 L 132.00000000000003 175.83737650009869 L 135.07500000000005 178.9158472618259 L 138.15000000000003 181.90333546270372 L 141.22500000000002 184.80253004377448 L 144.30000000000004 187.61604047586266 L 147.37500000000006 190.34639910827477 L 150.45000000000005 192.99606344808467 L 153.52500000000003 195.567418372056 L 156.60000000000005 198.06277827319192 L 159.67500000000007 200.4843891438453 L 162.75000000000006 202.8344305972634 L 165.82500000000005 205.11501782938686 L 168.90000000000006 207.32820352266884 L 171.97500000000008 209.47597969362775 L 175.05000000000007 211.56027948579674 L 178.12500000000009 213.58297890968325 L 181.20000000000007 215.54589853130506 L 184.2750000000001 217.45080511082264 L 187.35000000000008 219.29941319274266 L 190.4250000000001 221.0933866491236 L 193.50000000000009 222.8343401771731 L 196.5750000000001 224.52384075258422 L 199.6500000000001 226.1634090399196 L 202.7250000000001 227.754520761312 L 205.80000000000007 229.2986080247139 L 208.87500000000009 230.79706061289144 L 211.95000000000007 232.25122723432253 L 215.0250000000001 233.66241673712562 L 218.10000000000008 235.0318992871115 L 221.1750000000001 236.36090751101784 L 224.25000000000009 237.650637605957 L 227.3250000000001 238.90225041607383 L 230.4000000000001 240.1168724773838 L 233.4750000000001 241.29559703173152 L 236.5500000000001 242.43948501078222 L 239.6250000000001 243.54956599093182 L 242.7000000000001 244.62683911999517 L 245.77500000000012 245.6722740165065 L 248.8500000000001 246.68681164244163 L 251.92500000000013 247.67136515014732 L 255 280 Z" fill="url(#areaGradient)"></path><path d="M 50 48.18181818181819L 56.15 61.681858123651466L 62.3 74.39571694284078L 68.45 86.3691782637506L 74.6 97.64535948002626L 80.75 108.26486702378358L 86.9 118.26594259262464L 93.05 127.68460086105503L 99.2 136.55475917221284L 105.35000000000001 144.90835967693877L 111.5 152.77548436002115L 117.64999999999999 160.18446336783336L 123.8 167.16197702746112L 129.95 173.73315192469818L 136.1 179.92165138689518L 142.25 185.74976069649748L 148.4 191.2384673421331L 154.55 196.40753659624096L 160.70000000000002 201.27558269140047L 166.84999999999997 205.860135851675L 173 210.17770542035316L 179.15 214.24383931141688L 185.29999999999998 218.0731799988256L 191.45 221.67951724523826L 197.6 225.0758377600536L 203.75 228.27437196559129L 209.9 231.28663803982272L 216.04999999999998 234.12348339425296L 222.2 236.7951237363186L 228.35 239.31117985696892L 234.5 241.68071227590494L 240.65 243.912253869237L 246.8 246.0138405970552L 252.95000000000002 247.99304044156577L 259.1 249.85698066000128L 265.25 251.6123734504451L 271.40000000000003 253.2655401229946L 277.54999999999995 254.82243386330518L 283.69999999999993 256.28866117048904L 289.84999999999997 257.6695020465675L 296 258.96992901018166L 302.15 260.19462500303007L 308.3 261.34800025351745L 314.45 262.43420815834037L 320.59999999999997 263.4571602392014L 326.75 264.42054022851255L 332.9 265.32781733481056L 339.05 266.18225873565495L 345.2 266.98694134299626L 351.35 267.7447628833824L 357.5 268.45845233290424L 363.65 269.13057974445724L 369.8 269.7635655027076L 375.94999999999993 270.35968904009167L 382.09999999999997 270.92109704523483L 388.24999999999994 271.4498111933489L 394.4 271.94773542644697L 400.54999999999995 272.4166628095909L 406.7 272.85828198786226L 412.84999999999997 273.27418326730884L 419 273.665864341764L 425.15 274.03473568616204L 431.3 274.3821256357716L 437.45 274.70928516963755L 443.6 275.0173924154564L 449.75 275.307556892109L 455.90000000000003 275.5808235051264L 462.04999999999995 275.83817630947885L 468.20000000000005 276.0805420532365L 474.34999999999997 276.3087935148632L 480.50000000000006 276.523752646162L 486.65 276.72619353218926L 492.80000000000007 276.91684517879713L 498.95 277.09639413784186L 505.0999999999999 277.26548697951216L 511.25 277.4247326206802L 517.3999999999999 277.57470451766017L 523.55 277.7159427312702L 529.6999999999999 277.848955871635L 535.85 277.9742229297312L 542 278.0921950022726L 548.15 278.2032969161456L 554.3 278.3079287582445L 560.45 278.4064673162168L 566.6 278.4992674353056L 572.75 278.5866632961759L 578.9 278.6689696183256L 585.05 278.74648279341596L 591.1999999999999 278.81948195260156L 597.35 278.888229971704L 603.5 278.9529744178489L 609.65 279.0139484409747L 615.8 279.0713716134245L 621.95 279.12545072064364L 628.1 279.1763805058305L 634.25 279.22434437122257L 640.4 279.2695150385424L 646.55 279.3120551709826L 652.7 279.35211795896873L 658.8499999999999 279.38984767181057L 665 279.42538017722734" fill="none" stroke="#00288e" stroke-width="2.5"></path>
+          <line x1="152.5" y1="280" x2="152.5" y2="194.71885681934748" stroke="#ba1a1a" stroke-width="1.5" stroke-dasharray="4,2"></line>
+          <text x="152.5" y="296" fill="#ba1a1a" font-size="11" font-weight="bold" text-anchor="middle" font-family="Inter">E[X]=1/λ</text>
+        <line x1="50" y1="280" x2="665" y2="280" stroke="#475569" stroke-width="1.5"></line></svg>
+<div class="absolute pointer-events-none hidden bg-inverse-surface text-inverse-on-surface text-xs rounded px-2.5 py-1.5 shadow-lg font-code-math z-20" id="chartTooltip"></div>
+</div>
+<!-- Footnote Demarcation Indicators -->
+<div class="pt-space-sm flex flex-wrap items-center justify-between gap-space-sm bg-surface-container-low p-3 rounded-lg text-xs font-label-sm text-on-surface-variant">
+<div class="flex items-center gap-4">
+<span class="flex items-center gap-1.5">
+<span class="w-2.5 h-2.5 rounded bg-primary-fixed-dim"></span>
+                Shaded Area = Probability $\int_a^b f(x)\,dx$
+              </span>
+<span class="flex items-center gap-1.5">
+<span class="w-2.5 h-0.5 bg-error"></span>
+                $\mu$ (Mean Center)
+              </span>
+</div>
+<div class="flex items-center gap-2 text-primary font-bold">
+<span class="">Domain:</span>
+<span id="domainRangeLabel" class="">[0, +∞)</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Comparison Matrix Section (Toggled or inline view) -->
+<div class="hidden bg-surface-container-lowest p-space-lg rounded-xl shadow-sm mt-space-lg" id="matrixSection">
+<div class="flex items-center justify-between mb-space-md">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary">Distribution Comparison Matrix</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Comprehensive side-by-side analytical cross-reference</p>
+</div>
+<button class="px-3 py-1.5 bg-surface-container hover:bg-surface-container-high rounded-lg text-xs font-label-md" onclick="switchTab('normal')">Return to Workbench</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left font-body-sm text-body-sm">
+<thead class="bg-surface-container text-on-surface font-label-md">
+<tr>
+<th class="p-3">Family / Name</th>
+<th class="p-3">Type</th>
+<th class="p-3">Parameters</th>
+<th class="p-3">PMF / PDF $f(x)$</th>
+<th class="p-3">Mean $\mathbb{E}[X]$</th>
+<th class="p-3">Variance $\mathrm{Var}(X)$</th>
+<th class="p-3">Primary Canonical Application</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-high">
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="p-3 font-bold text-primary">Normal (Gaussian)</td>
+<td class="p-3"><span class="px-2 py-0.5 rounded bg-surface-container-highest text-primary text-xs">Continuous</span></td>
+<td class="p-3 font-code-math">$\mu \in \mathbb{R},\, \sigma &gt; 0$</td>
+<td class="p-3 font-code-math">$\frac{1}{\sigma\sqrt{2\pi}} e^{-(x-\mu)^2 / 2\sigma^2}$</td>
+<td class="p-3 font-code-math">$\mu$</td>
+<td class="p-3 font-code-math">$\sigma^2$</td>
+<td class="p-3 text-on-surface-variant">Central Limit Theorem, physical metrics, residual noise</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="p-3 font-bold text-primary">Binomial</td>
+<td class="p-3"><span class="px-2 py-0.5 rounded bg-secondary-fixed text-on-secondary-fixed text-xs">Discrete</span></td>
+<td class="p-3 font-code-math">$n \in \mathbb{N},\, p \in [0, 1]$</td>
+<td class="p-3 font-code-math">$\binom{n}{k} p^k (1-p)^{n-k}$</td>
+<td class="p-3 font-code-math">$np$</td>
+<td class="p-3 font-code-math">$np(1-p)$</td>
+<td class="p-3 text-on-surface-variant">Repeated independent Bernoulli trials, quality testing, A/B conversion</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="p-3 font-bold text-primary">Poisson</td>
+<td class="p-3"><span class="px-2 py-0.5 rounded bg-secondary-fixed text-on-secondary-fixed text-xs">Discrete</span></td>
+<td class="p-3 font-code-math">$\lambda &gt; 0$</td>
+<td class="p-3 font-code-math">$\frac{\lambda^k e^{-\lambda}}{k!}$</td>
+<td class="p-3 font-code-math">$\lambda$</td>
+<td class="p-3 font-code-math">$\lambda$</td>
+<td class="p-3 text-on-surface-variant">Arrival counting in continuous time, network packets, defect densities</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="p-3 font-bold text-primary">Exponential</td>
+<td class="p-3"><span class="px-2 py-0.5 rounded bg-surface-container-highest text-primary text-xs">Continuous</span></td>
+<td class="p-3 font-code-math">$\lambda &gt; 0$</td>
+<td class="p-3 font-code-math">$\lambda e^{-\lambda x}\; (x \ge 0)$</td>
+<td class="p-3 font-code-math">$\frac{1}{\lambda}$</td>
+<td class="p-3 font-code-math">$\frac{1}{\lambda^2}$</td>
+<td class="p-3 text-on-surface-variant">Waiting times between Poisson events, radioactive decay, component life</td>
+</tr>
+<tr class="hover:bg-surface-container-low transition-colors">
+<td class="p-3 font-bold text-primary">Uniform</td>
+<td class="p-3"><span class="px-2 py-0.5 rounded bg-surface-container-highest text-primary text-xs">Continuous</span></td>
+<td class="p-3 font-code-math">$a &lt; b$</td>
+<td class="p-3 font-code-math">$\frac{1}{b - a}\; (x \in [a, b])$</td>
+<td class="p-3 font-code-math">$\frac{a + b}{2}$</td>
+<td class="p-3 font-code-math">$\frac{(b - a)^2}{12}$</td>
+<td class="p-3 text-on-surface-variant">Pseudo-random generation, baseline non-informative prior modeling</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Deep-Dive Knowledge Cards (Curriculum & Foundation) -->
+<div class="w-full px-gutter-lg pb-space-xl">
+<div class="flex items-center justify-between mb-space-md">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary tracking-tight">Core Theoretical Foundations</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Formal definitions, axioms, and empirical invariants across standard distributions</p>
+</div>
+<span class="font-label-md text-label-md text-secondary hidden sm:inline-flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px]">school</span>
+        Curriculum Reference
+      </span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-space-md">
+<!-- Card 1: Binomial -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+<div class="space-y-space-sm">
+<div class="flex items-center justify-between">
+<span class="px-2 py-0.5 rounded text-xs font-label-sm bg-secondary-fixed text-on-secondary-fixed">Discrete Variable</span>
+<span class="material-symbols-outlined text-secondary">repeat</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary">Binomial Distribution</h3>
+<div class="p-2.5 bg-surface-container-low rounded-lg font-code-math text-xs text-primary">
+            $P(X = k) = \binom{n}{k} p^k (1-p)^{n-k}$
+          </div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Models the total number of successes in $n$ strictly independent trials with constant success probability $p$.
+          </p>
+<div class="space-y-1">
+<span class="text-xs font-bold text-on-surface">Key Assumptions:</span>
+<ul class="text-xs text-on-surface-variant space-y-0.5 list-disc pl-4">
+<li class="">Fixed number of trials $n$</li>
+<li class="">Dichotomous outcomes (success / failure)</li>
+<li class="">Independence between individual draws</li>
+</ul>
+</div>
+</div>
+<div class="pt-space-md mt-space-sm border-t border-surface-container text-xs text-on-surface-variant flex items-center justify-between">
+<span class="">Real-world: A/B Tests, Quality inspection</span>
+<span class="material-symbols-outlined text-[16px] text-primary">arrow_forward</span>
+</div>
+</div>
+<!-- Card 2: Poisson -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+<div class="space-y-space-sm">
+<div class="flex items-center justify-between">
+<span class="px-2 py-0.5 rounded text-xs font-label-sm bg-secondary-fixed text-on-secondary-fixed">Counting Process</span>
+<span class="material-symbols-outlined text-secondary">call_received</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary">Poisson Distribution</h3>
+<div class="p-2.5 bg-surface-container-low rounded-lg font-code-math text-xs text-primary">
+            $P(X = k) = \frac{\lambda^k e^{-\lambda}}{k!}$
+          </div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Expresses the probability of a given count of events occurring in a fixed interval of time or space at an invariant average rate $\lambda$.
+          </p>
+<div class="space-y-1">
+<span class="text-xs font-bold text-on-surface">Poisson Limit Theorem:</span>
+<p class="text-xs text-on-surface-variant">
+              As $n \to \infty$ and $p \to 0$ with $\lambda = np$ holding constant, the Binomial converges to Poisson.
+            </p>
+</div>
+</div>
+<div class="pt-space-md mt-space-sm border-t border-surface-container text-xs text-on-surface-variant flex items-center justify-between">
+<span class="">Real-world: Packet queues, Call centers</span>
+<span class="material-symbols-outlined text-[16px] text-primary">arrow_forward</span>
+</div>
+</div>
+<!-- Card 3: Normal -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+<div class="space-y-space-sm">
+<div class="flex items-center justify-between">
+<span class="px-2 py-0.5 rounded text-xs font-label-sm bg-surface-container-highest text-primary">Continuous Baseline</span>
+<span class="material-symbols-outlined text-secondary">all_inclusive</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary">Normal (Gaussian)</h3>
+<div class="p-2.5 bg-surface-container-low rounded-lg font-code-math text-xs text-primary">
+            $Z = \frac{X - \mu}{\sigma} \sim \mathcal{N}(0, 1)$
+          </div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Governed by the Central Limit Theorem: sums of independent identically distributed variables approach normality regardless of parent distribution.
+          </p>
+<div class="space-y-1">
+<span class="text-xs font-bold text-on-surface">Empirical Rule (68-95-99.7):</span>
+<ul class="text-xs text-on-surface-variant space-y-0.5 list-disc pl-4">
+<li class="">$68.27\%$ lies in $[\mu \pm \sigma]$</li>
+<li class="">$95.45\%$ lies in $[\mu \pm 2\sigma]$</li>
+<li class="">$99.73\%$ lies in $[\mu \pm 3\sigma]$</li>
+</ul>
+</div>
+</div>
+<div class="pt-space-md mt-space-sm border-t border-surface-container text-xs text-on-surface-variant flex items-center justify-between">
+<span class="">Real-world: Measurement error, Biometrics</span>
+<span class="material-symbols-outlined text-[16px] text-primary">arrow_forward</span>
+</div>
+</div>
+<!-- Card 4: Exponential -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow">
+<div class="space-y-space-sm">
+<div class="flex items-center justify-between">
+<span class="px-2 py-0.5 rounded text-xs font-label-sm bg-surface-container-highest text-primary">Survival / Waiting</span>
+<span class="material-symbols-outlined text-secondary">hourglass_top</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary">Exponential Family</h3>
+<div class="p-2.5 bg-surface-container-low rounded-lg font-code-math text-xs text-primary">
+            $P(X &gt; s + t \mid X &gt; s) = P(X &gt; t)$
+          </div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Models waiting times between continuous Poisson events. The unique continuous distribution with the <em>memoryless property</em>.
+          </p>
+<div class="space-y-1">
+<span class="text-xs font-bold text-on-surface">Survival Function:</span>
+<p class="text-xs text-on-surface-variant">
+              $S(t) = P(X &gt; t) = e^{-\lambda t}$. Constant instantaneous hazard rate $\lambda$.
+            </p>
+</div>
+</div>
+<div class="pt-space-md mt-space-sm border-t border-surface-container text-xs text-on-surface-variant flex items-center justify-between">
+<span class="">Real-world: Component MTBF, Decay</span>
+<span class="material-symbols-outlined text-[16px] text-primary">arrow_forward</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Real-World Interactive Scenario Solver -->
+<div class="w-full px-gutter-lg pb-space-xl">
+<div class="bg-surface-container-low rounded-xl p-space-lg shadow-sm">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm mb-space-lg">
+<div>
+<span class="text-xs font-label-sm uppercase tracking-wider text-secondary font-bold">Practical Applications</span>
+<h2 class="font-headline-lg text-headline-lg text-primary tracking-tight">Interactive Scenario Problem Solver</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Step through analytical derivations for standard engineering and operational challenges.</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">psychology</span>
+<span class="font-label-md text-label-md text-on-surface">3 Live Case Presets</span>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-space-md">
+<!-- Scenario 1: Poisson -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between">
+<div class="space-y-space-sm">
+<div class="flex items-center justify-between">
+<span class="text-xs px-2 py-0.5 rounded bg-error-container text-on-error-container font-label-sm">High Reliability Engineering</span>
+<span class="material-symbols-outlined text-error text-[18px]">dns</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary">Cloud Server Outage Risk</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              A datacenter experiences an average of $\lambda = 3.2$ critical outages per month. What is the probability of having <strong>5 or more</strong> failures next month?
+            </p>
+<div class="p-3 bg-surface-container rounded-lg space-y-1.5 font-body-sm text-body-sm">
+<span class="font-label-sm text-label-sm text-primary block">Step-by-step resolution:</span>
+<p class="text-xs text-on-surface-variant font-code-math">
+                $P(X \ge 5) = 1 - \sum_{k=0}^4 \frac{3.2^k e^{-3.2}}{k!}$
+              </p>
+<p class="text-xs text-on-surface-variant font-code-math">
+                $P(X &lt; 5) = e^{-3.2}\left(1 + 3.2 + \frac{3.2^2}{2} + \frac{3.2^3}{6} + \frac{3.2^4}{24}\right) \approx 0.7806$
+              </p>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm border-t border-surface-container flex items-center justify-between">
+<span class="text-xs font-label-sm text-on-surface-variant">Result: $P(X \ge 5)$</span>
+<span class="font-headline-md text-headline-md font-bold text-error">21.94%</span>
+</div>
+</div>
+<!-- Scenario 2: Binomial -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between">
+<div class="space-y-space-sm">
+<div class="flex items-center justify-between">
+<span class="text-xs px-2 py-0.5 rounded bg-surface-container-highest text-primary font-label-sm">Growth &amp; CRO Analytics</span>
+<span class="material-symbols-outlined text-secondary text-[18px]">shopping_cart</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary">E-Commerce Checkout Funnel</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              With a benchmark conversion rate of $p = 8\%$ and a cohort sample of $n = 50$ visitors, what is the exact probability of securing <strong>at least 6 orders</strong>?
+            </p>
+<div class="p-3 bg-surface-container rounded-lg space-y-1.5 font-body-sm text-body-sm">
+<span class="font-label-sm text-label-sm text-primary block">Step-by-step resolution:</span>
+<p class="text-xs text-on-surface-variant font-code-math">
+                $\mathbb{E}[X] = n \cdot p = 50 \cdot 0.08 = 4.0$
+              </p>
+<p class="text-xs text-on-surface-variant font-code-math">
+                $P(X \ge 6) = 1 - \sum_{k=0}^5 \binom{50}{k} 0.08^k (0.92)^{50-k} \approx 0.209$
+              </p>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm border-t border-surface-container flex items-center justify-between">
+<span class="text-xs font-label-sm text-on-surface-variant">Result: $P(X \ge 6)$</span>
+<span class="font-headline-md text-headline-md font-bold text-secondary">20.92%</span>
+</div>
+</div>
+<!-- Scenario 3: Normal -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col justify-between">
+<div class="space-y-space-sm">
+<div class="flex items-center justify-between">
+<span class="text-xs px-2 py-0.5 rounded bg-secondary-fixed text-on-secondary-fixed font-label-sm">Precision Manufacturing</span>
+<span class="material-symbols-outlined text-tertiary-container text-[18px]">precision_manufacturing</span>
+</div>
+<h3 class="font-headline-md text-headline-md text-primary">Shaft Diameter Tolerance</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+              Machined shafts have nominal $\mu = 50.00\text{ mm}$ and $\sigma = 0.05\text{ mm}$. Specification limits are $[49.90, 50.10]\text{ mm}$. What is the defect rate?
+            </p>
+<div class="p-3 bg-surface-container rounded-lg space-y-1.5 font-body-sm text-body-sm">
+<span class="font-label-sm text-label-sm text-primary block">Step-by-step resolution:</span>
+<p class="text-xs text-on-surface-variant font-code-math">
+                $Z_1 = \frac{49.90 - 50}{0.05} = -2.0, \quad Z_2 = \frac{50.10 - 50}{0.05} = +2.0$
+              </p>
+<p class="text-xs text-on-surface-variant font-code-math">
+                $P(\text{In Spec}) = \Phi(2.0) - \Phi(-2.0) = 0.9545$
+              </p>
+</div>
+</div>
+<div class="mt-space-md pt-space-sm border-t border-surface-container flex items-center justify-between">
+<span class="text-xs font-label-sm text-on-surface-variant">Out of Spec Defect $P(|Z| &gt; 2)$</span>
+<span class="font-headline-md text-headline-md font-bold text-primary">4.55%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // State Store
+  const state = {
+    currentTab: 'normal',
+    calcMode: 'interval', // 'interval' | 'less'
+    params: {
+      normal: { mu: 0, sigma: 1 },
+      binomial: { n: 20, p: 0.5 },
+      poisson: { lambda: 4.5 },
+      exponential: { lambda: 1.0 }
+    },
+    interval: {
+      a: -1.0,
+      b: 1.0
+    }
+  };
+
+  // Math helper functions
+  function erf(x) {
+    const a1 =  0.254829592, a2 = -0.284496736, a3 =  1.421413741;
+    const a4 = -1.453152027, a5 =  1.061405429, p  =  0.3275911;
+    const sign = (x < 0) ? -1 : 1;
+    x = Math.abs(x);
+    const t = 1.0 / (1.0 + p * x);
+    const y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+    return sign * y;
+  }
+
+  function normalCdf(x, mu, sigma) {
+    return 0.5 * (1 + erf((x - mu) / (sigma * Math.sqrt(2))));
+  }
+
+  function normalPdf(x, mu, sigma) {
+    return (1 / (sigma * Math.sqrt(2 * Math.PI))) * Math.exp(-0.5 * Math.pow((x - mu) / sigma, 2));
+  }
+
+  function factorial(k) {
+    let res = 1;
+    for (let i = 2; i <= k; i++) res *= i;
+    return res;
+  }
+
+  function combinations(n, k) {
+    if (k < 0 || k > n) return 0;
+    if (k === 0 || k === n) return 1;
+    let c = 1;
+    for (let i = 1; i <= k; i++) {
+      c = c * (n - (k - i)) / i;
+    }
+    return c;
+  }
+
+  function binomialPmf(k, n, p) {
+    if (k < 0 || k > n) return 0;
+    return combinations(n, k) * Math.pow(p, k) * Math.pow(1 - p, n - k);
+  }
+
+  function binomialCdf(k, n, p) {
+    let sum = 0;
+    for (let i = 0; i <= Math.floor(k); i++) {
+      sum += binomialPmf(i, n, p);
+    }
+    return Math.min(1, Math.max(0, sum));
+  }
+
+  function poissonPmf(k, lambda) {
+    if (k < 0) return 0;
+    return (Math.pow(lambda, k) * Math.exp(-lambda)) / factorial(k);
+  }
+
+  function poissonCdf(k, lambda) {
+    let sum = 0;
+    for (let i = 0; i <= Math.floor(k); i++) {
+      sum += poissonPmf(i, lambda);
+    }
+    return Math.min(1, Math.max(0, sum));
+  }
+
+  function expPdf(x, lambda) {
+    return x < 0 ? 0 : lambda * Math.exp(-lambda * x);
+  }
+
+  function expCdf(x, lambda) {
+    return x < 0 ? 0 : 1 - Math.exp(-lambda * x);
+  }
+
+  // Switch distribution tab
+  function switchTab(tabKey) {
+    state.currentTab = tabKey;
+    
+    // Update tab styles
+    document.querySelectorAll('#distroTabs .tab-btn').forEach(btn => {
+      if (btn.getAttribute('data-tab') === tabKey) {
+        btn.classList.add('bg-primary', 'text-on-primary', 'shadow-sm');
+        btn.classList.remove('bg-transparent', 'text-on-surface');
+      } else {
+        btn.classList.remove('bg-primary', 'text-on-primary', 'shadow-sm');
+        btn.classList.add('bg-transparent', 'text-on-surface');
+      }
+    });
+
+    const matrixSection = document.getElementById('matrixSection');
+    const workbench = document.getElementById('interactiveWorkbench');
+
+    if (tabKey === 'matrix') {
+      workbench.classList.add('hidden');
+      matrixSection.classList.remove('hidden');
+      return;
+    } else {
+      workbench.classList.remove('hidden');
+      matrixSection.classList.add('hidden');
+    }
+
+    // Default intervals for selected distro
+    if (tabKey === 'normal') {
+      state.interval = { a: -1.0, b: 1.0 };
+    } else if (tabKey === 'binomial') {
+      state.interval = { a: 8, b: 12 };
+    } else if (tabKey === 'poisson') {
+      state.interval = { a: 2, b: 6 };
+    } else if (tabKey === 'exponential') {
+      state.interval = { a: 0.5, b: 2.0 };
+    }
+
+    document.getElementById('inputA').value = state.interval.a;
+    document.getElementById('inputB').value = state.interval.b;
+
+    renderSliderControls();
+    updateCalculations();
+    redrawCanvas();
+  }
+
+  function renderSliderControls() {
+    const container = document.getElementById('dynamicSliders');
+    const title = document.getElementById('panelDistroTitle');
+    const badge = document.getElementById('distroClassBadge');
+    const pdfFormulaTitle = document.getElementById('pdfFormulaTitle');
+    const pdfFormulaCode = document.getElementById('pdfFormulaCode');
+
+    let html = '';
+
+    if (state.currentTab === 'normal') {
+      title.innerText = 'Normal Distribution N(μ, σ²)';
+      badge.innerText = 'Continuous PDF';
+      pdfFormulaTitle.innerText = 'Probability Density Function f(x):';
+      pdfFormulaCode.innerText = 'f(x) = (1 / (σ √(2π))) · exp(-0.5 · ((x - μ) / σ)²)';
+
+      html = `
+        <div class="space-y-1">
+          <div class="flex items-center justify-between text-xs font-label-md">
+            <span>Mean (μ)</span>
+            <span class="bg-surface-container px-2 py-0.5 rounded text-primary font-bold" id="badgeMu">${state.params.normal.mu.toFixed(1)}</span>
+          </div>
+          <input type="range" min="-4" max="4" step="0.1" value="${state.params.normal.mu}" 
+            oninput="state.params.normal.mu = parseFloat(this.value); document.getElementById('badgeMu').innerText = this.value; updateCalculations(); redrawCanvas();" 
+            class="w-full accent-primary cursor-pointer h-1.5 bg-surface-container rounded-lg" />
+        </div>
+        <div class="space-y-1">
+          <div class="flex items-center justify-between text-xs font-label-md">
+            <span>Standard Deviation (σ)</span>
+            <span class="bg-surface-container px-2 py-0.5 rounded text-primary font-bold" id="badgeSigma">${state.params.normal.sigma.toFixed(1)}</span>
+          </div>
+          <input type="range" min="0.2" max="3" step="0.1" value="${state.params.normal.sigma}" 
+            oninput="state.params.normal.sigma = parseFloat(this.value); document.getElementById('badgeSigma').innerText = this.value; updateCalculations(); redrawCanvas();" 
+            class="w-full accent-primary cursor-pointer h-1.5 bg-surface-container rounded-lg" />
+        </div>
+      `;
+    } else if (state.currentTab === 'binomial') {
+      title.innerText = 'Binomial Distribution B(n, p)';
+      badge.innerText = 'Discrete PMF';
+      pdfFormulaTitle.innerText = 'Probability Mass Function P(X = k):';
+      pdfFormulaCode.innerText = 'P(X = k) = (n choose k) · p^k · (1 - p)^(n - k)';
+
+      html = `
+        <div class="space-y-1">
+          <div class="flex items-center justify-between text-xs font-label-md">
+            <span>Number of Trials (n)</span>
+            <span class="bg-surface-container px-2 py-0.5 rounded text-primary font-bold" id="badgeN">${state.params.binomial.n}</span>
+          </div>
+          <input type="range" min="5" max="40" step="1" value="${state.params.binomial.n}" 
+            oninput="state.params.binomial.n = parseInt(this.value); document.getElementById('badgeN').innerText = this.value; updateCalculations(); redrawCanvas();" 
+            class="w-full accent-primary cursor-pointer h-1.5 bg-surface-container rounded-lg" />
+        </div>
+        <div class="space-y-1">
+          <div class="flex items-center justify-between text-xs font-label-md">
+            <span>Success Probability (p)</span>
+            <span class="bg-surface-container px-2 py-0.5 rounded text-primary font-bold" id="badgeP">${state.params.binomial.p.toFixed(2)}</span>
+          </div>
+          <input type="range" min="0.05" max="0.95" step="0.05" value="${state.params.binomial.p}" 
+            oninput="state.params.binomial.p = parseFloat(this.value); document.getElementById('badgeP').innerText = parseFloat(this.value).toFixed(2); updateCalculations(); redrawCanvas();" 
+            class="w-full accent-primary cursor-pointer h-1.5 bg-surface-container rounded-lg" />
+        </div>
+      `;
+    } else if (state.currentTab === 'poisson') {
+      title.innerText = 'Poisson Distribution Pois(λ)';
+      badge.innerText = 'Discrete PMF';
+      pdfFormulaTitle.innerText = 'Probability Mass Function P(X = k):';
+      pdfFormulaCode.innerText = 'P(X = k) = (λ^k · e^(-λ)) / k!';
+
+      html = `
+        <div class="space-y-1">
+          <div class="flex items-center justify-between text-xs font-label-md">
+            <span>Rate Parameter (λ)</span>
+            <span class="bg-surface-container px-2 py-0.5 rounded text-primary font-bold" id="badgeLambda">${state.params.poisson.lambda.toFixed(1)}</span>
+          </div>
+          <input type="range" min="0.5" max="15" step="0.5" value="${state.params.poisson.lambda}" 
+            oninput="state.params.poisson.lambda = parseFloat(this.value); document.getElementById('badgeLambda').innerText = this.value; updateCalculations(); redrawCanvas();" 
+            class="w-full accent-primary cursor-pointer h-1.5 bg-surface-container rounded-lg" />
+        </div>
+      `;
+    } else if (state.currentTab === 'exponential') {
+      title.innerText = 'Exponential Distribution Exp(λ)';
+      badge.innerText = 'Continuous PDF';
+      pdfFormulaTitle.innerText = 'Probability Density Function f(x):';
+      pdfFormulaCode.innerText = 'f(x) = λ · e^(-λ x)   for x ≥ 0';
+
+      html = `
+        <div class="space-y-1">
+          <div class="flex items-center justify-between text-xs font-label-md">
+            <span>Rate Parameter (λ)</span>
+            <span class="bg-surface-container px-2 py-0.5 rounded text-primary font-bold" id="badgeExpLambda">${state.params.exponential.lambda.toFixed(1)}</span>
+          </div>
+          <input type="range" min="0.2" max="3" step="0.1" value="${state.params.exponential.lambda}" 
+            oninput="state.params.exponential.lambda = parseFloat(this.value); document.getElementById('badgeExpLambda').innerText = this.value; updateCalculations(); redrawCanvas();" 
+            class="w-full accent-primary cursor-pointer h-1.5 bg-surface-container rounded-lg" />
+        </div>
+      `;
+    }
+
+    container.innerHTML = html;
+  }
+
+  function setCalcMode(mode) {
+    state.calcMode = mode;
+    const btnInt = document.getElementById('modeIntervalBtn');
+    const btnLess = document.getElementById('modeLessBtn');
+    const inputsRow = document.getElementById('intervalInputs');
+
+    if (mode === 'interval') {
+      btnInt.classList.add('bg-primary', 'text-on-primary');
+      btnInt.classList.remove('bg-surface-container', 'text-on-surface');
+      btnLess.classList.remove('bg-primary', 'text-on-primary');
+      btnLess.classList.add('bg-surface-container', 'text-on-surface');
+      inputsRow.children[0].classList.remove('opacity-30', 'pointer-events-none');
+    } else {
+      btnLess.classList.add('bg-primary', 'text-on-primary');
+      btnLess.classList.remove('bg-surface-container', 'text-on-surface');
+      btnInt.classList.remove('bg-primary', 'text-on-primary');
+      btnInt.classList.add('bg-surface-container', 'text-on-surface');
+      inputsRow.children[0].classList.add('opacity-30', 'pointer-events-none');
+    }
+    updateCalculations();
+    redrawCanvas();
+  }
+
+  function updateCalculations() {
+    const valA = parseFloat(document.getElementById('inputA').value) || 0;
+    const valB = parseFloat(document.getElementById('inputB').value) || 0;
+    state.interval.a = Math.min(valA, valB);
+    state.interval.b = Math.max(valA, valB);
+
+    let prob = 0;
+    let mean = 0, variance = 0, stdDev = 0, skew = 0;
+    let expr = '';
+
+    if (state.currentTab === 'normal') {
+      const { mu, sigma } = state.params.normal;
+      mean = mu;
+      variance = sigma * sigma;
+      stdDev = sigma;
+      skew = 0;
+
+      if (state.calcMode === 'interval') {
+        prob = normalCdf(state.interval.b, mu, sigma) - normalCdf(state.interval.a, mu, sigma);
+        expr = `P(${state.interval.a.toFixed(1)} ≤ X ≤ ${state.interval.b.toFixed(1)})`;
+      } else {
+        prob = normalCdf(state.interval.b, mu, sigma);
+        expr = `P(X ≤ ${state.interval.b.toFixed(1)})`;
+      }
+      document.getElementById('domainRangeLabel').innerText = '(-∞, +∞)';
+      document.getElementById('metricSkewFormula').innerText = 'Symmetric (0.00)';
+
+    } else if (state.currentTab === 'binomial') {
+      const { n, p } = state.params.binomial;
+      mean = n * p;
+      variance = n * p * (1 - p);
+      stdDev = Math.sqrt(variance);
+      skew = (1 - 2 * p) / Math.sqrt(n * p * (1 - p));
+
+      const aFloor = Math.ceil(state.interval.a);
+      const bFloor = Math.floor(state.interval.b);
+
+      if (state.calcMode === 'interval') {
+        let sum = 0;
+        for (let k = Math.max(0, aFloor); k <= Math.min(n, bFloor); k++) {
+          sum += binomialPmf(k, n, p);
+        }
+        prob = sum;
+        expr = `P(${aFloor} ≤ X ≤ ${bFloor})`;
+      } else {
+        prob = binomialCdf(bFloor, n, p);
+        expr = `P(X ≤ ${bFloor})`;
+      }
+      document.getElementById('domainRangeLabel').innerText = `{0, 1, ..., ${n}}`;
+      document.getElementById('metricSkewFormula').innerText = '(1-2p) / √(np(1-p))';
+
+    } else if (state.currentTab === 'poisson') {
+      const { lambda } = state.params.poisson;
+      mean = lambda;
+      variance = lambda;
+      stdDev = Math.sqrt(lambda);
+      skew = 1 / Math.sqrt(lambda);
+
+      const aFloor = Math.ceil(state.interval.a);
+      const bFloor = Math.floor(state.interval.b);
+
+      if (state.calcMode === 'interval') {
+        let sum = 0;
+        for (let k = Math.max(0, aFloor); k <= bFloor; k++) {
+          sum += poissonPmf(k, lambda);
+        }
+        prob = sum;
+        expr = `P(${aFloor} ≤ X ≤ ${bFloor})`;
+      } else {
+        prob = poissonCdf(bFloor, lambda);
+        expr = `P(X ≤ ${bFloor})`;
+      }
+      document.getElementById('domainRangeLabel').innerText = '{0, 1, 2, ... ∞}';
+      document.getElementById('metricSkewFormula').innerText = '1 / √λ';
+
+    } else if (state.currentTab === 'exponential') {
+      const { lambda } = state.params.exponential;
+      mean = 1 / lambda;
+      variance = 1 / (lambda * lambda);
+      stdDev = 1 / lambda;
+      skew = 2.0;
+
+      if (state.calcMode === 'interval') {
+        const start = Math.max(0, state.interval.a);
+        const end = Math.max(0, state.interval.b);
+        prob = expCdf(end, lambda) - expCdf(start, lambda);
+        expr = `P(${start.toFixed(1)} ≤ X ≤ ${end.toFixed(1)})`;
+      } else {
+        const end = Math.max(0, state.interval.b);
+        prob = expCdf(end, lambda);
+        expr = `P(X ≤ ${end.toFixed(1)})`;
+      }
+      document.getElementById('domainRangeLabel').innerText = '[0, +∞)';
+      document.getElementById('metricSkewFormula').innerText = 'Invariant: 2.0';
+    }
+
+    // Update display values
+    document.getElementById('calcExpressionDisplay').innerText = expr;
+    document.getElementById('calcResultDisplay').innerText = (Math.max(0, Math.min(1, prob)) * 100).toFixed(2) + '%';
+    document.getElementById('metricMean').innerText = mean.toFixed(2);
+    document.getElementById('metricVariance').innerText = variance.toFixed(2);
+    document.getElementById('metricStdDev').innerText = stdDev.toFixed(2);
+    document.getElementById('metricSkewness').innerText = skew.toFixed(2);
+  }
+
+  function resetPlotView() {
+    if (state.currentTab === 'normal') {
+      state.params.normal = { mu: 0, sigma: 1 };
+      state.interval = { a: -1, b: 1 };
+    } else if (state.currentTab === 'binomial') {
+      state.params.binomial = { n: 20, p: 0.5 };
+      state.interval = { a: 8, b: 12 };
+    } else if (state.currentTab === 'poisson') {
+      state.params.poisson = { lambda: 4.5 };
+      state.interval = { a: 2, b: 6 };
+    } else if (state.currentTab === 'exponential') {
+      state.params.exponential = { lambda: 1.0 };
+      state.interval = { a: 0.5, b: 2.0 };
+    }
+    document.getElementById('inputA').value = state.interval.a;
+    document.getElementById('inputB').value = state.interval.b;
+    renderSliderControls();
+    updateCalculations();
+    redrawCanvas();
+  }
+
+  // Visual Chart Renderer (Dynamic High-Fidelity SVG)
+  function redrawCanvas() {
+    const svg = document.getElementById('distroSvg');
+    const width = 700;
+    const height = 320;
+    const padding = { top: 25, right: 35, bottom: 40, left: 50 };
+    const chartW = width - padding.left - padding.right;
+    const chartH = height - padding.top - padding.bottom;
+
+    const showCDF = document.getElementById('toggleCDF').checked;
+    const showSigma = document.getElementById('toggleSigmaGrid').checked;
+
+    let svgInner = '';
+
+    // Generate grid lines
+    svgInner += `
+      <defs>
+        <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#1e40af" stop-opacity="0.35"/>
+          <stop offset="100%" stop-color="#1e40af" stop-opacity="0.05"/>
+        </linearGradient>
+      </defs>
+    `;
+
+    // Draw horizontal grid lines
+    for (let i = 0; i <= 4; i++) {
+      const y = padding.top + (chartH / 4) * i;
+      svgInner += `<line x1="${padding.left}" y1="${y}" x2="${width - padding.right}" y2="${y}" stroke="#e2e8f0" stroke-dasharray="3,3" />`;
+    }
+
+    if (state.currentTab === 'normal') {
+      const { mu, sigma } = state.params.normal;
+      const xMin = mu - 4 * sigma;
+      const xMax = mu + 4 * sigma;
+      const yMax = normalPdf(mu, mu, sigma) * 1.15;
+
+      const scaleX = x => padding.left + ((x - xMin) / (xMax - xMin)) * chartW;
+      const scaleY = y => padding.top + chartH - (y / yMax) * chartH;
+
+      // Shaded Area between a and b
+      const a = state.calcMode === 'less' ? xMin : Math.max(xMin, state.interval.a);
+      const b = Math.min(xMax, state.interval.b);
+
+      if (b > a) {
+        let areaPath = `M ${scaleX(a)} ${scaleY(0)}`;
+        const step = (b - a) / 60;
+        for (let x = a; x <= b; x += step) {
+          areaPath += ` L ${scaleX(x)} ${scaleY(normalPdf(x, mu, sigma))}`;
+        }
+        areaPath += ` L ${scaleX(b)} ${scaleY(0)} Z`;
+        svgInner += `<path d="${areaPath}" fill="url(#areaGradient)" />`;
+      }
+
+      // Continuous PDF curve
+      let curvePath = '';
+      const totalSteps = 120;
+      const dx = (xMax - xMin) / totalSteps;
+      for (let i = 0; i <= totalSteps; i++) {
+        const x = xMin + i * dx;
+        const y = normalPdf(x, mu, sigma);
+        curvePath += (i === 0 ? 'M' : 'L') + ` ${scaleX(x)} ${scaleY(y)}`;
+      }
+      svgInner += `<path d="${curvePath}" fill="none" stroke="#00288e" stroke-width="2.5" />`;
+
+      // Optional CDF overlay
+      if (showCDF) {
+        let cdfPath = '';
+        for (let i = 0; i <= totalSteps; i++) {
+          const x = xMin + i * dx;
+          const y = normalCdf(x, mu, sigma) * (yMax / 1.15); // scaled to match height
+          cdfPath += (i === 0 ? 'M' : 'L') + ` ${scaleX(x)} ${scaleY(y)}`;
+        }
+        svgInner += `<path d="${cdfPath}" fill="none" stroke="#316bf3" stroke-width="2" stroke-dasharray="4,4" />`;
+      }
+
+      // Sigma markers
+      if (showSigma) {
+        [-3, -2, -1, 1, 2, 3].forEach(s => {
+          const markX = mu + s * sigma;
+          svgInner += `
+            <line x1="${scaleX(markX)}" y1="${scaleY(0)}" x2="${scaleX(markX)}" y2="${scaleY(normalPdf(markX, mu, sigma))}" stroke="#94a3b8" stroke-dasharray="2,2" />
+            <text x="${scaleX(markX)}" y="${height - padding.bottom + 16}" fill="#64748b" font-size="11" text-anchor="middle" font-family="Inter">${s > 0 ? '+' : ''}${s}σ</text>
+          `;
+        });
+      }
+
+      // Mean line
+      svgInner += `
+        <line x1="${scaleX(mu)}" y1="${scaleY(0)}" x2="${scaleX(mu)}" y2="${scaleY(normalPdf(mu, mu, sigma))}" stroke="#ba1a1a" stroke-width="1.5" stroke-dasharray="4,2" />
+        <text x="${scaleX(mu)}" y="${height - padding.bottom + 16}" fill="#ba1a1a" font-size="12" font-weight="bold" text-anchor="middle" font-family="Inter">μ</text>
+      `;
+
+      // Base X-axis
+      svgInner += `<line x1="${padding.left}" y1="${scaleY(0)}" x2="${width - padding.right}" y2="${scaleY(0)}" stroke="#475569" stroke-width="1.5" />`;
+
+    } else if (state.currentTab === 'binomial' || state.currentTab === 'poisson') {
+      // Discrete Bars
+      const isBinomial = state.currentTab === 'binomial';
+      const n = isBinomial ? state.params.binomial.n : 30;
+      const kMax = isBinomial ? n : Math.max(16, Math.ceil(state.params.poisson.lambda * 2.2));
+      
+      let pValues = [];
+      let maxP = 0;
+      for (let k = 0; k <= kMax; k++) {
+        const val = isBinomial 
+          ? binomialPmf(k, state.params.binomial.n, state.params.binomial.p)
+          : poissonPmf(k, state.params.poisson.lambda);
+        pValues.push({ k, val });
+        if (val > maxP) maxP = val;
+      }
+
+      const yMax = maxP * 1.25;
+      const scaleX = k => padding.left + (k / kMax) * chartW;
+      const scaleY = y => padding.top + chartH - (y / yMax) * chartH;
+      const barWidth = Math.max(4, (chartW / (kMax + 1)) * 0.7);
+
+      // Render stem bars
+      pValues.forEach(({ k, val }) => {
+        const inSelection = state.calcMode === 'less' 
+          ? k <= state.interval.b
+          : (k >= state.interval.a && k <= state.interval.b);
+
+        const fillColor = inSelection ? '#00288e' : '#cbd5e1';
+        const xPos = scaleX(k) - barWidth / 2;
+        const barH = (val / yMax) * chartH;
+
+        svgInner += `
+          <rect x="${xPos}" y="${scaleY(val)}" width="${barWidth}" height="${barH}" rx="2" fill="${fillColor}" class="transition-all duration-150 hover:opacity-80 cursor-pointer">
+            <title>k=${k}: P(X=k)=${(val * 100).toFixed(2)}%</title>
+          </rect>
+        `;
+
+        if (kMax <= 25 || k % 2 === 0) {
+          svgInner += `<text x="${scaleX(k)}" y="${height - padding.bottom + 16}" fill="#64748b" font-size="10" text-anchor="middle" font-family="Inter">${k}</text>`;
+        }
+      });
+
+      // CDF line overlay for discrete
+      if (showCDF) {
+        let cumSum = 0;
+        let stepPath = `M ${padding.left} ${scaleY(0)}`;
+        pValues.forEach(({ k, val }) => {
+          cumSum += val;
+          const y = (Math.min(1, cumSum) / 1.0) * (maxP / 1.25);
+          stepPath += ` L ${scaleX(k) - barWidth/2} ${scaleY(y)} L ${scaleX(k) + barWidth/2} ${scaleY(y)}`;
+        });
+        svgInner += `<path d="${stepPath}" fill="none" stroke="#316bf3" stroke-width="2" stroke-dasharray="3,3" />`;
+      }
+
+      svgInner += `<line x1="${padding.left}" y1="${scaleY(0)}" x2="${width - padding.right}" y2="${scaleY(0)}" stroke="#475569" stroke-width="1.5" />`;
+
+    } else if (state.currentTab === 'exponential') {
+      const { lambda } = state.params.exponential;
+      const xMax = 6 / lambda;
+      const yMax = lambda * 1.1;
+
+      const scaleX = x => padding.left + (x / xMax) * chartW;
+      const scaleY = y => padding.top + chartH - (y / yMax) * chartH;
+
+      // Area shading
+      const a = state.calcMode === 'less' ? 0 : Math.max(0, state.interval.a);
+      const b = Math.min(xMax, state.interval.b);
+
+      if (b > a) {
+        let areaPath = `M ${scaleX(a)} ${scaleY(0)}`;
+        const step = (b - a) / 50;
+        for (let x = a; x <= b; x += step) {
+          areaPath += ` L ${scaleX(x)} ${scaleY(expPdf(x, lambda))}`;
+        }
+        areaPath += ` L ${scaleX(b)} ${scaleY(0)} Z`;
+        svgInner += `<path d="${areaPath}" fill="url(#areaGradient)" />`;
+      }
+
+      // Smooth decay curve
+      let curvePath = '';
+      const totalSteps = 100;
+      const dx = xMax / totalSteps;
+      for (let i = 0; i <= totalSteps; i++) {
+        const x = i * dx;
+        const y = expPdf(x, lambda);
+        curvePath += (i === 0 ? 'M' : 'L') + ` ${scaleX(x)} ${scaleY(y)}`;
+      }
+      svgInner += `<path d="${curvePath}" fill="none" stroke="#00288e" stroke-width="2.5" />`;
+
+      if (showCDF) {
+        let cdfPath = '';
+        for (let i = 0; i <= totalSteps; i++) {
+          const x = i * dx;
+          const y = expCdf(x, lambda) * (yMax / 1.1);
+          cdfPath += (i === 0 ? 'M' : 'L') + ` ${scaleX(x)} ${scaleY(y)}`;
+        }
+        svgInner += `<path d="${cdfPath}" fill="none" stroke="#316bf3" stroke-width="2" stroke-dasharray="4,4" />`;
+      }
+
+      // Mean line E[X] = 1/lambda
+      const meanX = 1 / lambda;
+      if (meanX <= xMax) {
+        svgInner += `
+          <line x1="${scaleX(meanX)}" y1="${scaleY(0)}" x2="${scaleX(meanX)}" y2="${scaleY(expPdf(meanX, lambda))}" stroke="#ba1a1a" stroke-width="1.5" stroke-dasharray="4,2" />
+          <text x="${scaleX(meanX)}" y="${height - padding.bottom + 16}" fill="#ba1a1a" font-size="11" font-weight="bold" text-anchor="middle" font-family="Inter">E[X]=1/λ</text>
+        `;
+      }
+
+      svgInner += `<line x1="${padding.left}" y1="${scaleY(0)}" x2="${width - padding.right}" y2="${scaleY(0)}" stroke="#475569" stroke-width="1.5" />`;
+    }
+
+    svg.innerHTML = svgInner;
+  }
+
+  // Initialize workbench on mount
+  document.addEventListener('DOMContentLoaded', () => {
+    renderSliderControls();
+    updateCalculations();
+    redrawCanvas();
+  });
+</script></main><footer class="w-full bg-surface-container-low py-space-lg mt-auto shadow-[0_-1px_8px_rgba(0,0,0,0.02)]"><div class="w-full px-gutter-lg flex flex-col md:flex-row items-center justify-between gap-space-md font-body-sm text-body-sm text-on-surface-variant"><div class="flex items-center gap-space-sm"><span class="font-label-md text-label-md text-primary">MathViz</span><span class="">— Academic Computing Laboratory for Probability &amp; Statistics</span></div><div class="flex items-center gap-space-lg"><a class="hover:text-primary transition-colors" data-path="overview-and-guide" href="#">Methodology &amp; References</a><a class="hover:text-primary transition-colors" data-path="cheatsheet-and-proofs" href="#">Notation Index</a><span class="">LaTeX/KaTeX Math Kernel v3.4</span></div></div></footer>
+
+</body></html>
